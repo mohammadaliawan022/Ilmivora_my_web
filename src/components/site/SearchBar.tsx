@@ -9,9 +9,9 @@ export function SearchBar({
   size = "default",
   className,
 }: {
-  defaultValue?: string;
+  defaultValue?: string | undefined;
   size?: "default" | "lg";
-  className?: string;
+  className?: string | undefined;
 }) {
   const [q, setQ] = useState(defaultValue);
   const navigate = useNavigate();
