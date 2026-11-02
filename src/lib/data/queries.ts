@@ -3,8 +3,11 @@ import {
   getExamCategoryCounts,
   getRecentMcqs,
   getSubjectCounts,
+  getSubmissionCounts,
   listMcqs,
+  listSubmissions,
   type McqFilters,
+  type SubmissionStatus,
 } from "./mcq-repo";
 
 export const mcqListQuery = (filters: McqFilters, page: number, pageSize?: number) =>
@@ -22,3 +25,13 @@ export const subjectCountsQuery = () =>
 
 export const examCountsQuery = () =>
   queryOptions({ queryKey: ["mcqs", "exam-counts"], queryFn: getExamCategoryCounts });
+
+export const submissionListQuery = (status: SubmissionStatus, page: number) =>
+  queryOptions({
+    queryKey: ["submissions", "list", status, page],
+    queryFn: () => listSubmissions(status, page),
+    placeholderData: keepPreviousData,
+  });
+
+export const submissionCountsQuery = () =>
+  queryOptions({ queryKey: ["submissions", "counts"], queryFn: getSubmissionCounts });

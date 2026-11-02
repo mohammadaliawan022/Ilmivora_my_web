@@ -69,3 +69,40 @@ export function scoreExam(
   const percentage = total === 0 ? 0 : Math.round((correct / total) * 100);
   return { total, correct, incorrect, unanswered, percentage };
 }
+
+/** Questions shown per page in Practice Mode. */
+export const PRACTICE_PAGE_SIZE = 10;
+
+/** Split a practice set into pages of PRACTICE_PAGE_SIZE questions. */
+export function paginate<T>(items: T[], pageSize = PRACTICE_PAGE_SIZE): T[][] {
+  const pages: T[][] = [];
+  for (let i = 0; i < items.length; i += pageSize) pages.push(items.slice(i, i + pageSize));
+  return pages;
+}
+
+export interface McqDraft {
+  question: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  correct_answer: string;
+  subject: string;
+}
+
+/**
+ * Check a submitted or hand-entered MCQ. Returns a list of problems
+ * (empty when the MCQ is valid). `knownSubjects` is the subject catalogue.
+ */
+export function validateMcqDraft(d: McqDraft, knownSubjects: string[]): string[] {
+  const errors: string[] = [];
+  if (d.question.trim().length < 10) errors.push("Question must be at least 10 characters");
+  const opts = [d.option_a, d.option_b, d.option_c, d.option_d].map((o) => o.trim());
+  if (opts.some((o) => !o)) errors.push("All four options are required");
+  else if (new Set(opts.map((o) => o.toLowerCase())).size < 4)
+    errors.push("Options must all be different");
+  if (!/^[ABCD]$/.test(d.correct_answer)) errors.push("Choose the correct answer (A–D)");
+  if (!knownSubjects.some((s) => s.toLowerCase() === d.subject.trim().toLowerCase()))
+    errors.push("Choose a subject from the list");
+  return errors;
+}
