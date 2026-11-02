@@ -1,13 +1,16 @@
 import {
   Atom,
+  BadgeCheck,
   BookOpen,
   Brain,
   Briefcase,
   Building2,
   Calculator,
+  Camera,
   Code2,
   Cpu,
   Dumbbell,
+  FileText,
   FlaskConical,
   Gavel,
   Globe2,
@@ -19,38 +22,43 @@ import {
   Leaf,
   LineChart,
   Megaphone,
+  MessageSquare,
   Microscope,
   Moon,
   Newspaper,
+  PawPrint,
   PenTool,
   PieChart,
+  Pill,
+  Puzzle,
   Receipt,
   Scale,
   ScrollText,
   Settings2,
+  ShieldCheck,
   Sigma,
   Sprout,
   TreePine,
   Users,
+  Vote,
   Wallet,
   Zap,
   type LucideIcon,
 } from "lucide-react";
+import { DOMAINS, TOP_LEVEL_CATEGORIES, getChildren, getDescendants } from "./categories";
 
-export type SubjectGroup =
-  | "General"
-  | "Sciences"
-  | "Languages"
-  | "Social Sciences"
-  | "Business"
-  | "Engineering"
-  | "Professional";
+/** Field of study (the "domain" column of the owner's catalogue). */
+export type SubjectGroup = string;
 
 export interface Subject {
   name: string;
   slug: string;
   icon: LucideIcon;
   group: SubjectGroup;
+  /** Direct sub-sections. */
+  sectionCount: number;
+  /** All nested sections at any depth. */
+  totalSections: number;
 }
 
 export function slugify(value: string): string {
@@ -62,61 +70,72 @@ export function slugify(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-const RAW: Array<[string, LucideIcon, SubjectGroup]> = [
-  ["General Knowledge", Globe2, "General"],
-  ["Pakistan Studies", Landmark, "General"],
-  ["Pakistan Affairs", ScrollText, "General"],
-  ["Current Affairs", Newspaper, "General"],
-  ["Islamic Studies", Moon, "General"],
-  ["Computer Science", Cpu, "Sciences"],
-  ["Everyday Science", Microscope, "Sciences"],
-  ["Physics", Atom, "Sciences"],
-  ["Chemistry", FlaskConical, "Sciences"],
-  ["Biology", Leaf, "Sciences"],
-  ["Mathematics", Sigma, "Sciences"],
-  ["Statistics", PieChart, "Sciences"],
-  ["English", Languages, "Languages"],
-  ["Urdu", PenTool, "Languages"],
-  ["English Literature", BookOpen, "Languages"],
-  ["Psychology", Brain, "Social Sciences"],
-  ["Sociology", Users, "Social Sciences"],
-  ["Economics", LineChart, "Social Sciences"],
-  ["Political Science", Building2, "Social Sciences"],
-  ["International Relations", Globe2, "Social Sciences"],
-  ["Judiciary and Law", Gavel, "Professional"],
-  ["Pedagogy", GraduationCap, "Professional"],
-  ["Agriculture", Sprout, "Professional"],
-  ["Forestry", TreePine, "Professional"],
-  ["Physical Education", Dumbbell, "Professional"],
-  ["Finance", Wallet, "Business"],
-  ["HRM", Briefcase, "Business"],
-  ["Marketing", Megaphone, "Business"],
-  ["Accounting", Calculator, "Business"],
-  ["Auditing", Receipt, "Business"],
-  ["Electrical Engineering", Zap, "Engineering"],
-  ["Civil Engineering", HardHat, "Engineering"],
-  ["Mechanical Engineering", Settings2, "Engineering"],
-  ["Chemical Engineering", Scale, "Engineering"],
-  ["Software Engineering", Code2, "Engineering"],
-  ["Medical MCQs", HeartPulse, "Professional"],
-];
+const ICONS: Record<string, LucideIcon> = {
+  "general-knowledge": Globe2,
+  "pakistan-studies": Landmark,
+  "pakistan-affairs": ScrollText,
+  "current-affairs": Newspaper,
+  "islamic-studies": Moon,
+  "computer-science": Cpu,
+  "everyday-science": Microscope,
+  physics: Atom,
+  chemistry: FlaskConical,
+  biology: Leaf,
+  mathematics: Sigma,
+  statistics: PieChart,
+  english: Languages,
+  urdu: PenTool,
+  "english-literature": BookOpen,
+  psychology: Brain,
+  sociology: Users,
+  economics: LineChart,
+  "political-science": Building2,
+  "international-relations": Globe2,
+  "judiciary-and-law": Gavel,
+  pedagogy: GraduationCap,
+  agriculture: Sprout,
+  forestry: TreePine,
+  "physical-education": Dumbbell,
+  finance: Wallet,
+  hrm: Briefcase,
+  marketing: Megaphone,
+  accounting: Calculator,
+  auditing: Receipt,
+  "electrical-engineering": Zap,
+  "civil-engineering": HardHat,
+  "mechanical-engineering": Settings2,
+  "chemical-engineering": Scale,
+  "software-engineering": Code2,
+  medical: HeartPulse,
+  "asf-act-1975-mcqs": ShieldCheck,
+  "botany-mcqs": Leaf,
+  "business-communication-mcqs": MessageSquare,
+  "business-maths-mcqs": Calculator,
+  "computer-science-theory": Cpu,
+  "election-officer-mcqs": Vote,
+  "intelligence-test-mcqs": Puzzle,
+  "management-mcqs": Briefcase,
+  "pakistan-current-affairs-mcqs": Newspaper,
+  "past-papers": FileText,
+  "pharmaceutical-chemistry-mcqs": Pill,
+  philosophy: Brain,
+  "photography-mcqs": Camera,
+  "reasoning-mcqs": Puzzle,
+  "senior-auditor-mcqs": BadgeCheck,
+  "world-current-affairs-mcqs": Globe2,
+  "zoology-mcqs": PawPrint,
+};
 
-export const SUBJECTS: Subject[] = RAW.map(([name, icon, group]) => ({
-  name,
-  slug: slugify(name),
-  icon,
-  group,
+export const SUBJECTS: Subject[] = TOP_LEVEL_CATEGORIES.map((c) => ({
+  name: c.name,
+  slug: c.slug,
+  icon: ICONS[c.slug] ?? BookOpen,
+  group: c.domain,
+  sectionCount: getChildren(c.name).length,
+  totalSections: getDescendants(c.name).length,
 }));
 
-export const SUBJECT_GROUPS: SubjectGroup[] = [
-  "General",
-  "Sciences",
-  "Languages",
-  "Social Sciences",
-  "Business",
-  "Engineering",
-  "Professional",
-];
+export const SUBJECT_GROUPS: SubjectGroup[] = DOMAINS;
 
 export const POPULAR_SUBJECT_SLUGS = [
   "general-knowledge",
@@ -130,6 +149,7 @@ export const POPULAR_SUBJECT_SLUGS = [
 ];
 
 export const GK_SUBJECT = "General Knowledge";
+export const GK_DOMAIN = "General Knowledge & Affairs";
 
 export function getSubjectBySlug(slug: string): Subject | undefined {
   return SUBJECTS.find((s) => s.slug === slug);
