@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ExamRouteImport } from './routes/exam'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as GeneralKnowledgeIndexRouteImport } from './routes/general-knowledge.index'
@@ -23,9 +25,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExamRoute = ExamRouteImport.update({
   id: '/exam',
   path: '/exam',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeRoute = PracticeRouteImport.update({
@@ -61,7 +73,9 @@ const SubjectsSlugRoute = SubjectsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
+  '/login': typeof LoginRoute
   '/practice': typeof PracticeRoute
   '/search': typeof SearchRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
@@ -71,7 +85,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
+  '/login': typeof LoginRoute
   '/practice': typeof PracticeRoute
   '/search': typeof SearchRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
@@ -82,7 +98,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
+  '/login': typeof LoginRoute
   '/practice': typeof PracticeRoute
   '/search': typeof SearchRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
@@ -94,7 +112,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
     | '/exam'
+    | '/login'
     | '/practice'
     | '/search'
     | '/general-knowledge/$topic'
@@ -104,7 +124,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dashboard'
     | '/exam'
+    | '/login'
     | '/practice'
     | '/search'
     | '/general-knowledge/$topic'
@@ -114,7 +136,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
     | '/exam'
+    | '/login'
     | '/practice'
     | '/search'
     | '/general-knowledge/$topic'
@@ -125,7 +149,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
   ExamRoute: typeof ExamRoute
+  LoginRoute: typeof LoginRoute
   PracticeRoute: typeof PracticeRoute
   SearchRoute: typeof SearchRoute
   GeneralKnowledgeTopicRoute: typeof GeneralKnowledgeTopicRoute
@@ -143,11 +169,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/exam': {
       id: '/exam'
       path: '/exam'
       fullPath: '/exam'
       preLoaderRoute: typeof ExamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/practice': {
@@ -197,7 +237,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
   ExamRoute: ExamRoute,
+  LoginRoute: LoginRoute,
   PracticeRoute: PracticeRoute,
   SearchRoute: SearchRoute,
   GeneralKnowledgeTopicRoute: GeneralKnowledgeTopicRoute,
