@@ -10,7 +10,7 @@ export function Footer() {
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-navy-foreground/70">
             MCQ preparation for PPSC, FPSC, NTS and other competitive examinations in Pakistan.
           </p>
-          <p className="mt-6 font-urdu text-lg text-navy-foreground/50" dir="rtl" lang="ur">
+          <p className="mt-6 text-left font-urdu text-lg text-navy-foreground/50" dir="rtl" lang="ur">
             علم ہی طاقت ہے
           </p>
         </div>

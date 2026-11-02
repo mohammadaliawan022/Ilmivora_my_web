@@ -27,7 +27,6 @@ import {
   Receipt,
   Scale,
   ScrollText,
-  Search,
   Settings2,
   Sigma,
   Sprout,
@@ -140,5 +139,3 @@ export function getSubjectByName(name: string): Subject | undefined {
   const n = name.trim().toLowerCase();
   return SUBJECTS.find((s) => s.name.toLowerCase() === n);
 }
-
-export const SearchIcon = Search;
