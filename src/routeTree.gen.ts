@@ -10,12 +10,42 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExamRouteImport } from './routes/exam'
+import { Route as PracticeRouteImport } from './routes/practice'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as GeneralKnowledgeIndexRouteImport } from './routes/general-knowledge.index'
+import { Route as GeneralKnowledgeTopicRouteImport } from './routes/general-knowledge.$topic'
 import { Route as SubjectsIndexRouteImport } from './routes/subjects.index'
 import { Route as SubjectsSlugRouteImport } from './routes/subjects.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExamRoute = ExamRouteImport.update({
+  id: '/exam',
+  path: '/exam',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PracticeRoute = PracticeRouteImport.update({
+  id: '/practice',
+  path: '/practice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GeneralKnowledgeIndexRoute = GeneralKnowledgeIndexRouteImport.update({
+  id: '/general-knowledge/',
+  path: '/general-knowledge/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GeneralKnowledgeTopicRoute = GeneralKnowledgeTopicRouteImport.update({
+  id: '/general-knowledge/$topic',
+  path: '/general-knowledge/$topic',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SubjectsIndexRoute = SubjectsIndexRouteImport.update({
@@ -31,31 +61,76 @@ const SubjectsSlugRoute = SubjectsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/exam': typeof ExamRoute
+  '/practice': typeof PracticeRoute
+  '/search': typeof SearchRoute
+  '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
   '/subjects/$slug': typeof SubjectsSlugRoute
+  '/general-knowledge/': typeof GeneralKnowledgeIndexRoute
   '/subjects/': typeof SubjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/exam': typeof ExamRoute
+  '/practice': typeof PracticeRoute
+  '/search': typeof SearchRoute
+  '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
   '/subjects/$slug': typeof SubjectsSlugRoute
+  '/general-knowledge': typeof GeneralKnowledgeIndexRoute
   '/subjects': typeof SubjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/exam': typeof ExamRoute
+  '/practice': typeof PracticeRoute
+  '/search': typeof SearchRoute
+  '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
   '/subjects/$slug': typeof SubjectsSlugRoute
+  '/general-knowledge/': typeof GeneralKnowledgeIndexRoute
   '/subjects/': typeof SubjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/subjects/$slug' | '/subjects/'
+  fullPaths:
+    | '/'
+    | '/exam'
+    | '/practice'
+    | '/search'
+    | '/general-knowledge/$topic'
+    | '/subjects/$slug'
+    | '/general-knowledge/'
+    | '/subjects/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/subjects/$slug' | '/subjects'
-  id: '__root__' | '/' | '/subjects/$slug' | '/subjects/'
+  to:
+    | '/'
+    | '/exam'
+    | '/practice'
+    | '/search'
+    | '/general-knowledge/$topic'
+    | '/subjects/$slug'
+    | '/general-knowledge'
+    | '/subjects'
+  id:
+    | '__root__'
+    | '/'
+    | '/exam'
+    | '/practice'
+    | '/search'
+    | '/general-knowledge/$topic'
+    | '/subjects/$slug'
+    | '/general-knowledge/'
+    | '/subjects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ExamRoute: typeof ExamRoute
+  PracticeRoute: typeof PracticeRoute
+  SearchRoute: typeof SearchRoute
+  GeneralKnowledgeTopicRoute: typeof GeneralKnowledgeTopicRoute
   SubjectsSlugRoute: typeof SubjectsSlugRoute
+  GeneralKnowledgeIndexRoute: typeof GeneralKnowledgeIndexRoute
   SubjectsIndexRoute: typeof SubjectsIndexRoute
 }
 
@@ -66,6 +141,41 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exam': {
+      id: '/exam'
+      path: '/exam'
+      fullPath: '/exam'
+      preLoaderRoute: typeof ExamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/practice': {
+      id: '/practice'
+      path: '/practice'
+      fullPath: '/practice'
+      preLoaderRoute: typeof PracticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/general-knowledge/': {
+      id: '/general-knowledge/'
+      path: '/general-knowledge'
+      fullPath: '/general-knowledge/'
+      preLoaderRoute: typeof GeneralKnowledgeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/general-knowledge/$topic': {
+      id: '/general-knowledge/$topic'
+      path: '/general-knowledge/$topic'
+      fullPath: '/general-knowledge/$topic'
+      preLoaderRoute: typeof GeneralKnowledgeTopicRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/subjects/': {
@@ -87,7 +197,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ExamRoute: ExamRoute,
+  PracticeRoute: PracticeRoute,
+  SearchRoute: SearchRoute,
+  GeneralKnowledgeTopicRoute: GeneralKnowledgeTopicRoute,
   SubjectsSlugRoute: SubjectsSlugRoute,
+  GeneralKnowledgeIndexRoute: GeneralKnowledgeIndexRoute,
   SubjectsIndexRoute: SubjectsIndexRoute,
 }
 export const routeTree = rootRouteImport
