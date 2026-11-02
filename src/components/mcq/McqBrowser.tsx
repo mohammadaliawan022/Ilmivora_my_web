@@ -20,7 +20,7 @@ export function McqBrowser({
 }: {
   filters: McqFilters;
   page: number;
-  search?: string;
+  search?: string | undefined;
   onPageChange: (page: number) => void;
   onSearchChange?: (q: string | undefined) => void;
   emptyMessage?: string;

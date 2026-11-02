@@ -9,10 +9,10 @@ import { SAMPLE_MCQS } from "./sample-mcqs";
 export const DEFAULT_PAGE_SIZE = 10;
 
 export interface McqFilters {
-  subject?: string;
-  topic?: string;
-  examCategory?: string;
-  search?: string;
+  subject?: string | undefined;
+  topic?: string | undefined;
+  examCategory?: string | undefined;
+  search?: string | undefined;
 }
 
 export interface McqPage {
@@ -75,7 +75,9 @@ export async function getQuizQuestions(filters: McqFilters, count: number): Prom
   const shuffled = [...rows];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    const tmp = shuffled[i]!;
+    shuffled[i] = shuffled[j]!;
+    shuffled[j] = tmp;
   }
   return shuffled.slice(0, count);
 }

@@ -2,15 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/site/PageHeader";
 import { QuizLauncher } from "@/components/mcq/QuizLauncher";
 
-type Search = { subject?: string; topic?: string; exam?: string };
+type Search = { subject?: string | undefined; topic?: string | undefined; exam?: string };
 
 const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
 
 export const Route = createFileRoute("/practice")({
   validateSearch: (s: Record<string, unknown>): Search => ({
-    subject: str(s.subject),
-    topic: str(s.topic),
-    exam: str(s.exam),
+    subject: str(s["subject"]),
+    topic: str(s["topic"]),
+    exam: str(s["exam"]),
   }),
   head: () => ({
     meta: [

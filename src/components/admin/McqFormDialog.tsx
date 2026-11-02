@@ -24,7 +24,7 @@ const EMPTY: McqInput = {
   option_d: "",
   correct_answer: "A",
   explanation: "",
-  subject: SUBJECTS[0].name,
+  subject: SUBJECTS[0]!.name,
   exam_category: "PPSC",
   topic: null,
 };

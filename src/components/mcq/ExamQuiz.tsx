@@ -34,7 +34,7 @@ export function ExamQuiz({
 }: {
   mcqs: Mcq[];
   label: string;
-  topic?: string | null;
+  topic?: string | null | undefined;
   onRestart: () => void;
 }) {
   const [index, setIndex] = useState(0);
@@ -45,7 +45,7 @@ export function ExamQuiz({
   const [finished, setFinished] = useState(false);
   const startedAt = useRef(Date.now());
 
-  const mcq = mcqs[index];
+  const mcq = mcqs[Math.min(index, mcqs.length - 1)]!;
   const remaining = timeLeft[mcq.id] ?? 0;
   const expired = remaining <= 0;
   const score = useMemo(() => scoreExam(mcqs, answers), [mcqs, answers]);

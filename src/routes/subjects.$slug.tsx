@@ -5,12 +5,12 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { getSubjectBySlug } from "@/lib/subjects";
 
-type Search = { page?: number; q?: string };
+type Search = { page?: number | undefined; q?: string };
 
 export const Route = createFileRoute("/subjects/$slug")({
   validateSearch: (s: Record<string, unknown>): Search => ({
-    page: Number(s.page) > 1 ? Math.floor(Number(s.page)) : undefined,
-    q: typeof s.q === "string" && s.q ? s.q : undefined,
+    page: Number(s["page"]) > 1 ? Math.floor(Number(s["page"])) : undefined,
+    q: typeof s["q"] === "string" && s["q"] ? s["q"] : undefined,
   }),
   loader: ({ params }) => {
     const subject = getSubjectBySlug(params.slug);

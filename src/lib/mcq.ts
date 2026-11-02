@@ -34,7 +34,7 @@ export function getCorrectLetter(mcq: Mcq): OptionLetter | null {
   const raw = (mcq.correct_answer ?? "").trim();
   if (!raw) return null;
   const letterMatch = raw.match(/^(?:option\s*)?\(?([a-d])\)?[.)]?$/i);
-  if (letterMatch) return letterMatch[1].toUpperCase() as OptionLetter;
+  if (letterMatch) return letterMatch[1]!.toUpperCase() as OptionLetter;
   const lower = raw.toLowerCase();
   const found = getOptions(mcq).find((o) => o.text.trim().toLowerCase() === lower);
   return found ? found.letter : null;

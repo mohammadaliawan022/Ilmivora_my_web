@@ -232,7 +232,7 @@ function FeaturedGroups() {
       <SectionHead eyebrow="Featured categories" title="Explore by field of study" />
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         {SUBJECT_GROUPS.filter((g) => g !== "General").map((g, i) => {
-          const subjects = SUBJECTS.filter((s) => s.group === g);
+          const subjects = SUBJECTS.filter((s) => s["group"] === g);
           return (
             <Link
               key={g}

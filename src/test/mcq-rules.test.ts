@@ -64,7 +64,7 @@ describe("CSV import", () => {
       "Bad,1,2,3,4,E,Mathematics\n";
     const r = csvToMcqs(csv);
     expect(r.rows).toHaveLength(1);
-    expect(r.rows[0].question).toBe("Capital, of Pakistan?");
+    expect(r.rows[0]?.question).toBe("Capital, of Pakistan?");
     expect(r.errors).toEqual([{ line: 3, message: "correct_answer must be A–D or match an option" }]);
   });
   it("reports missing required columns", () => {

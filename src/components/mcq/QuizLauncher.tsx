@@ -21,9 +21,9 @@ export function QuizLauncher({
   initialExam,
 }: {
   mode: "practice" | "exam";
-  initialSubject?: string;
-  initialTopic?: string;
-  initialExam?: string;
+  initialSubject?: string | undefined;
+  initialTopic?: string | undefined;
+  initialExam?: string | undefined;
 }) {
   const [subject, setSubject] = useState(initialSubject ?? ALL);
   const [exam, setExam] = useState(initialExam ?? ALL);

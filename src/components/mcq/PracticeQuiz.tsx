@@ -16,7 +16,7 @@ export function PracticeQuiz({
 }: {
   mcqs: Mcq[];
   label: string;
-  topic?: string | null;
+  topic?: string | null | undefined;
   onRestart: () => void;
 }) {
   const [index, setIndex] = useState(0);
@@ -24,9 +24,9 @@ export function PracticeQuiz({
   const [finished, setFinished] = useState(false);
   const startedAt = useRef(Date.now());
 
-  const mcq = mcqs[index];
-  const chosen = answers[mcq?.id];
-  const correct = mcq ? getCorrectLetter(mcq) : null;
+  const mcq = mcqs[Math.min(index, mcqs.length - 1)]!;
+  const chosen = answers[mcq.id];
+  const correct = getCorrectLetter(mcq);
   const answeredCount = Object.values(answers).filter(Boolean).length;
   const score = useMemo(() => scoreExam(mcqs, answers), [mcqs, answers]);
 

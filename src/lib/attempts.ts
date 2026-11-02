@@ -6,7 +6,7 @@ export interface TestAttempt {
   id: string;
   mode: "practice" | "exam";
   subject: string;
-  topic?: string | null;
+  topic?: string | null | undefined;
   total: number;
   correct: number;
   incorrect: number;

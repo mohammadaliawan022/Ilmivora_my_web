@@ -6,14 +6,14 @@ import { EXAM_CATEGORIES } from "@/lib/exam-categories";
 import { SUBJECTS } from "@/lib/subjects";
 import { cn } from "@/lib/utils";
 
-type Search = { q?: string; exam?: string; subject?: string; page?: number };
+type Search = { q?: string | undefined; exam?: string | undefined; subject?: string | undefined; page?: number };
 
 export const Route = createFileRoute("/search")({
   validateSearch: (s: Record<string, unknown>): Search => ({
-    q: typeof s.q === "string" && s.q ? s.q : undefined,
-    exam: typeof s.exam === "string" && s.exam ? s.exam : undefined,
-    subject: typeof s.subject === "string" && s.subject ? s.subject : undefined,
-    page: Number(s.page) > 1 ? Math.floor(Number(s.page)) : undefined,
+    q: typeof s["q"] === "string" && s["q"] ? s["q"] : undefined,
+    exam: typeof s["exam"] === "string" && s["exam"] ? s["exam"] : undefined,
+    subject: typeof s["subject"] === "string" && s["subject"] ? s["subject"] : undefined,
+    page: Number(s["page"]) > 1 ? Math.floor(Number(s["page"])) : undefined,
   }),
   head: () => ({
     meta: [

@@ -9,7 +9,7 @@ export function InfoPage({
 }: {
   eyebrow: string;
   title: string;
-  description?: string;
+  description?: string | undefined;
   children: ReactNode;
 }) {
   return (

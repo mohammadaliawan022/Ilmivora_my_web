@@ -57,7 +57,7 @@ export interface CsvImportResult {
 export function csvToMcqs(text: string): CsvImportResult {
   const table = parseCsv(text);
   if (table.length === 0) return { rows: [], errors: [], missingColumns: [...REQUIRED_CSV_COLUMNS] };
-  const header = table[0].map((h) => h.trim().toLowerCase());
+  const header = table[0]!.map((h) => h.trim().toLowerCase());
   const missingColumns = REQUIRED_CSV_COLUMNS.filter((c) => !header.includes(c));
   if (missingColumns.length) return { rows: [], errors: [], missingColumns };
 

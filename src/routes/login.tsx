@@ -12,7 +12,7 @@ type Search = { tab?: "login" | "signup" };
 
 export const Route = createFileRoute("/login")({
   validateSearch: (s: Record<string, unknown>): Search => ({
-    tab: s.tab === "signup" ? "signup" : undefined,
+    tab: s["tab"] === "signup" ? "signup" : undefined,
   }),
   head: () => ({
     meta: [

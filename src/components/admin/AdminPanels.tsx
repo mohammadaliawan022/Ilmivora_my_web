@@ -183,7 +183,7 @@ export function AdminPastPapers({
   onChange: (next: PastPaper[]) => void;
 }) {
   const [title, setTitle] = useState("");
-  const [exam, setExam] = useState(EXAM_CATEGORIES[0].code);
+  const [exam, setExam] = useState(EXAM_CATEGORIES[0]!.code);
   const [year, setYear] = useState(String(new Date().getFullYear()));
   const [url, setUrl] = useState("");
 
@@ -264,7 +264,7 @@ export function AdminAnalytics() {
         <Stat icon={Users} label="Tests taken" value={s.totalTests} />
         <Stat icon={BookMarked} label="Questions answered" value={s.totalQuestions} />
         <Stat icon={Layers} label="Average score" value={`${s.averageScore}%`} />
-        <Stat icon={FileText} label="Exam-mode tests" value={modeData[1].value} />
+        <Stat icon={FileText} label="Exam-mode tests" value={modeData[1]?.value ?? 0} />
       </div>
       <section className="card-surface p-6">
         <h3 className="font-bold">Average score by subject</h3>
