@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Logo } from "@/components/site/Logo";
 
-type Search = { tab?: "login" | "signup" };
+type Search = { tab?: "login" | "signup" | undefined };
 
 export const Route = createFileRoute("/login")({
   validateSearch: (s: Record<string, unknown>): Search => ({

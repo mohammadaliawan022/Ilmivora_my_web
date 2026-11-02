@@ -6,7 +6,7 @@ import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { GK_CATEGORY_TARGET_COUNT, getGkCategories } from "@/lib/gk-categories";
 import { GK_SUBJECT } from "@/lib/subjects";
 
-type Search = { page?: number | undefined; q?: string };
+type Search = { page?: number | undefined; q?: string | undefined };
 
 export const Route = createFileRoute("/general-knowledge/")({
   validateSearch: (s: Record<string, unknown>): Search => ({

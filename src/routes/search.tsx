@@ -6,7 +6,7 @@ import { EXAM_CATEGORIES } from "@/lib/exam-categories";
 import { SUBJECTS } from "@/lib/subjects";
 import { cn } from "@/lib/utils";
 
-type Search = { q?: string | undefined; exam?: string | undefined; subject?: string | undefined; page?: number };
+type Search = { q?: string | undefined; exam?: string | undefined; subject?: string | undefined; page?: number | undefined };
 
 export const Route = createFileRoute("/search")({
   validateSearch: (s: Record<string, unknown>): Search => ({

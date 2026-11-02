@@ -112,9 +112,9 @@ function DashboardPage() {
             <h2 className="text-lg font-bold">Subject-wise performance</h2>
             <ul className="mt-5 space-y-4">
               {summary.bySubject.slice(0, 8).map((s) => (
-                <li key={s["subject"]}>
+                <li key={s.subject}>
                   <div className="mb-1.5 flex justify-between text-sm">
-                    <span className="font-medium">{s["subject"]}</span>
+                    <span className="font-medium">{s.subject}</span>
                     <span className="text-muted-foreground">
                       {s.average}% · {s.tests} test{s.tests === 1 ? "" : "s"}
                     </span>

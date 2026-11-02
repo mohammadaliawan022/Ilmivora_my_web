@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { QuizLauncher } from "@/components/mcq/QuizLauncher";
 import { EXAM_SECONDS_PER_QUESTION } from "@/lib/mcq";
 
-type Search = { subject?: string | undefined; topic?: string | undefined; exam?: string };
+type Search = { subject?: string | undefined; topic?: string | undefined; exam?: string | undefined };
 
 const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
 

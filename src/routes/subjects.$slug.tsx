@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { getSubjectBySlug } from "@/lib/subjects";
 
-type Search = { page?: number | undefined; q?: string };
+type Search = { page?: number | undefined; q?: string | undefined };
 
 export const Route = createFileRoute("/subjects/$slug")({
   validateSearch: (s: Record<string, unknown>): Search => ({

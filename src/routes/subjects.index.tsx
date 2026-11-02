@@ -7,7 +7,7 @@ import { subjectCountsQuery } from "@/lib/data/queries";
 import { SUBJECT_GROUPS, SUBJECTS, type SubjectGroup } from "@/lib/subjects";
 import { cn } from "@/lib/utils";
 
-type Search = { group?: SubjectGroup };
+type Search = { group?: SubjectGroup | undefined };
 
 export const Route = createFileRoute("/subjects/")({
   validateSearch: (s: Record<string, unknown>): Search => ({
@@ -36,7 +36,7 @@ function SubjectsPage() {
 
   const visible = useMemo(() => {
     const f = filter.trim().toLowerCase();
-    return SUBJECTS.filter((s) => (!group || s["group"] === group) && (!f || s.name.toLowerCase().includes(f)));
+    return SUBJECTS.filter((s) => (!group || s.group === group) && (!f || s.name.toLowerCase().includes(f)));
   }, [group, filter]);
 
   return (
@@ -81,7 +81,7 @@ function SubjectsPage() {
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-semibold">{s.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  {counts ? `${(counts[s.name] ?? 0).toLocaleString()} MCQs` : s["group"]}
+                  {counts ? `${(counts[s.name] ?? 0).toLocaleString()} MCQs` : s.group}
                 </span>
               </span>
               <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />

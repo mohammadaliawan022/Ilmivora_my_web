@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/site/PageHeader";
 import { QuizLauncher } from "@/components/mcq/QuizLauncher";
 
-type Search = { subject?: string | undefined; topic?: string | undefined; exam?: string };
+type Search = { subject?: string | undefined; topic?: string | undefined; exam?: string | undefined };
 
 const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
 
