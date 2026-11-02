@@ -10,11 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PracticeRouteImport } from './routes/practice'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as GeneralKnowledgeIndexRouteImport } from './routes/general-knowledge.index'
 import { Route as GeneralKnowledgeTopicRouteImport } from './routes/general-knowledge.$topic'
 import { Route as SubjectsIndexRouteImport } from './routes/subjects.index'
@@ -23,6 +28,21 @@ import { Route as SubjectsSlugRouteImport } from './routes/subjects.$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -45,9 +65,19 @@ const PracticeRoute = PracticeRouteImport.update({
   path: '/practice',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GeneralKnowledgeIndexRoute = GeneralKnowledgeIndexRouteImport.update({
@@ -73,11 +103,16 @@ const SubjectsSlugRoute = SubjectsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRoute
+  '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
   '/subjects/$slug': typeof SubjectsSlugRoute
   '/general-knowledge/': typeof GeneralKnowledgeIndexRoute
@@ -85,11 +120,16 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRoute
+  '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
   '/subjects/$slug': typeof SubjectsSlugRoute
   '/general-knowledge': typeof GeneralKnowledgeIndexRoute
@@ -98,11 +138,16 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRoute
+  '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
   '/subjects/$slug': typeof SubjectsSlugRoute
   '/general-knowledge/': typeof GeneralKnowledgeIndexRoute
@@ -112,11 +157,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/admin'
+    | '/contact'
     | '/dashboard'
     | '/exam'
     | '/login'
     | '/practice'
+    | '/privacy'
     | '/search'
+    | '/terms'
     | '/general-knowledge/$topic'
     | '/subjects/$slug'
     | '/general-knowledge/'
@@ -124,11 +174,16 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/admin'
+    | '/contact'
     | '/dashboard'
     | '/exam'
     | '/login'
     | '/practice'
+    | '/privacy'
     | '/search'
+    | '/terms'
     | '/general-knowledge/$topic'
     | '/subjects/$slug'
     | '/general-knowledge'
@@ -136,11 +191,16 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/admin'
+    | '/contact'
     | '/dashboard'
     | '/exam'
     | '/login'
     | '/practice'
+    | '/privacy'
     | '/search'
+    | '/terms'
     | '/general-knowledge/$topic'
     | '/subjects/$slug'
     | '/general-knowledge/'
@@ -149,11 +209,16 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRoute
+  ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   ExamRoute: typeof ExamRoute
   LoginRoute: typeof LoginRoute
   PracticeRoute: typeof PracticeRoute
+  PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
+  TermsRoute: typeof TermsRoute
   GeneralKnowledgeTopicRoute: typeof GeneralKnowledgeTopicRoute
   SubjectsSlugRoute: typeof SubjectsSlugRoute
   GeneralKnowledgeIndexRoute: typeof GeneralKnowledgeIndexRoute
@@ -167,6 +232,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -197,11 +283,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/general-knowledge/': {
@@ -237,11 +337,16 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AdminRoute: AdminRoute,
+  ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   ExamRoute: ExamRoute,
   LoginRoute: LoginRoute,
   PracticeRoute: PracticeRoute,
+  PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
+  TermsRoute: TermsRoute,
   GeneralKnowledgeTopicRoute: GeneralKnowledgeTopicRoute,
   SubjectsSlugRoute: SubjectsSlugRoute,
   GeneralKnowledgeIndexRoute: GeneralKnowledgeIndexRoute,
