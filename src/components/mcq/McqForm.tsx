@@ -38,14 +38,14 @@ export function McqForm({
   gkCategories,
   children,
 }: {
-  initial?: (Mcq | McqInput) | null;
+  initial?: Mcq | McqInput | null | undefined;
   /** Change to reset the form to `initial`. */
   resetKey?: unknown;
   onSubmit: (v: McqInput) => void;
-  pending?: boolean;
+  pending?: boolean | undefined;
   submitLabel: string;
-  onCancel?: () => void;
-  gkCategories?: string[];
+  onCancel?: (() => void) | undefined;
+  gkCategories?: string[] | undefined;
   /** Extra fields rendered above the question (e.g. submitter name). */
   children?: ReactNode;
 }) {

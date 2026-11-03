@@ -21,12 +21,12 @@ export function McqFormDialog({
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  initial?: (Mcq | McqInput) | null;
+  initial?: Mcq | McqInput | null | undefined;
   onSubmit: (v: McqInput) => void;
-  pending?: boolean;
+  pending?: boolean | undefined;
   gkCategories: string[];
-  title?: string;
-  submitLabel?: string;
+  title?: string | undefined;
+  submitLabel?: string | undefined;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
