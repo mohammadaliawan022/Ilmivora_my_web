@@ -20,7 +20,7 @@ import { recentMcqsQuery } from "@/lib/data/queries";
 import { EXAM_CATEGORIES } from "@/lib/exam-categories";
 import { GK_CATEGORY_TARGET_COUNT } from "@/lib/gk-categories";
 import { EXAM_SECONDS_PER_QUESTION, type OptionLetter } from "@/lib/mcq";
-import { POPULAR_SUBJECT_SLUGS, SUBJECT_GROUPS, SUBJECTS, getSubjectBySlug } from "@/lib/subjects";
+import { GK_DOMAIN, POPULAR_SUBJECT_SLUGS, SUBJECT_GROUPS, SUBJECTS, getSubjectBySlug } from "@/lib/subjects";
 import { formatDistanceToNow } from "date-fns";
 
 export const Route = createFileRoute("/")({
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Thousands of MCQs across 36 subjects with practice tests, timed exam mode and progress tracking for Pakistan's competitive exams.",
+          "Thousands of MCQs across 53 subjects with practice tests, timed exam mode and progress tracking for Pakistan's competitive exams.",
       },
       { property: "og:title", content: "Ilmivora — Prepare Smarter. Achieve More." },
       {
@@ -231,7 +231,7 @@ function FeaturedGroups() {
     <section className="container-page py-20">
       <SectionHead eyebrow="Featured categories" title="Explore by field of study" />
       <div className="mt-8 grid gap-4 md:grid-cols-3">
-        {SUBJECT_GROUPS.filter((g) => g !== "General").map((g, i) => {
+        {SUBJECT_GROUPS.filter((g) => g !== GK_DOMAIN).map((g, i) => {
           const subjects = SUBJECTS.filter((s) => s.group === g);
           return (
             <Link
