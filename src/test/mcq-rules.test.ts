@@ -118,7 +118,7 @@ describe("MCQ submission checks", () => {
 
 describe("student submissions", () => {
   const input = {
-    question: "Who wrote the national anthem of Pakistan?",
+    question: "Zxq unique test question about the anthem?",
     option_a: "Allama Iqbal",
     option_b: "Hafeez Jalandhari",
     option_c: "Faiz Ahmed Faiz",
@@ -132,10 +132,10 @@ describe("student submissions", () => {
   };
   it("stays hidden until an admin approves it", async () => {
     const sub = await submitMcq(input);
-    const before = await listMcqs({ search: "national anthem" });
+    const before = await listMcqs({ search: "Zxq unique" });
     expect(before.total).toBe(0);
     await approveSubmission(sub.id);
-    const after = await listMcqs({ search: "national anthem" });
+    const after = await listMcqs({ search: "Zxq unique" });
     expect(after.total).toBe(1);
     expect((await listSubmissions("approved")).items.map((s) => s.id)).toContain(sub.id);
   });
