@@ -61,6 +61,7 @@ type FooterLink = {
     | "/login"
     | "/dashboard"
     | "/search"
+    | "/submit-mcq"
     | "/about"
     | "/contact"
     | "/privacy"
