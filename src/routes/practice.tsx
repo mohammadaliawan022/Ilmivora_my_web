@@ -18,7 +18,7 @@ export const Route = createFileRoute("/practice")({
       {
         name: "description",
         content:
-          "Practise MCQs one at a time with instant feedback, highlighted answers and explanations.",
+          "Practise MCQs 10 per page with instant feedback, highlighted answers and explanations.",
       },
       { property: "og:title", content: "Practice Test — Ilmivora" },
       { property: "og:description", content: "Instant-feedback MCQ practice with explanations." },
@@ -34,7 +34,7 @@ function PracticePage() {
       <PageHeader
         eyebrow="Practice mode"
         title="Practice test"
-        description="Answer one question at a time and learn from every explanation."
+        description="10 questions per page — answer each one and learn from every explanation."
       />
       <div className="container-page py-10">
         <QuizLauncher

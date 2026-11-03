@@ -22,7 +22,7 @@ export const Route = createFileRoute("/about")({
       </p>
       <h2>What you can do</h2>
       <p>
-        Browse MCQs across 36 subjects, practise with instant feedback, simulate the real exam with a
+        Browse MCQs across 53 subjects and more than 1,200 sections, practise with instant feedback, simulate the real exam with a
         timer, and track your progress over time.
       </p>
     </InfoPage>

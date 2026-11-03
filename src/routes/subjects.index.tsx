@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/site/PageHeader";
+import { CategoryLink } from "@/components/site/CategoryLink";
+import { CATEGORIES, getPath } from "@/lib/categories";
 import { subjectCountsQuery } from "@/lib/data/queries";
 import { SUBJECT_GROUPS, SUBJECTS, type SubjectGroup } from "@/lib/subjects";
 import { cn } from "@/lib/utils";
@@ -19,10 +21,12 @@ export const Route = createFileRoute("/subjects/")({
       {
         name: "description",
         content:
-          "Browse MCQs across 36 subjects: Pakistan Studies, Islamic Studies, English, Computer Science, Everyday Science, Law, Engineering and more.",
+          "Browse MCQs across 53 subjects and 1,200+ sections: Pakistan Studies, Islamic Studies, English, Computer Science, Law, Engineering, Medical, Past Papers and more.",
       },
-      { property: "og:title", content: "All 36 Subjects — Ilmivora" },
+      { property: "og:title", content: "All Subjects — Ilmivora" },
       { property: "og:description", content: "Subject-wise MCQs for PPSC, FPSC and NTS preparation." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SubjectsPage,
@@ -39,12 +43,20 @@ function SubjectsPage() {
     return SUBJECTS.filter((s) => (!group || s.group === group) && (!f || s.name.toLowerCase().includes(f)));
   }, [group, filter]);
 
+  const matchingSections = useMemo(() => {
+    const f = filter.trim().toLowerCase();
+    if (f.length < 2) return [];
+    return CATEGORIES.filter(
+      (c) => c.parent && (!group || c.domain === group) && c.name.toLowerCase().includes(f),
+    ).slice(0, 30);
+  }, [group, filter]);
+
   return (
     <>
       <PageHeader
         eyebrow="Subjects"
         title="All subjects"
-        description={`${SUBJECTS.length} subjects for PPSC, FPSC, NTS and other competitive exams.`}
+        description={`${SUBJECTS.length} subjects and ${(CATEGORIES.length - SUBJECTS.length).toLocaleString()} sections for PPSC, FPSC, NTS and other competitive exams.`}
       />
       <div className="container-page py-10">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -61,18 +73,17 @@ function SubjectsPage() {
           <input
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            placeholder="Filter subjects…"
-            aria-label="Filter subjects"
+            placeholder="Find a subject or section…"
+            aria-label="Find a subject or section"
             className="h-10 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring md:w-64"
           />
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visible.map((s) => (
-            <Link
+            <CategoryLink
               key={s.slug}
-              to={s.slug === "general-knowledge" ? "/general-knowledge" : "/subjects/$slug"}
-              params={{ slug: s.slug }}
+              cat={{ name: s.name, slug: s.slug, parent: null }}
               className="card-surface card-interactive group flex items-center gap-4 p-4"
             >
               <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
@@ -81,15 +92,36 @@ function SubjectsPage() {
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-semibold">{s.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  {counts ? `${(counts[s.name] ?? 0).toLocaleString()} MCQs` : s.group}
+                  {s.totalSections > 0 ? `${s.totalSections} sections` : s.group}
+                  {counts && ` · ${(counts[s.name] ?? 0).toLocaleString()} MCQs`}
                 </span>
               </span>
               <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
-            </Link>
+            </CategoryLink>
           ))}
         </div>
-        {visible.length === 0 && (
-          <p className="mt-10 text-center text-muted-foreground">No subjects match “{filter}”.</p>
+        {matchingSections.length > 0 && (
+          <section className="mt-10">
+            <h2 className="text-xl font-bold">Matching sections</h2>
+            <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {matchingSections.map((c) => (
+                <li key={c.slug}>
+                  <CategoryLink cat={c} className="card-surface card-interactive block px-4 py-3">
+                    <span className="block font-medium leading-snug">{c.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {getPath(c)
+                        .slice(0, -1)
+                        .map((p) => p.name)
+                        .join(" › ")}
+                    </span>
+                  </CategoryLink>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {visible.length === 0 && matchingSections.length === 0 && (
+          <p className="mt-10 text-center text-muted-foreground">Nothing matches “{filter}”.</p>
         )}
       </div>
     </>

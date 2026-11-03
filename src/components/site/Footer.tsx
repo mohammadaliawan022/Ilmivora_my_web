@@ -29,6 +29,7 @@ export function Footer() {
             { to: "/login", label: "Log in / Sign up" },
             { to: "/dashboard", label: "My Dashboard" },
             { to: "/search", label: "Search MCQs" },
+            { to: "/submit-mcq", label: "Submit an MCQ" },
           ]}
         />
         <FooterCol
@@ -60,6 +61,7 @@ type FooterLink = {
     | "/login"
     | "/dashboard"
     | "/search"
+    | "/submit-mcq"
     | "/about"
     | "/contact"
     | "/privacy"
