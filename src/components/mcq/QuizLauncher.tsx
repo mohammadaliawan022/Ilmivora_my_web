@@ -12,7 +12,7 @@ import { ExamQuiz } from "./ExamQuiz";
 import { PracticeQuiz } from "./PracticeQuiz";
 
 const ALL = "__all__";
-const COUNTS = [5, 10, 20, 30, 50];
+const COUNTS = [5, 10, 20, 30, 50, 100];
 
 export function QuizLauncher({
   mode,
@@ -70,7 +70,7 @@ export function QuizLauncher({
             </h2>
             <p className="text-sm text-muted-foreground">
               {mode === "practice"
-                ? "Instant feedback and explanations after every answer."
+                ? "10 questions per page, with instant feedback and explanations."
                 : `${EXAM_SECONDS_PER_QUESTION} seconds per question. Answers revealed at the end.`}
             </p>
           </div>
