@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { BookMarked, FileText, FolderTree, Layers, Plus, Trash2, Users } from "lucide-react";
+import { BookMarked, ClipboardCheck, FileText, FolderTree, Layers, Plus, Trash2, Users } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { examCountsQuery, mcqListQuery, subjectCountsQuery } from "@/lib/data/queries";
+import { examCountsQuery, mcqListQuery, subjectCountsQuery, submissionCountsQuery } from "@/lib/data/queries";
 import { loadAttempts, summarizeAttempts, type TestAttempt } from "@/lib/attempts";
 import { EXAM_CATEGORIES } from "@/lib/exam-categories";
 import { GK_CATEGORY_TARGET_COUNT } from "@/lib/gk-categories";
@@ -29,6 +29,7 @@ export function AdminOverview({ gkCount, paperCount }: { gkCount: number; paperC
   const total = useQuery(mcqListQuery({}, 1, 1));
   const subjectCounts = useQuery(subjectCountsQuery());
   const examCounts = useQuery(examCountsQuery());
+  const subs = useQuery(submissionCountsQuery());
 
   const bySubject = Object.entries(subjectCounts.data ?? {})
     .map(([name, count]) => ({ name, count }))
@@ -38,11 +39,12 @@ export function AdminOverview({ gkCount, paperCount }: { gkCount: number; paperC
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <Stat icon={BookMarked} label="Total MCQs" value={total.data?.total.toLocaleString() ?? "—"} />
         <Stat icon={Layers} label="Subjects" value={SUBJECTS.length} />
         <Stat icon={FolderTree} label="GK categories" value={`${gkCount}/${GK_CATEGORY_TARGET_COUNT}`} />
         <Stat icon={FileText} label="Past papers" value={paperCount} />
+        <Stat icon={ClipboardCheck} label="Pending submissions" value={subs.data?.pending ?? "—"} />
       </div>
       <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
         <section className="card-surface p-6">
@@ -90,12 +92,13 @@ export function AdminOverview({ gkCount, paperCount }: { gkCount: number; paperC
 export function AdminSubjects() {
   const { data } = useQuery(subjectCountsQuery());
   return (
-    <div className="card-surface overflow-hidden">
+    <div className="card-surface overflow-x-auto">
       <table className="w-full text-sm">
         <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
           <tr>
             <th className="px-4 py-3 font-semibold">Subject</th>
-            <th className="px-4 py-3 font-semibold">Group</th>
+            <th className="px-4 py-3 font-semibold">Field</th>
+            <th className="px-4 py-3 text-right font-semibold">Sections</th>
             <th className="px-4 py-3 text-right font-semibold">MCQs</th>
           </tr>
         </thead>
@@ -108,6 +111,7 @@ export function AdminSubjects() {
                 </span>
               </td>
               <td className="px-4 py-3 text-muted-foreground">{s.group}</td>
+              <td className="px-4 py-3 text-right text-muted-foreground">{s.totalSections}</td>
               <td className="px-4 py-3 text-right font-semibold">{(data?.[s.name] ?? 0).toLocaleString()}</td>
             </tr>
           ))}
