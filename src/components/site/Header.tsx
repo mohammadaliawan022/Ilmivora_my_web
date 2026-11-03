@@ -12,6 +12,7 @@ const NAV = [
   { to: "/practice", label: "Practice" },
   { to: "/exam", label: "Exam Mode" },
   { to: "/dashboard", label: "Dashboard" },
+  { to: "/submit-mcq", label: "Submit MCQ" },
 ] as const;
 
 export function Header() {
