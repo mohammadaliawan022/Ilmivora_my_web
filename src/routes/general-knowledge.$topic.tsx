@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Clock, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/site/PageHeader";
+import { SubjectIntro } from "@/components/site/SubjectIntro";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { getGkCategoryBySlug } from "@/lib/gk-categories";
 import { GK_SUBJECT } from "@/lib/subjects";
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/general-knowledge/$topic")({
 
 function TopicPage() {
   const { name } = Route.useLoaderData();
+  const { topic } = Route.useParams();
   const { page = 1, q } = Route.useSearch();
   const navigate = Route.useNavigate();
 
@@ -61,6 +63,9 @@ function TopicPage() {
             <ArrowLeft /> All GK topics
           </Link>
         </Button>
+        <div className="mb-8 [&>section]:mt-0">
+          <SubjectIntro slug={topic} name={name} />
+        </div>
         <McqBrowser
           filters={{ subject: GK_SUBJECT, topic: name }}
           page={page}

@@ -15,5 +15,6 @@
 - Quiz/exam rules (timer length, scoring) live in `src/lib/mcq.ts` and are covered by `src/test/mcq-rules.test.ts`.
 - The subject/section tree is owner data in `src/lib/category-data.ts` (generated from their CSV; never hand-invent entries) and is read through `src/lib/categories.ts`; top-level names map to the MCQ `subject` column, nested names to `topic`, and a section's MCQ list includes its nested sections (`getTopicScope`).
 - Student MCQ submissions live separately from live MCQs and only become MCQs through admin approval in `mcq-repo.ts`, so unreviewed content never reaches students.
+- Subject/section intros (image + paragraph) are keyed by category slug and go through `src/lib/data/subject-intro-repo.ts`, so they can move to a table + file storage without UI changes.
 - Admin sections are selected via the `?tab=` URL param on `/admin` so each section is linkable and survives reload.
 - Theme uses a `.dark` class on `<html>` set by an inline head script before paint to avoid flashes.
