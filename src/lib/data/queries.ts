@@ -10,6 +10,14 @@ import {
   type SubmissionStatus,
 } from "./mcq-repo";
 
+import { getSubjectIntro, listSubjectIntros } from "./subject-intro-repo";
+
+export const subjectIntroQuery = (slug: string) =>
+  queryOptions({ queryKey: ["subject-intros", slug], queryFn: () => getSubjectIntro(slug) });
+
+export const subjectIntroListQuery = () =>
+  queryOptions({ queryKey: ["subject-intros", "all"], queryFn: listSubjectIntros });
+
 export const mcqListQuery = (filters: McqFilters, page: number, pageSize?: number) =>
   queryOptions({
     queryKey: ["mcqs", "list", filters, page, pageSize],
