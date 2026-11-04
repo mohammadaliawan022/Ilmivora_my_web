@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BarChart3,
   BookOpen,
@@ -9,28 +9,30 @@ import {
   FolderTree,
   Image as ImageIcon,
   LayoutGrid,
+  LogOut,
   PlusCircle,
   ShieldAlert,
   Trash2,
   Upload,
   type LucideIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminCsvUpload } from "@/components/admin/AdminCsvUpload";
 import { AdminAddMcq, AdminDeleteBySubject } from "@/components/admin/AdminExtraPanels";
 import { AdminMcqs } from "@/components/admin/AdminMcqs";
+import { AdminPastPapers } from "@/components/admin/AdminPastPapers";
 import {
   AdminAnalytics,
   AdminGkCategories,
   AdminOverview,
-  AdminPastPapers,
   AdminSubjects,
-  type PastPaper,
 } from "@/components/admin/AdminPanels";
 import { AdminSubjectIntros } from "@/components/admin/AdminSubjectIntros";
 import { AdminSubmissions } from "@/components/admin/AdminSubmissions";
+import { Button } from "@/components/ui/button";
 import { submissionCountsQuery } from "@/lib/data/queries";
 import { GK_CATEGORY_NAMES } from "@/lib/gk-categories";
+import { getCurrentAuthUser, isCurrentUserAdmin, isPreviewMode, signOut } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 const SECTIONS = [
@@ -57,7 +59,7 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Admin Dashboard — Ilmivora" },
-      { name: "description", content: "Manage MCQs, student submissions, subjects, GK categories and past papers." },
+      { name: "description", content: "Manage MCQs, student submissions, subjects, past papers and GK categories." },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Admin — Ilmivora" },
       { property: "og:description", content: "Ilmivora content management." },
@@ -71,12 +73,48 @@ export const Route = createFileRoute("/admin")({
 function AdminPage() {
   const { tab = "overview" } = Route.useSearch();
   const navigate = Route.useNavigate();
+  const queryClient = useQueryClient();
+  const [hydrated, setHydrated] = useState(false);
   const [gk, setGk] = useState<string[]>(GK_CATEGORY_NAMES);
-  const [papers, setPapers] = useState<PastPaper[]>([]);
-  const pending = useQuery(submissionCountsQuery()).data?.pending ?? 0;
+  useEffect(() => setHydrated(true), []);
+  const access = useQuery({
+    queryKey: ["auth", "admin"],
+    queryFn: isCurrentUserAdmin,
+    enabled: !isPreviewMode,
+    retry: false,
+  });
+  const isAdmin = isPreviewMode || (hydrated && access.data === true);
+  const pending = useQuery({ ...submissionCountsQuery(), enabled: isAdmin }).data?.pending ?? 0;
   const active = SECTIONS.find((s) => s.id === tab) ?? SECTIONS[0];
 
   const go = (id: SectionId) => navigate({ search: { tab: id === "overview" ? undefined : id } });
+
+  if (!isPreviewMode && (!hydrated || access.isPending || access.data !== true)) {
+    const user = getCurrentAuthUser();
+    return (
+      <div className="container-page py-16">
+        <section className="card-surface mx-auto max-w-xl space-y-4 p-8 text-center">
+          <ShieldAlert className="mx-auto h-9 w-9 text-warning" />
+          <h1 className="text-2xl font-bold">Admin access required</h1>
+          <p className="text-muted-foreground">
+            {!hydrated || access.isPending
+              ? "Checking your account…"
+              : user
+                ? "This account is not on Ilmivora’s admin list."
+                : "Log in with an Ilmivora admin account to manage content."}
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button asChild><Link to="/login">Log in</Link></Button>
+            {hydrated && user && (
+              <Button variant="outline" onClick={() => { signOut(); void navigate({ to: "/login" }); }}>
+                Sign out
+              </Button>
+            )}
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="container-page py-8 lg:py-10">
@@ -119,19 +157,39 @@ function AdminPage() {
         </aside>
 
         <main className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet">Admin</p>
-          <h1 className="mt-1 text-3xl font-bold md:text-4xl">{active.label}</h1>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet">Admin</p>
+              <h1 className="mt-1 text-3xl font-bold md:text-4xl">{active.label}</h1>
+            </div>
+            {!isPreviewMode && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  signOut();
+                  queryClient.clear();
+                  void navigate({ to: "/login" });
+                }}
+              >
+                <LogOut aria-hidden="true" />
+                Log out
+              </Button>
+            )}
+          </div>
 
-          <div className="mt-5 flex items-start gap-3 rounded-xl border border-warning/40 bg-warning-soft px-4 py-3 text-sm">
-            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+          <div className={cn("mt-5 flex items-start gap-3 rounded-xl border px-4 py-3 text-sm", isPreviewMode ? "border-warning/40 bg-warning-soft" : "border-success/40 bg-success-soft")}>
+            <ShieldAlert className={cn("mt-0.5 h-4 w-4 shrink-0", isPreviewMode ? "text-warning" : "text-success")} />
             <p className="text-foreground">
-              Preview mode — changes here are not saved yet. Once sign-in is connected, this area will be
-              locked to admin accounts only and every change will be checked on the server.
+              {isPreviewMode
+                ? "Preview mode — changes here are not saved yet."
+                : "Connected to Ilmivora. Database changes are limited to admin accounts."}
             </p>
           </div>
 
           <div className="mt-6">
-            {active.id === "overview" && <AdminOverview gkCount={gk.length} paperCount={papers.length} />}
+            {active.id === "overview" && <AdminOverview gkCount={gk.length} />}
             {active.id === "mcqs" && <AdminMcqs gkCategories={gk} />}
             {active.id === "add" && <AdminAddMcq gkCategories={gk} />}
             {active.id === "submissions" && <AdminSubmissions gkCategories={gk} />}
@@ -140,7 +198,7 @@ function AdminPage() {
             {active.id === "subjects" && <AdminSubjects />}
             {active.id === "intros" && <AdminSubjectIntros />}
             {active.id === "gk" && <AdminGkCategories categories={gk} onChange={setGk} />}
-            {active.id === "papers" && <AdminPastPapers papers={papers} onChange={setPapers} />}
+            {active.id === "papers" && <AdminPastPapers />}
             {active.id === "analytics" && <AdminAnalytics />}
           </div>
         </main>

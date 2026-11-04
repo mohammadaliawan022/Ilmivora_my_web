@@ -11,6 +11,10 @@ import {
 } from "./mcq-repo";
 
 import { getSubjectIntro, listSubjectIntros } from "./subject-intro-repo";
+import { listPastPapers } from "./past-paper-repo";
+
+export const pastPapersQuery = () =>
+  queryOptions({ queryKey: ["past-papers"], queryFn: listPastPapers });
 
 export const subjectIntroQuery = (slug: string) =>
   queryOptions({ queryKey: ["subject-intros", slug], queryFn: () => getSubjectIntro(slug) });

@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import { Clock, Loader2, Play, Target } from "lucide-react";
+import { ChevronDown, Clock, Loader2, Play, Target } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getQuizQuestions } from "@/lib/data/mcq-repo";
@@ -25,7 +26,9 @@ export function QuizLauncher({
   initialTopic?: string | undefined;
   initialExam?: string | undefined;
 }) {
-  const [subject, setSubject] = useState(initialSubject ?? ALL);
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(initialSubject ? [initialSubject] : []);
+  const [subjectSearch, setSubjectSearch] = useState("");
+  const [subjectPickerOpen, setSubjectPickerOpen] = useState(false);
   const [exam, setExam] = useState(initialExam ?? ALL);
   const [count, setCount] = useState(10);
   const [questions, setQuestions] = useState<Mcq[] | null>(null);
@@ -34,7 +37,7 @@ export function QuizLauncher({
     mutationFn: () =>
       getQuizQuestions(
         {
-          subject: subject === ALL ? undefined : subject,
+          subjects: selectedSubjects.length > 0 ? selectedSubjects : undefined,
           topic: initialTopic,
           examCategory: exam === ALL ? undefined : exam,
         },
@@ -43,7 +46,12 @@ export function QuizLauncher({
     onSuccess: (rows) => setQuestions(rows),
   });
 
-  const label = initialTopic ?? (subject === ALL ? "Mixed subjects" : subject);
+  const selectedLabel = selectedSubjects.length === 0
+    ? "Mixed subjects"
+    : selectedSubjects.length === 1
+      ? selectedSubjects[0]!
+      : `Mixed: ${selectedSubjects.join(", ")}`;
+  const label = initialTopic ?? selectedLabel;
   const reset = () => {
     setQuestions(null);
     start.reset();
@@ -85,21 +93,81 @@ export function QuizLauncher({
               </p>
             </div>
           ) : (
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="subject">Subject</Label>
-              <Select value={subject} onValueChange={setSubject}>
-                <SelectTrigger id="subject">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ALL}>All subjects (mixed)</SelectItem>
-                  {SUBJECTS.map((s) => (
-                    <SelectItem key={s.slug} value={s.name}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="space-y-3 sm:col-span-2">
+              <Label id="practice-subject-label">Subjects</Label>
+              <div className="relative">
+                <Button
+                  type="button"
+                  variant="outline"
+                  aria-labelledby="practice-subject-label"
+                  aria-expanded={subjectPickerOpen}
+                  aria-controls="practice-subject-options"
+                  className="w-full justify-between font-normal"
+                  onClick={() => setSubjectPickerOpen((open) => !open)}
+                >
+                  <span>
+                    {selectedSubjects.length === 0
+                      ? "All subjects (mixed)"
+                      : selectedSubjects.length === 1
+                        ? selectedSubjects[0]
+                        : `${selectedSubjects.length} subjects selected`}
+                  </span>
+                  <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${subjectPickerOpen ? "rotate-180" : ""}`} />
+                </Button>
+                {subjectPickerOpen && (
+                  <div id="practice-subject-options" className="absolute left-0 top-full z-30 mt-2 w-full rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-xl">
+                  <Input
+                    value={subjectSearch}
+                    onChange={(event) => setSubjectSearch(event.target.value)}
+                    placeholder="Search subjects…"
+                    aria-label="Search subjects"
+                    className="mb-2"
+                  />
+                  <div className="max-h-56 space-y-1 overflow-y-auto">
+                    <label className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm font-medium hover:bg-accent">
+                      <input
+                        type="checkbox"
+                        checked={selectedSubjects.length === 0}
+                        onChange={() => setSelectedSubjects([])}
+                        className="h-4 w-4 accent-primary"
+                      />
+                      All subjects (mixed)
+                    </label>
+                    {SUBJECTS.filter((s) => s.name.toLowerCase().includes(subjectSearch.trim().toLowerCase())).map((s) => (
+                      <label key={s.slug} className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-accent">
+                        <input
+                          type="checkbox"
+                          checked={selectedSubjects.includes(s.name)}
+                          onChange={(event) => {
+                            const checked = event.target.checked;
+                            setSelectedSubjects((current) =>
+                              checked
+                                ? current.includes(s.name) ? current : [...current, s.name]
+                                : current.filter((name) => name !== s.name),
+                            );
+                          }}
+                          className="h-4 w-4 accent-primary"
+                        />
+                        {s.name}
+                      </label>
+                    ))}
+                    {SUBJECTS.every((s) => !s.name.toLowerCase().includes(subjectSearch.trim().toLowerCase())) && (
+                      <p className="px-2 py-3 text-center text-sm text-muted-foreground">No subjects found.</p>
+                    )}
+                  </div>
+                  <div className="mt-3 border-t border-border pt-2 text-center text-xs text-muted-foreground">
+                    Select multiple subjects to mix them in one test.
+                    <button
+                      type="button"
+                      className="mx-auto mt-2 block rounded-md px-4 py-1.5 font-semibold text-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      onClick={() => setSubjectPickerOpen(false)}
+                    >
+                      OK
+                    </button>
+                  </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
           <div className="space-y-2">

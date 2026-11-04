@@ -18,7 +18,6 @@ export function Footer() {
           title="Prepare"
           links={[
             { to: "/subjects", label: "All Subjects" },
-            { to: "/general-knowledge", label: "General Knowledge" },
             { to: "/practice", label: "Practice Test" },
             { to: "/exam", label: "Exam Mode" },
           ]}
@@ -55,7 +54,6 @@ export function Footer() {
 type FooterLink = {
   to:
     | "/subjects"
-    | "/general-knowledge"
     | "/practice"
     | "/exam"
     | "/login"

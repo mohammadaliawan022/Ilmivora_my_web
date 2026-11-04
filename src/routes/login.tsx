@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2 } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Logo } from "@/components/site/Logo";
+import { isCurrentUserAdmin, signInWithPassword, signUpWithPassword } from "@/lib/supabase";
 
-type Search = { tab?: "login" | "signup" | undefined };
+type LoginTab = "login" | "signup";
+type Search = { tab?: LoginTab | undefined };
 
 export const Route = createFileRoute("/login")({
   validateSearch: (s: Record<string, unknown>): Search => ({
@@ -30,17 +32,43 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const { tab } = Route.useSearch();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<LoginTab>(tab ?? "login");
   const [pending, setPending] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setPending(true);
-    setTimeout(() => {
+    try {
+      if (activeTab === "signup") {
+        const session = await signUpWithPassword(email, password, name);
+        if (!session) {
+          toast.success("Account created", { description: "Check your email to confirm your account, then log in." });
+          setActiveTab("login");
+          return;
+        }
+      } else {
+        await signInWithPassword(email, password);
+      }
+      const isAdmin = await isCurrentUserAdmin();
+      if (isAdmin) {
+        toast.success("Signed in");
+        await navigate({ to: "/admin" });
+      } else {
+        toast.success(activeTab === "signup" ? "Account created" : "Signed in", {
+          description: "Your account is ready. Admin tools require an Ilmivora admin account.",
+        });
+        await navigate({ to: "/dashboard" });
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not sign in.");
+    } finally {
       setPending(false);
-      toast.info("Accounts are being set up", {
-        description: "Sign-in opens soon. Your test results are saved on this device meanwhile.",
-      });
-    }, 400);
+    }
   };
 
   return (
@@ -73,7 +101,7 @@ function LoginPage() {
 
       <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
-          <Tabs defaultValue={tab ?? "login"}>
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as LoginTab)}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Log in</TabsTrigger>
               <TabsTrigger value="signup">Sign up</TabsTrigger>
@@ -83,10 +111,10 @@ function LoginPage() {
               <h1 className="text-2xl font-bold">Welcome back</h1>
               <p className="mt-1 text-sm text-muted-foreground">Log in to continue your preparation.</p>
               <form onSubmit={onSubmit} className="mt-6 space-y-4">
-                <Field id="login-email" label="Email" type="email" autoComplete="email" />
-                <Field id="login-password" label="Password" type="password" autoComplete="current-password" />
+                <Field id="login-email" label="Email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <PasswordField id="login-password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} visible={showPassword} onToggle={() => setShowPassword((visible) => !visible)} />
                 <Button type="submit" className="w-full" size="lg" disabled={pending}>
-                  Log in
+                  {pending ? "Signing in…" : "Log in"}
                 </Button>
               </form>
             </TabsContent>
@@ -95,14 +123,15 @@ function LoginPage() {
               <h1 className="text-2xl font-bold">Create your account</h1>
               <p className="mt-1 text-sm text-muted-foreground">Free forever for students.</p>
               <form onSubmit={onSubmit} className="mt-6 space-y-4">
-                <Field id="signup-name" label="Full name" autoComplete="name" />
-                <Field id="signup-email" label="Email" type="email" autoComplete="email" />
-                <Field id="signup-password" label="Password" type="password" autoComplete="new-password" minLength={8} />
+                <Field id="signup-name" label="Full name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
+                <Field id="signup-email" label="Email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <PasswordField id="signup-password" autoComplete="new-password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} visible={showPassword} onToggle={() => setShowPassword((visible) => !visible)} />
                 <Button type="submit" variant="brand" className="w-full" size="lg" disabled={pending}>
-                  Create account
+                  {pending ? "Creating account…" : "Create account"}
                 </Button>
               </form>
             </TabsContent>
+
           </Tabs>
           <p className="mt-6 text-center text-xs text-muted-foreground">
             By continuing you agree to our{" "}
@@ -130,6 +159,41 @@ function Field({
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
       <Input id={id} required className="h-11" {...props} />
+    </div>
+  );
+}
+
+function PasswordField({
+  id,
+  visible,
+  onToggle,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  id: string;
+  visible: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>Password</Label>
+      <div className="relative">
+        <Input
+          id={id}
+          required
+          className="h-11 pr-11"
+          type={visible ? "text" : "password"}
+          {...props}
+        />
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label={visible ? "Hide password" : "Show password"}
+          aria-pressed={visible}
+          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-md text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+        >
+          {visible ? <EyeOff aria-hidden="true" className="h-4 w-4" /> : <Eye aria-hidden="true" className="h-4 w-4" />}
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Clock, FolderOpen, Target } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/site/PageHeader";
+import { BookOpen, ChevronRight } from "lucide-react";
+import { SubjectQuizSidebar } from "@/components/mcq/SubjectQuizSidebar";
+import { SubjectIntro } from "@/components/site/SubjectIntro";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { GK_CATEGORY_TARGET_COUNT, getGkCategories } from "@/lib/gk-categories";
 import { GK_SUBJECT } from "@/lib/subjects";
@@ -35,64 +35,73 @@ function GkPage() {
 
   return (
     <>
-      <PageHeader
-        eyebrow="General Knowledge"
-        title="General Knowledge MCQs"
-        description="Pick a topic to focus your preparation, or work through every GK question."
-      >
-        <div className="flex flex-wrap gap-3">
-          <Button variant="hero" asChild>
-            <Link to="/practice" search={{ subject: GK_SUBJECT }}>
-              <Target /> Practice GK
-            </Link>
-          </Button>
-          <Button variant="hero-outline" asChild>
-            <Link to="/exam" search={{ subject: GK_SUBJECT }}>
-              <Clock /> GK exam
-            </Link>
-          </Button>
+      <section className="relative overflow-hidden bg-hero text-navy-foreground">
+        <div className="pointer-events-none absolute inset-0 grid-pattern" aria-hidden />
+        <div className="container-page relative py-12 text-center md:py-16">
+          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-violet/30 bg-violet/10 px-4 py-2 text-sm font-semibold text-violet-soft">
+            <BookOpen className="h-4 w-4" aria-hidden="true" /> MCQ Practice
+          </div>
+          <h1 className="mt-5 text-3xl font-extrabold tracking-tight md:text-5xl">
+            General Knowledge <span className="bg-gradient-to-r from-blue-400 via-violet to-purple-500 bg-clip-text text-transparent">MCQs</span>
+          </h1>
+          <p className="mt-3 text-sm text-navy-foreground/75 md:text-base">Learn Smarter. Achieve More.</p>
         </div>
-      </PageHeader>
+      </section>
 
-      <div className="container-page py-10">
-        <section>
-          <h2 className="text-2xl font-bold">Topic categories</h2>
-          {categories.length === 0 ? (
-            <div className="card-surface mt-5 flex flex-col items-center gap-3 p-10 text-center">
-              <FolderOpen className="h-8 w-8 text-muted-foreground" />
-              <p className="font-semibold">Topic categories are on their way</p>
-              <p className="max-w-md text-sm text-muted-foreground">
-                The {GK_CATEGORY_TARGET_COUNT} General Knowledge topics will appear here once they're
-                added. Until then, all GK MCQs are listed below.
-              </p>
-            </div>
-          ) : (
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="container-page py-8 md:py-10">
+        <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+          <Link to="/subjects" className="font-semibold text-primary hover:underline">All Subjects &amp; Topics</Link>
+          <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          <span className="text-foreground">General Knowledge</span>
+        </nav>
+        <SubjectIntro slug="general-knowledge" name={GK_SUBJECT} />
+
+        <div className="mt-6 flex flex-wrap items-center gap-3 text-sm">
+          <span className="rounded-xl bg-primary-soft px-4 py-3 font-semibold text-primary">All MCQs</span>
+          <span className="text-muted-foreground">All General Knowledge questions</span>
+        </div>
+
+        {categories.length > 0 && (
+          <details className="card-surface mt-5 rounded-2xl p-4">
+            <summary className="cursor-pointer list-none font-semibold text-primary marker:hidden">
+              <span aria-hidden="true" className="mr-2">›</span> Explore {categories.length} topics in General Knowledge
+            </summary>
+            <div className="mt-4 grid gap-2 border-t border-border pt-4 sm:grid-cols-2 lg:grid-cols-3">
               {categories.map((c) => (
                 <Link
                   key={c.slug}
                   to="/general-knowledge/$topic"
                   params={{ topic: c.slug }}
-                  className="card-surface card-interactive px-4 py-3.5 font-medium"
+                  className="rounded-lg px-3 py-2 text-sm hover:bg-accent hover:text-primary"
                 >
                   {c.name}
                 </Link>
               ))}
             </div>
-          )}
-        </section>
+          </details>
+        )}
+        {categories.length === 0 && (
+          <p className="card-surface mt-5 p-5 text-sm text-muted-foreground">
+            The {GK_CATEGORY_TARGET_COUNT} General Knowledge topics will appear here once they are available.
+          </p>
+        )}
 
-        <section className="mx-auto mt-14 max-w-4xl">
-          <h2 className="mb-5 text-2xl font-bold">All GK MCQs</h2>
-          <McqBrowser
-            filters={{ subject: GK_SUBJECT }}
-            page={page}
-            search={q}
-            onPageChange={(p) => navigate({ search: (s) => ({ ...s, page: p > 1 ? p : undefined }) })}
-            onSearchChange={(v) => navigate({ search: { q: v } })}
-            emptyMessage="No General Knowledge MCQs have been added yet."
-          />
-        </section>
+        <div className="mt-7 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <section className="min-w-0" aria-labelledby="gk-questions-heading">
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+              <h2 id="gk-questions-heading" className="text-xl font-bold md:text-2xl">General Knowledge Questions</h2>
+            </div>
+            <McqBrowser
+              filters={{ subject: GK_SUBJECT }}
+              page={page}
+              search={q}
+              onPageChange={(p) => navigate({ search: (s) => ({ ...s, page: p > 1 ? p : undefined }) })}
+              onSearchChange={(v) => navigate({ search: { q: v } })}
+              emptyMessage="No General Knowledge MCQs have been added yet."
+            />
+          </section>
+          <SubjectQuizSidebar filters={{ subject: GK_SUBJECT }} subject={GK_SUBJECT} page={page} />
+        </div>
       </div>
     </>
   );

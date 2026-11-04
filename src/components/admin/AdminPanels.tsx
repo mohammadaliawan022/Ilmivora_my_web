@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { examCountsQuery, mcqListQuery, subjectCountsQuery, submissionCountsQuery } from "@/lib/data/queries";
 import { loadAttempts, summarizeAttempts, type TestAttempt } from "@/lib/attempts";
-import { EXAM_CATEGORIES } from "@/lib/exam-categories";
 import { GK_CATEGORY_TARGET_COUNT } from "@/lib/gk-categories";
 import { SUBJECTS } from "@/lib/subjects";
 
@@ -25,7 +24,7 @@ function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ classN
   );
 }
 
-export function AdminOverview({ gkCount, paperCount }: { gkCount: number; paperCount: number }) {
+export function AdminOverview({ gkCount }: { gkCount: number }) {
   const total = useQuery(mcqListQuery({}, 1, 1));
   const subjectCounts = useQuery(subjectCountsQuery());
   const examCounts = useQuery(examCountsQuery());
@@ -43,7 +42,6 @@ export function AdminOverview({ gkCount, paperCount }: { gkCount: number; paperC
         <Stat icon={BookMarked} label="Total MCQs" value={total.data?.total.toLocaleString() ?? "—"} />
         <Stat icon={Layers} label="Subjects" value={SUBJECTS.length} />
         <Stat icon={FolderTree} label="GK categories" value={`${gkCount}/${GK_CATEGORY_TARGET_COUNT}`} />
-        <Stat icon={FileText} label="Past papers" value={paperCount} />
         <Stat icon={ClipboardCheck} label="Pending submissions" value={subs.data?.pending ?? "—"} />
       </div>
       <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
@@ -161,86 +159,6 @@ export function AdminGkCategories({
             <li key={c} className="card-surface flex items-center justify-between px-4 py-2.5 text-sm font-medium">
               {c}
               <Button variant="ghost" size="icon" aria-label={`Remove ${c}`} onClick={() => onChange(categories.filter((x) => x !== c))}>
-                <Trash2 className="text-danger" />
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-export interface PastPaper {
-  id: string;
-  title: string;
-  exam: string;
-  year: number;
-  url: string;
-}
-
-export function AdminPastPapers({
-  papers,
-  onChange,
-}: {
-  papers: PastPaper[];
-  onChange: (next: PastPaper[]) => void;
-}) {
-  const [title, setTitle] = useState("");
-  const [exam, setExam] = useState(EXAM_CATEGORIES[0]!.code);
-  const [year, setYear] = useState(String(new Date().getFullYear()));
-  const [url, setUrl] = useState("");
-
-  const add = (e: FormEvent) => {
-    e.preventDefault();
-    onChange([{ id: crypto.randomUUID(), title: title.trim(), exam, year: Number(year), url: url.trim() }, ...papers]);
-    setTitle("");
-    setUrl("");
-    toast.success("Past paper added");
-  };
-
-  return (
-    <div className="space-y-5">
-      <form onSubmit={add} className="card-surface grid gap-3 p-6 md:grid-cols-[2fr_1fr_1fr_2fr_auto] md:items-end">
-        <label className="space-y-1.5 text-sm font-medium">
-          Title
-          <Input required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Lecturer English 2024" />
-        </label>
-        <label className="space-y-1.5 text-sm font-medium">
-          Exam
-          <select
-            value={exam}
-            onChange={(e) => setExam(e.target.value)}
-            className="h-10 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-          >
-            {EXAM_CATEGORIES.map((c) => (
-              <option key={c.code}>{c.code}</option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-1.5 text-sm font-medium">
-          Year
-          <Input required type="number" min={1990} max={2100} value={year} onChange={(e) => setYear(e.target.value)} />
-        </label>
-        <label className="space-y-1.5 text-sm font-medium">
-          File link
-          <Input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://…" />
-        </label>
-        <Button type="submit">
-          <Plus /> Add
-        </Button>
-      </form>
-      {papers.length === 0 ? (
-        <p className="card-surface p-8 text-center text-sm text-muted-foreground">No past papers added yet.</p>
-      ) : (
-        <ul className="space-y-2">
-          {papers.map((p) => (
-            <li key={p.id} className="card-surface flex items-center justify-between gap-3 px-4 py-3 text-sm">
-              <span>
-                <span className="font-semibold">{p.title}</span>{" "}
-                <span className="text-muted-foreground">· {p.exam} · {p.year}</span>
-              </span>
-              <Button variant="ghost" size="icon" aria-label={`Remove ${p.title}`} onClick={() => onChange(papers.filter((x) => x.id !== p.id))}>
                 <Trash2 className="text-danger" />
               </Button>
             </li>

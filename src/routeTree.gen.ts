@@ -16,6 +16,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PastPapersRouteImport } from './routes/past-papers'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SearchRouteImport } from './routes/search'
@@ -59,6 +60,11 @@ const ExamRoute = ExamRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PastPapersRoute = PastPapersRouteImport.update({
+  id: '/past-papers',
+  path: '/past-papers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeRoute = PracticeRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
   '/login': typeof LoginRoute
+  '/past-papers': typeof PastPapersRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
   '/login': typeof LoginRoute
+  '/past-papers': typeof PastPapersRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
   '/login': typeof LoginRoute
+  '/past-papers': typeof PastPapersRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/exam'
     | '/login'
+    | '/past-papers'
     | '/practice'
     | '/privacy'
     | '/search'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/exam'
     | '/login'
+    | '/past-papers'
     | '/practice'
     | '/privacy'
     | '/search'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/exam'
     | '/login'
+    | '/past-papers'
     | '/practice'
     | '/privacy'
     | '/search'
@@ -227,6 +239,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   ExamRoute: typeof ExamRoute
   LoginRoute: typeof LoginRoute
+  PastPapersRoute: typeof PastPapersRoute
   PracticeRoute: typeof PracticeRoute
   PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
@@ -287,6 +300,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/past-papers': {
+      id: '/past-papers'
+      path: '/past-papers'
+      fullPath: '/past-papers'
+      preLoaderRoute: typeof PastPapersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/practice': {
@@ -363,6 +383,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   ExamRoute: ExamRoute,
   LoginRoute: LoginRoute,
+  PastPapersRoute: PastPapersRoute,
   PracticeRoute: PracticeRoute,
   PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
