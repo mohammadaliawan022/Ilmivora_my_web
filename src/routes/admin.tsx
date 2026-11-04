@@ -7,6 +7,7 @@ import {
   FileText,
   FolderOpen,
   FolderTree,
+  Image as ImageIcon,
   LayoutGrid,
   PlusCircle,
   ShieldAlert,
@@ -26,6 +27,7 @@ import {
   AdminSubjects,
   type PastPaper,
 } from "@/components/admin/AdminPanels";
+import { AdminSubjectIntros } from "@/components/admin/AdminSubjectIntros";
 import { AdminSubmissions } from "@/components/admin/AdminSubmissions";
 import { submissionCountsQuery } from "@/lib/data/queries";
 import { GK_CATEGORY_NAMES } from "@/lib/gk-categories";
@@ -39,6 +41,7 @@ const SECTIONS = [
   { id: "csv", label: "CSV Upload", icon: Upload },
   { id: "delete", label: "Delete by Subject", icon: Trash2 },
   { id: "subjects", label: "Subjects", icon: FolderOpen },
+  { id: "intros", label: "Subject Intros", icon: ImageIcon },
   { id: "gk", label: "GK Categories", icon: FolderTree },
   { id: "papers", label: "Past Papers", icon: FileText },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
@@ -135,6 +138,7 @@ function AdminPage() {
             {active.id === "csv" && <AdminCsvUpload />}
             {active.id === "delete" && <AdminDeleteBySubject />}
             {active.id === "subjects" && <AdminSubjects />}
+            {active.id === "intros" && <AdminSubjectIntros />}
             {active.id === "gk" && <AdminGkCategories categories={gk} onChange={setGk} />}
             {active.id === "papers" && <AdminPastPapers papers={papers} onChange={setPapers} />}
             {active.id === "analytics" && <AdminAnalytics />}

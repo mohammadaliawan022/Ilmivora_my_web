@@ -3,6 +3,7 @@ import { ChevronRight, Clock, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/site/PageHeader";
 import { CategoryLink } from "@/components/site/CategoryLink";
+import { SubjectIntro } from "@/components/site/SubjectIntro";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { SectionGrid } from "@/components/mcq/SectionGrid";
 import { getCategoryBySlug, getChildren, getPath } from "@/lib/categories";
@@ -57,6 +58,7 @@ export const Route = createFileRoute("/subjects/$slug")({
 
 function SubjectPage() {
   const { name, domain, isSubject, rootName, path } = Route.useLoaderData();
+  const { slug } = Route.useParams();
   const { page = 1, q } = Route.useSearch();
   const navigate = Route.useNavigate();
   const sections = getChildren(name);
@@ -105,6 +107,8 @@ function SubjectPage() {
             </span>
           ))}
         </nav>
+
+        <SubjectIntro slug={slug} name={name} />
 
         {sections.length > 0 && (
           <div className="mt-8">
