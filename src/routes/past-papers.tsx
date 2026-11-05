@@ -42,7 +42,10 @@ function PastPapersPage() {
 
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
-    navigate({ search: (current) => ({ ...current, q: searchDraft.trim() || undefined, page: undefined }) });
+    navigate({
+      search: (current) => ({ ...current, q: searchDraft.trim() || undefined, page: undefined }),
+      resetScroll: false,
+    });
   };
 
   const examLabel = (code: string) => EXAM_CATEGORIES.find((category) => category.code === code)?.name ?? code;

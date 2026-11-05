@@ -29,7 +29,14 @@ export function McqBrowser({
   const [draft, setDraft] = useState(search ?? "");
   const questionListRef = useRef<HTMLDivElement>(null);
   const previousPage = useRef(page);
+  const previousSearch = useRef(search);
   useEffect(() => setDraft(search ?? ""), [search]);
+
+  useEffect(() => {
+    if (previousSearch.current === search) return;
+    previousSearch.current = search;
+    previousPage.current = page;
+  }, [page, search]);
 
   const query = useQuery(mcqListQuery({ ...filters, search }, page));
 
@@ -52,8 +59,15 @@ export function McqBrowser({
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
+              type="search"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.currentTarget.form?.requestSubmit();
+                }
+              }}
               placeholder="Search within these MCQs…"
               aria-label="Search within these MCQs"
               className="h-10 w-full rounded-lg border border-input bg-card pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"

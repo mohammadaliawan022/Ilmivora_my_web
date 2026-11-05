@@ -99,7 +99,7 @@ function GkPage() {
                 search: (s) => ({ ...s, page: p > 1 ? p : undefined }),
                 resetScroll: false,
               })}
-              onSearchChange={(v) => navigate({ search: { q: v } })}
+              onSearchChange={(v) => navigate({ search: { q: v }, resetScroll: false })}
               emptyMessage="No General Knowledge MCQs have been added yet."
             />
           </section>

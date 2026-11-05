@@ -37,9 +37,16 @@ export function SearchBar({
     >
       <Search className="ml-3 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden />
       <input
+        type="search"
         autoFocus={autoFocus}
         value={q}
         onChange={(e) => setQ(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            e.currentTarget.form?.requestSubmit();
+          }
+        }}
         placeholder="Search MCQs, subjects or topics…"
         aria-label="Search MCQs and subjects"
         className={cn(

@@ -71,7 +71,7 @@ function TopicPage() {
           page={page}
           search={q}
           onPageChange={(p) => navigate({ search: (s) => ({ ...s, page: p > 1 ? p : undefined }) })}
-          onSearchChange={(v) => navigate({ search: { q: v } })}
+          onSearchChange={(v) => navigate({ search: { q: v }, resetScroll: false })}
           emptyMessage={`No MCQs have been tagged “${name}” yet.`}
         />
       </div>
