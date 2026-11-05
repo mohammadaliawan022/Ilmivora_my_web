@@ -44,19 +44,25 @@ export function getCorrectLetter(mcq: Mcq): OptionLetter | null {
 
 /** Seconds allowed per question in Exam Mode. */
 export const EXAM_SECONDS_PER_QUESTION = 30;
+/** Marks deducted for each incorrect answer in Exam Mode. */
+export const EXAM_NEGATIVE_MARKS_PER_WRONG = 0.25;
 
 export interface ExamScore {
   total: number;
   correct: number;
   incorrect: number;
   unanswered: number;
+  negativeMarks: number;
+  netMarks: number;
+  penaltyPerIncorrect: number;
   percentage: number;
 }
 
-/** Score an exam. Unanswered questions count as neither correct nor incorrect. */
+/** Score a quiz. Unanswered questions receive no penalty. */
 export function scoreExam(
   mcqs: Mcq[],
   answers: Record<string, OptionLetter | undefined>,
+  penaltyPerIncorrect = 0,
 ): ExamScore {
   let correct = 0;
   let incorrect = 0;
@@ -68,8 +74,19 @@ export function scoreExam(
     else incorrect++;
   }
   const total = mcqs.length;
-  const percentage = total === 0 ? 0 : Math.round((correct / total) * 100);
-  return { total, correct, incorrect, unanswered, percentage };
+  const negativeMarks = incorrect * penaltyPerIncorrect;
+  const netMarks = correct - negativeMarks;
+  const percentage = total === 0 ? 0 : Math.round((netMarks / total) * 100);
+  return {
+    total,
+    correct,
+    incorrect,
+    unanswered,
+    negativeMarks,
+    netMarks,
+    penaltyPerIncorrect,
+    percentage,
+  };
 }
 
 /** Questions shown per page in Practice Mode. */

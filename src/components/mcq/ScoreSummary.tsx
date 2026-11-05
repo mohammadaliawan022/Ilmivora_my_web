@@ -2,6 +2,8 @@ import type { ExamScore } from "@/lib/mcq";
 import { cn } from "@/lib/utils";
 
 export function ScoreSummary({ score, title }: { score: ExamScore; title: string }) {
+  const hasNegativeMarking = score.penaltyPerIncorrect > 0;
+  const netMarks = Number.isInteger(score.netMarks) ? score.netMarks : score.netMarks.toFixed(2);
   const tone =
     score.percentage >= 70 ? "text-success" : score.percentage >= 40 ? "text-warning" : "text-danger";
   const message =
@@ -25,8 +27,18 @@ export function ScoreSummary({ score, title }: { score: ExamScore; title: string
         <Stat label="Total questions" value={score.total} />
         <Stat label="Correct" value={score.correct} className="text-success" />
         <Stat label="Incorrect" value={score.incorrect} className="text-danger" />
-        <Stat label="Percentage" value={`${score.percentage}%`} className={tone} />
+        {hasNegativeMarking ? (
+          <Stat label="Net marks" value={`${netMarks} / ${score.total}`} className={tone} />
+        ) : (
+          <Stat label="Percentage" value={`${score.percentage}%`} className={tone} />
+        )}
       </dl>
+      {hasNegativeMarking && (
+        <p className="border-t border-border px-6 py-3 text-center text-xs text-muted-foreground">
+          {score.correct} mark{score.correct === 1 ? "" : "s"} earned − {score.negativeMarks} deducted
+          for incorrect answers ({score.penaltyPerIncorrect} each).
+        </p>
+      )}
       {score.unanswered > 0 && (
         <p className="border-t border-border px-6 py-3 text-center text-xs text-muted-foreground">
           {score.unanswered} question{score.unanswered === 1 ? "" : "s"} left unanswered.

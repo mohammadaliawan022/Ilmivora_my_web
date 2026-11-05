@@ -3,6 +3,7 @@ import { BookOpen, Clock, GraduationCap, ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { mcqListQuery } from "@/lib/data/queries";
 import type { McqFilters } from "@/lib/data/mcq-repo";
+import { EXAM_NEGATIVE_MARKS_PER_WRONG } from "@/lib/mcq";
 
 export function SubjectQuizSidebar({
   filters,
@@ -49,7 +50,9 @@ export function SubjectQuizSidebar({
         >
           <Clock className="h-5 w-5 text-violet" aria-hidden="true" />
           <h3 className="mt-3 font-bold">Exam mode</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Timed questions. Review your score at the end.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Timed questions. −{EXAM_NEGATIVE_MARKS_PER_WRONG} for each incorrect answer.
+          </p>
           <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-violet">
             Start exam <ArrowRight className="h-4 w-4" />
           </span>

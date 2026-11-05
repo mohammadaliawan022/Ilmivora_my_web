@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getQuizQuestions } from "@/lib/data/mcq-repo";
 import { EXAM_CATEGORIES } from "@/lib/exam-categories";
-import { EXAM_SECONDS_PER_QUESTION, type Mcq } from "@/lib/mcq";
+import { EXAM_NEGATIVE_MARKS_PER_WRONG, EXAM_SECONDS_PER_QUESTION, type Mcq } from "@/lib/mcq";
 import { SUBJECTS } from "@/lib/subjects";
 import { ExamQuiz } from "./ExamQuiz";
 import { PracticeQuiz } from "./PracticeQuiz";
@@ -76,7 +76,7 @@ export function QuizLauncher({
             <p className="text-sm text-muted-foreground">
               {mode === "practice"
                 ? "10 questions per page, with instant feedback and explanations."
-                : `${EXAM_SECONDS_PER_QUESTION} seconds per question. Answers revealed at the end.`}
+                : `${EXAM_SECONDS_PER_QUESTION} seconds per question. +1 correct, −${EXAM_NEGATIVE_MARKS_PER_WRONG} incorrect, 0 unanswered. Answers revealed at the end.`}
             </p>
           </div>
         </div>

@@ -11,6 +11,9 @@ export interface TestAttempt {
   correct: number;
   incorrect: number;
   unanswered: number;
+  negativeMarks?: number;
+  netMarks?: number;
+  penaltyPerIncorrect?: number;
   percentage: number;
   durationSec: number;
   createdAt: string;

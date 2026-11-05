@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/site/PageHeader";
 import { QuizLauncher } from "@/components/mcq/QuizLauncher";
-import { EXAM_SECONDS_PER_QUESTION } from "@/lib/mcq";
+import { EXAM_NEGATIVE_MARKS_PER_WRONG, EXAM_SECONDS_PER_QUESTION } from "@/lib/mcq";
 
 type Search = { subject?: string | undefined; exam?: string | undefined };
 
@@ -34,7 +34,7 @@ function ExamPage() {
       <PageHeader
         eyebrow="Exam mode"
         title="Timed exam"
-        description={`${EXAM_SECONDS_PER_QUESTION} seconds per question. Your score and the correct answers appear when you finish.`}
+        description={`${EXAM_SECONDS_PER_QUESTION} seconds per question. Scoring: +1 for a correct answer, −${EXAM_NEGATIVE_MARKS_PER_WRONG} for an incorrect answer, and 0 for unanswered questions.`}
       />
       <div className="container-page py-10">
         <QuizLauncher

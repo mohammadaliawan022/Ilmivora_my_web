@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { saveAttempt } from "@/lib/attempts";
 import {
+  EXAM_NEGATIVE_MARKS_PER_WRONG,
   EXAM_SECONDS_PER_QUESTION,
   getOptions,
   scoreExam,
@@ -46,7 +47,10 @@ export function ExamQuiz({
   const mcq = mcqs[Math.min(index, mcqs.length - 1)]!;
   const remaining = timeLeft[mcq.id] ?? 0;
   const expired = remaining <= 0;
-  const score = useMemo(() => scoreExam(mcqs, answers), [mcqs, answers]);
+  const score = useMemo(
+    () => scoreExam(mcqs, answers, EXAM_NEGATIVE_MARKS_PER_WRONG),
+    [mcqs, answers],
+  );
 
   // Tick the current question's own 30-second clock.
   useEffect(() => {
@@ -118,6 +122,9 @@ export function ExamQuiz({
             {expired ? "Time up" : `0:${String(remaining).padStart(2, "0")}`}
           </div>
         </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Scoring: +1 correct, −{EXAM_NEGATIVE_MARKS_PER_WRONG} incorrect, 0 unanswered.
+        </p>
         <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
           <div
             className={cn(
