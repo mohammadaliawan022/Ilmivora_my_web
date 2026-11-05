@@ -91,10 +91,7 @@ export function McqBrowser({
             page={query.data.page}
             pageCount={query.data.pageCount}
             total={query.data.total}
-            onChange={(p) => {
-              onPageChange(p);
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
+            onChange={onPageChange}
           />
         </>
       )}
