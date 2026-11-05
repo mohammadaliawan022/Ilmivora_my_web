@@ -52,7 +52,8 @@ function applyFilters(rows: Mcq[], f: McqFilters): Mcq[] {
   });
 }
 
-const byNewest = <T extends { created_at: string }>(a: T, b: T) => b.created_at.localeCompare(a.created_at);
+const byNewest = <T extends { created_at: string; id?: string }>(a: T, b: T) =>
+  b.created_at.localeCompare(a.created_at) || String(a.id ?? "").localeCompare(String(b.id ?? ""));
 
 function toPage<T>(rows: T[], page: number, pageSize: number): Page<T> {
   const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
@@ -62,7 +63,8 @@ function toPage<T>(rows: T[], page: number, pageSize: number): Page<T> {
 }
 
 function makeMcqQuery(filters: McqFilters, page?: number, pageSize?: number) {
-  const query = new URLSearchParams({ select: "*", order: "created_at.desc" });
+  // A unique tie-breaker keeps offset pagination stable when many imported MCQs share a timestamp.
+  const query = new URLSearchParams({ select: "*", order: "created_at.desc,id.asc" });
   if (filters.subject) query.set("subject", `ilike.${filters.subject}`);
   else if (filters.subjects?.length) {
     query.set("subject", `in.(${filters.subjects.map((s) => `"${s.replaceAll('"', '\\"')}"`).join(",")})`);
