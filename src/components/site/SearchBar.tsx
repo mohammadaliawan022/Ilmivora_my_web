@@ -8,17 +8,22 @@ export function SearchBar({
   defaultValue = "",
   size = "default",
   className,
+  autoFocus = false,
+  onSubmitted,
 }: {
   defaultValue?: string | undefined;
   size?: "default" | "lg";
   className?: string | undefined;
+  autoFocus?: boolean;
+  onSubmitted?: (() => void) | undefined;
 }) {
   const [q, setQ] = useState(defaultValue);
   const navigate = useNavigate();
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    navigate({ to: "/search", search: { q: q.trim() || undefined } });
+    void navigate({ to: "/search", search: { q: q.trim() || undefined } });
+    onSubmitted?.();
   };
 
   return (
@@ -32,6 +37,7 @@ export function SearchBar({
     >
       <Search className="ml-3 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden />
       <input
+        autoFocus={autoFocus}
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search MCQs, subjects or topics…"

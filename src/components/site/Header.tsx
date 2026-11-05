@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { getCurrentAuthUser, signOut, subscribeToAuthChanges } from "@/lib/supabase";
 import { Logo } from "./Logo";
+import { SearchBar } from "./SearchBar";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
@@ -17,6 +18,7 @@ const NAV = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const [user, setUser] = useState<ReturnType<typeof getCurrentAuthUser>>(null);
@@ -155,10 +157,15 @@ export function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/search" aria-label="Search MCQs">
-              <Search />
-            </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={searchOpen ? "Close search" : "Open search"}
+            aria-expanded={searchOpen}
+            aria-controls="header-search-panel"
+            onClick={() => setSearchOpen((current) => !current)}
+          >
+            <Search aria-hidden="true" />
           </Button>
           <ThemeToggle />
           {authReady && (user ? accountMenu : (
@@ -220,6 +227,15 @@ export function Header() {
           </Sheet>
         </div>
       </div>
+      {searchOpen && (
+        <div
+          id="header-search-panel"
+          className="border-t border-border/70 bg-background/95 px-4 py-4 shadow-lg backdrop-blur-xl"
+          onKeyDown={(event) => event.key === "Escape" && setSearchOpen(false)}
+        >
+          <SearchBar autoFocus onSubmitted={() => setSearchOpen(false)} className="mx-auto max-w-2xl" />
+        </div>
+      )}
     </header>
   );
 }

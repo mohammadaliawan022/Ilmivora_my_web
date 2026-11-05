@@ -69,7 +69,7 @@ function SubjectPage() {
       <section className="relative overflow-hidden bg-hero text-navy-foreground">
         <div className="pointer-events-none absolute inset-0 grid-pattern" aria-hidden />
         <div className="container-page relative py-12 text-center md:py-16">
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-violet/30 bg-violet/10 px-4 py-2 text-sm font-semibold text-violet-soft">
+          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-violet/70 bg-violet/25 px-4 py-2 text-sm font-semibold text-white shadow-sm">
             <BookOpen className="h-4 w-4" aria-hidden="true" /> MCQ Practice
           </div>
           <h1 className="mt-5 text-3xl font-extrabold tracking-tight md:text-5xl">

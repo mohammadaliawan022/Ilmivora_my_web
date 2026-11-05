@@ -381,7 +381,7 @@ export async function approveSubmission(id: string, edits?: McqInput): Promise<M
   if (!sub) throw new Error("Submission not found");
   if (sub.status !== "pending") throw new Error("This submission has already been reviewed");
   const { id: _id, submitter_name: _n, status: _s, review_note: _r, created_at: _c, reviewed_at: _ra, ...base } = sub;
-  const mcq = await createMcq(edits ?? base);
+  const mcq = await createMcq({ ...base, ...(edits ?? {}), submitter_name: sub.submitter_name });
   submissions = submissions.map((s) =>
     s.id === id ? { ...s, ...(edits ?? {}), status: "approved", reviewed_at: new Date().toISOString() } : s,
   );

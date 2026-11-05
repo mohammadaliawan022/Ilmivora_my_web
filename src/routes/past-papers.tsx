@@ -52,7 +52,7 @@ function PastPapersPage() {
       <section className="relative overflow-hidden bg-hero text-navy-foreground">
         <div className="pointer-events-none absolute inset-0 grid-pattern" aria-hidden />
         <div className="container-page relative py-14 text-center md:py-20">
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-violet/30 bg-violet/10 px-4 py-2 text-sm font-semibold text-violet-soft">
+          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-violet/70 bg-violet/25 px-4 py-2 text-sm font-semibold text-white shadow-sm">
             <FileText className="h-4 w-4" aria-hidden="true" />
             Competitive exam preparation
           </div>

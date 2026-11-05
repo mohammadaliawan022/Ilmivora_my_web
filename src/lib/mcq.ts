@@ -11,6 +11,8 @@ export interface Mcq {
   subject: string;
   exam_category: string | null;
   topic: string | null;
+  /** Optional public contributor credit copied from an approved submission. */
+  submitter_name?: string | null;
   created_at: string;
 }
 

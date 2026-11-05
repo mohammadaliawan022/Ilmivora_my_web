@@ -88,8 +88,11 @@ function SubmitPage() {
                   value={name}
                   maxLength={80}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Shown to admins only"
+                  placeholder="Your display name"
                 />
+                <p className="text-xs text-muted-foreground">
+                  If entered, your name will appear with this question after an admin approves it.
+                </p>
               </div>
             </McqForm>
           </div>

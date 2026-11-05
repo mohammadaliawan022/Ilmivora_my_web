@@ -19,6 +19,9 @@ export function McqCard({ mcq, index }: { mcq: Mcq; index?: number }) {
         {mcq.topic && <Badge variant="violet">{mcq.topic}</Badge>}
         {mcq.exam_category && <Badge variant="outline">{mcq.exam_category}</Badge>}
       </div>
+      {mcq.submitter_name && (
+        <p className="mt-2 text-xs text-muted-foreground">Submitted by {mcq.submitter_name}</p>
+      )}
       <h3 className="mt-3 font-sans text-base font-semibold leading-relaxed tracking-normal text-foreground md:text-lg">
         {mcq.question}
       </h3>
