@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, Inbox, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Pager } from "@/components/site/Pager";
@@ -27,9 +27,17 @@ export function McqBrowser({
   showSearch?: boolean;
 }) {
   const [draft, setDraft] = useState(search ?? "");
+  const questionListRef = useRef<HTMLDivElement>(null);
+  const previousPage = useRef(page);
   useEffect(() => setDraft(search ?? ""), [search]);
 
   const query = useQuery(mcqListQuery({ ...filters, search }, page));
+
+  useEffect(() => {
+    if (previousPage.current === page || query.isPlaceholderData || query.data?.page !== page) return;
+    previousPage.current = page;
+    questionListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [page, query.data?.page, query.isPlaceholderData]);
 
   return (
     <div className="space-y-5">
@@ -78,7 +86,10 @@ export function McqBrowser({
         </div>
       ) : (
         <>
-          <div className={query.isPlaceholderData ? "space-y-4 opacity-60" : "space-y-4"}>
+          <div
+            ref={questionListRef}
+            className={`scroll-mt-24 space-y-4${query.isPlaceholderData ? " opacity-60" : ""}`}
+          >
             {query.data.items.map((m, i) => (
               <McqCard
                 key={m.id}
