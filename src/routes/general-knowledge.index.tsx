@@ -95,7 +95,10 @@ function GkPage() {
               filters={{ subject: GK_SUBJECT }}
               page={page}
               search={q}
-              onPageChange={(p) => navigate({ search: (s) => ({ ...s, page: p > 1 ? p : undefined }) })}
+              onPageChange={(p) => navigate({
+                search: (s) => ({ ...s, page: p > 1 ? p : undefined }),
+                resetScroll: false,
+              })}
               onSearchChange={(v) => navigate({ search: { q: v } })}
               emptyMessage="No General Knowledge MCQs have been added yet."
             />
