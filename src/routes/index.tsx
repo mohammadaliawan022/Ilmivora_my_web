@@ -4,7 +4,6 @@ import {
   ArrowRight,
   BookMarked,
   Clock,
-  GraduationCap,
   Layers,
   LineChart,
   Sparkles,
@@ -18,7 +17,6 @@ import { SearchBar } from "@/components/site/SearchBar";
 import { OptionButton } from "@/components/mcq/OptionButton";
 import { recentMcqsQuery } from "@/lib/data/queries";
 import { EXAM_CATEGORIES } from "@/lib/exam-categories";
-import { GK_CATEGORY_TARGET_COUNT } from "@/lib/gk-categories";
 import { EXAM_SECONDS_PER_QUESTION, type OptionLetter } from "@/lib/mcq";
 import { GK_DOMAIN, POPULAR_SUBJECT_SLUGS, SUBJECT_GROUPS, SUBJECTS, getSubjectBySlug } from "@/lib/subjects";
 import { formatDistanceToNow } from "date-fns";
@@ -229,7 +227,7 @@ function ExamCategories() {
 function FeaturedGroups() {
   return (
     <section className="container-page py-20">
-      <SectionHead eyebrow="Featured categories" title="Explore by field of study" />
+      <SectionHead eyebrow="Fields of study" title="Explore by field of study" />
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         {SUBJECT_GROUPS.filter((g) => g !== GK_DOMAIN).map((g, i) => {
           const subjects = SUBJECTS.filter((s) => s.group === g);
@@ -314,12 +312,11 @@ function Stats() {
   const stats = [
     { icon: BookMarked, value: "10,000+", label: "MCQs with explanations" },
     { icon: Layers, value: String(SUBJECTS.length), label: "Subjects covered" },
-    { icon: GraduationCap, value: String(GK_CATEGORY_TARGET_COUNT), label: "GK topic categories" },
     { icon: Clock, value: `${EXAM_SECONDS_PER_QUESTION}s`, label: "Per question in exam mode" },
   ];
   return (
     <section className="container-page py-20">
-      <div className="grid gap-px overflow-hidden rounded-3xl border border-border bg-border md:grid-cols-4">
+      <div className="grid gap-px overflow-hidden rounded-3xl border border-border md:grid-cols-3">
         {stats.map((s) => (
           <div key={s.label} className="bg-card p-8">
             <s.icon className="h-6 w-6 text-violet" />

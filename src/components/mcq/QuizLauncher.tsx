@@ -18,12 +18,10 @@ const COUNTS = [5, 10, 20, 30, 50, 100];
 export function QuizLauncher({
   mode,
   initialSubject,
-  initialTopic,
   initialExam,
 }: {
   mode: "practice" | "exam";
   initialSubject?: string | undefined;
-  initialTopic?: string | undefined;
   initialExam?: string | undefined;
 }) {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>(initialSubject ? [initialSubject] : []);
@@ -38,7 +36,6 @@ export function QuizLauncher({
       getQuizQuestions(
         {
           subjects: selectedSubjects.length > 0 ? selectedSubjects : undefined,
-          topic: initialTopic,
           examCategory: exam === ALL ? undefined : exam,
         },
         count,
@@ -51,7 +48,7 @@ export function QuizLauncher({
     : selectedSubjects.length === 1
       ? selectedSubjects[0]!
       : `Mixed: ${selectedSubjects.join(", ")}`;
-  const label = initialTopic ?? selectedLabel;
+  const label = selectedLabel;
   const reset = () => {
     setQuestions(null);
     start.reset();
@@ -59,9 +56,9 @@ export function QuizLauncher({
 
   if (questions && questions.length > 0) {
     return mode === "practice" ? (
-      <PracticeQuiz mcqs={questions} label={label} topic={initialTopic} onRestart={reset} />
+      <PracticeQuiz mcqs={questions} label={label} onRestart={reset} />
     ) : (
-      <ExamQuiz mcqs={questions} label={label} topic={initialTopic} onRestart={reset} />
+      <ExamQuiz mcqs={questions} label={label} onRestart={reset} />
     );
   }
 
@@ -85,15 +82,7 @@ export function QuizLauncher({
         </div>
 
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
-          {initialTopic ? (
-            <div className="sm:col-span-2">
-              <Label>Topic</Label>
-              <p className="mt-2 rounded-lg border border-border bg-muted px-3 py-2 text-sm font-medium">
-                {initialTopic}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3 sm:col-span-2">
+          <div className="space-y-3 sm:col-span-2">
               <Label id="practice-subject-label">Subjects</Label>
               <div className="relative">
                 <Button
@@ -168,8 +157,7 @@ export function QuizLauncher({
                   </div>
                 )}
               </div>
-            </div>
-          )}
+          </div>
           <div className="space-y-2">
             <Label htmlFor="exam">Exam category</Label>
             <Select value={exam} onValueChange={setExam}>

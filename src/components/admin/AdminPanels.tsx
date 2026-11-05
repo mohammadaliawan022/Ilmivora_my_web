@@ -1,13 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { BookMarked, ClipboardCheck, FileText, FolderTree, Layers, Plus, Trash2, Users } from "lucide-react";
-import { useEffect, useState, type FormEvent } from "react";
+import { BookMarked, ClipboardCheck, FileText, Layers, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { examCountsQuery, mcqListQuery, subjectCountsQuery, submissionCountsQuery } from "@/lib/data/queries";
 import { loadAttempts, summarizeAttempts, type TestAttempt } from "@/lib/attempts";
-import { GK_CATEGORY_TARGET_COUNT } from "@/lib/gk-categories";
 import { SUBJECTS } from "@/lib/subjects";
 
 const CHART_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
@@ -24,7 +20,7 @@ function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ classN
   );
 }
 
-export function AdminOverview({ gkCount }: { gkCount: number }) {
+export function AdminOverview() {
   const total = useQuery(mcqListQuery({}, 1, 1));
   const subjectCounts = useQuery(subjectCountsQuery());
   const examCounts = useQuery(examCountsQuery());
@@ -38,10 +34,9 @@ export function AdminOverview({ gkCount }: { gkCount: number }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <Stat icon={BookMarked} label="Total MCQs" value={total.data?.total.toLocaleString() ?? "—"} />
         <Stat icon={Layers} label="Subjects" value={SUBJECTS.length} />
-        <Stat icon={FolderTree} label="GK categories" value={`${gkCount}/${GK_CATEGORY_TARGET_COUNT}`} />
         <Stat icon={ClipboardCheck} label="Pending submissions" value={subs.data?.pending ?? "—"} />
       </div>
       <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
@@ -96,7 +91,6 @@ export function AdminSubjects() {
           <tr>
             <th className="px-4 py-3 font-semibold">Subject</th>
             <th className="px-4 py-3 font-semibold">Field</th>
-            <th className="px-4 py-3 text-right font-semibold">Sections</th>
             <th className="px-4 py-3 text-right font-semibold">MCQs</th>
           </tr>
         </thead>
@@ -109,62 +103,11 @@ export function AdminSubjects() {
                 </span>
               </td>
               <td className="px-4 py-3 text-muted-foreground">{s.group}</td>
-              <td className="px-4 py-3 text-right text-muted-foreground">{s.totalSections}</td>
               <td className="px-4 py-3 text-right font-semibold">{(data?.[s.name] ?? 0).toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
-  );
-}
-
-export function AdminGkCategories({
-  categories,
-  onChange,
-}: {
-  categories: string[];
-  onChange: (next: string[]) => void;
-}) {
-  const [name, setName] = useState("");
-  const add = (e: FormEvent) => {
-    e.preventDefault();
-    const n = name.trim();
-    if (!n) return;
-    if (categories.some((c) => c.toLowerCase() === n.toLowerCase())) {
-      toast.error("That category already exists");
-      return;
-    }
-    onChange([...categories, n]);
-    setName("");
-  };
-  return (
-    <div className="space-y-5">
-      <div className="card-surface p-6">
-        <h3 className="text-lg font-bold">General Knowledge categories</h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {categories.length} of {GK_CATEGORY_TARGET_COUNT} added. Names must match the MCQ{" "}
-          <code className="text-foreground">topic</code> value exactly.
-        </p>
-        <form onSubmit={add} className="mt-4 flex gap-2">
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Category name" aria-label="Category name" />
-          <Button type="submit">
-            <Plus /> Add
-          </Button>
-        </form>
-      </div>
-      {categories.length > 0 && (
-        <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((c) => (
-            <li key={c} className="card-surface flex items-center justify-between px-4 py-2.5 text-sm font-medium">
-              {c}
-              <Button variant="ghost" size="icon" aria-label={`Remove ${c}`} onClick={() => onChange(categories.filter((x) => x !== c))}>
-                <Trash2 className="text-danger" />
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

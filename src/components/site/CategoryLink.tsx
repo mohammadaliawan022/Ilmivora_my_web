@@ -3,25 +3,19 @@ import type { ReactNode } from "react";
 import type { Category } from "@/lib/categories";
 import { GK_SUBJECT } from "@/lib/subjects";
 
-/** Links a catalogue entry to its page (GK has its own pages). */
+/** Links a subject to its page. */
 export function CategoryLink({
   cat,
   className,
   children,
 }: {
-  cat: Pick<Category, "slug" | "parent" | "name">;
+  cat: Pick<Category, "slug" | "name">;
   className?: string;
   children: ReactNode;
 }) {
   if (cat.name === GK_SUBJECT)
     return (
       <Link to="/general-knowledge" className={className}>
-        {children}
-      </Link>
-    );
-  if (cat.parent === GK_SUBJECT)
-    return (
-      <Link to="/general-knowledge/$topic" params={{ topic: cat.slug }} className={className}>
         {children}
       </Link>
     );

@@ -46,7 +46,7 @@ export const REQUIRED_CSV_COLUMNS = [
   "subject",
 ] as const;
 
-export const OPTIONAL_CSV_COLUMNS = ["explanation", "exam_category", "topic"] as const;
+export const OPTIONAL_CSV_COLUMNS = ["explanation", "exam_category"] as const;
 
 export interface CsvImportResult {
   rows: McqInput[];
@@ -89,7 +89,7 @@ export function csvToMcqs(text: string): CsvImportResult {
       explanation: get(r, "explanation") || null,
       subject: get(r, "subject"),
       exam_category: get(r, "exam_category") || null,
-      topic: get(r, "topic") || null,
+      topic: null,
     });
   });
   return { rows, errors, missingColumns: [] };

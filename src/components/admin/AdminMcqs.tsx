@@ -12,7 +12,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Pager } from "@/components/site/Pager";
@@ -22,7 +21,7 @@ import { getCorrectLetter, type Mcq } from "@/lib/mcq";
 import { SUBJECTS } from "@/lib/subjects";
 import { McqFormDialog } from "./McqFormDialog";
 
-export function AdminMcqs({ gkCategories }: { gkCategories: string[] }) {
+export function AdminMcqs() {
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -116,7 +115,6 @@ export function AdminMcqs({ gkCategories }: { gkCategories: string[] }) {
                 <tr key={m.id} className="align-top">
                   <td className="max-w-md px-4 py-3 font-medium">
                     <span className="line-clamp-2">{m.question}</span>
-                    {m.topic && <Badge variant="violet" className="mt-1">{m.topic}</Badge>}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{m.subject}</td>
                   <td className="px-4 py-3 text-muted-foreground">{m.exam_category ?? "—"}</td>
@@ -160,7 +158,6 @@ export function AdminMcqs({ gkCategories }: { gkCategories: string[] }) {
         initial={editing}
         pending={save.isPending}
         onSubmit={(v) => save.mutate(v)}
-        gkCategories={gkCategories}
       />
 
       <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>

@@ -7,16 +7,14 @@ import type { McqFilters } from "@/lib/data/mcq-repo";
 export function SubjectQuizSidebar({
   filters,
   subject,
-  topic,
   page = 1,
 }: {
   filters: McqFilters;
   subject: string;
-  topic?: string | undefined;
   page?: number;
 }) {
   const { data } = useQuery(mcqListQuery(filters, page));
-  const search = topic ? { subject, topic } : { subject };
+  const search = { subject };
   const total = data?.total ?? 0;
 
   return (

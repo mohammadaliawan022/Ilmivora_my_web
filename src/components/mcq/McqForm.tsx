@@ -1,13 +1,12 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { getDescendants } from "@/lib/categories";
 import type { McqInput } from "@/lib/data/mcq-repo";
 import { EXAM_CATEGORIES } from "@/lib/exam-categories";
 import { getCorrectLetter, validateMcqDraft, type Mcq } from "@/lib/mcq";
-import { GK_SUBJECT, SUBJECTS } from "@/lib/subjects";
+import { SUBJECTS } from "@/lib/subjects";
 
 export const EMPTY_MCQ: McqInput = {
   question: "",
@@ -35,7 +34,6 @@ export function McqForm({
   pending,
   submitLabel,
   onCancel,
-  gkCategories,
   children,
 }: {
   initial?: Mcq | McqInput | null | undefined;
@@ -45,7 +43,6 @@ export function McqForm({
   pending?: boolean | undefined;
   submitLabel: string;
   onCancel?: (() => void) | undefined;
-  gkCategories?: string[] | undefined;
   /** Extra fields rendered above the question (e.g. submitter name). */
   children?: ReactNode;
 }) {
@@ -55,19 +52,13 @@ export function McqForm({
   useEffect(() => {
     setErrors([]);
     if (!initial) return setV(EMPTY_MCQ);
-    const { question, option_a, option_b, option_c, option_d, explanation, subject, exam_category, topic } =
-      initial;
+    const { question, option_a, option_b, option_c, option_d, explanation, subject, exam_category } = initial;
     const letter = getCorrectLetter({ ...EMPTY_MCQ, ...initial, id: "", created_at: "" } as Mcq);
-    setV({ question, option_a, option_b, option_c, option_d, explanation, subject, exam_category, topic, correct_answer: letter ?? "A" });
+    setV({ question, option_a, option_b, option_c, option_d, explanation, subject, exam_category, topic: null, correct_answer: letter ?? "A" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetKey]);
 
   const set = <K extends keyof McqInput>(k: K, val: McqInput[K]) => setV((p) => ({ ...p, [k]: val }));
-
-  const sections = useMemo(() => {
-    if (v.subject === GK_SUBJECT && gkCategories) return gkCategories.map((name) => ({ name, depth: 1 }));
-    return getDescendants(v.subject);
-  }, [v.subject, gkCategories]);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -82,45 +73,25 @@ export function McqForm({
       option_c: v.option_c.trim(),
       option_d: v.option_d.trim(),
       explanation: v.explanation?.trim() || null,
-      topic: sections.some((s) => s.name === v.topic) ? v.topic : null,
+      topic: null,
     });
   };
 
   return (
     <form onSubmit={submit} className="space-y-4" noValidate>
       {children}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-2">
+      <div className="space-y-2">
           <Label htmlFor="mcq-subj">Subject</Label>
           <select
             id="mcq-subj"
             className={selectCls}
             value={v.subject}
-            onChange={(e) => setV((p) => ({ ...p, subject: e.target.value, topic: null }))}
+            onChange={(e) => set("subject", e.target.value)}
           >
             {SUBJECTS.map((s) => (
               <option key={s.slug}>{s.name}</option>
             ))}
           </select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="mcq-topic">Section / topic</Label>
-          <select
-            id="mcq-topic"
-            className={selectCls}
-            value={v.topic ?? ""}
-            disabled={sections.length === 0}
-            onChange={(e) => set("topic", e.target.value || null)}
-          >
-            <option value="">{sections.length === 0 ? "No sections" : "Whole subject"}</option>
-            {sections.map((s) => (
-              <option key={s.name} value={s.name}>
-                {"\u00A0\u00A0".repeat(s.depth - 1)}
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
       <div className="space-y-2">
         <Label htmlFor="mcq-q">Question</Label>

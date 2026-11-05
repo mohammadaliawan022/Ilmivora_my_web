@@ -144,7 +144,7 @@ function DashboardPage() {
                       <td className="whitespace-nowrap px-6 py-3 text-muted-foreground">
                         {format(new Date(a.createdAt), "d MMM yyyy, h:mm a")}
                       </td>
-                      <td className="px-6 py-3 font-medium">{a.topic ?? a.subject}</td>
+                      <td className="px-6 py-3 font-medium">{a.subject}</td>
                       <td className="px-6 py-3">
                         <Badge variant={a.mode === "exam" ? "violet" : "soft"}>
                           {a.mode === "exam" ? "Exam" : "Practice"}

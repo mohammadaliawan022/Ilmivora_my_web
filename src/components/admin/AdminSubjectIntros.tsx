@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { selectCls } from "@/components/mcq/McqForm";
-import { getCategoryBySlug, getDescendants, getPath } from "@/lib/categories";
 import { subjectIntroListQuery, subjectIntroQuery } from "@/lib/data/queries";
 import {
   INTRO_MAX_CHARS,
@@ -28,24 +27,17 @@ const readAsDataUrl = (file: File) =>
   });
 
 function labelFor(slug: string): string {
-  const cat = getCategoryBySlug(slug);
-  return cat ? getPath(cat).map((c) => c.name).join(" › ") : slug;
+  return SUBJECTS.find((subject) => subject.slug === slug)?.name ?? slug;
 }
 
 export function AdminSubjectIntros() {
   const [subjectSlug, setSubjectSlug] = useState(SUBJECTS[0]?.slug ?? "");
-  const [sectionSlug, setSectionSlug] = useState("");
-  const subject = SUBJECTS.find((s) => s.slug === subjectSlug);
-  const sections = subject ? getDescendants(subject.name) : [];
-  const targetSlug = sectionSlug || subjectSlug;
+  const targetSlug = subjectSlug;
   const saved = useQuery(subjectIntroListQuery());
+  const savedSubjects = saved.data?.filter((row) => SUBJECTS.some((subject) => subject.slug === row.slug)) ?? [];
 
   const pick = (slug: string) => {
-    const cat = getCategoryBySlug(slug);
-    if (!cat) return;
-    const root = getPath(cat)[0]!;
-    setSubjectSlug(root.slug);
-    setSectionSlug(cat.parent ? cat.slug : "");
+    if (SUBJECTS.some((subject) => subject.slug === slug)) setSubjectSlug(slug);
   };
 
   return (
@@ -54,41 +46,20 @@ export function AdminSubjectIntros() {
         <div>
           <h3 className="text-lg font-bold">Subject introduction</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            Shown at the top of the subject page, above its MCQs. You can also write one for any section.
+            Shown at the top of the subject page, above its MCQs.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="max-w-md">
           <div className="space-y-2">
             <Label htmlFor="intro-subject">Subject</Label>
             <select
               id="intro-subject"
               className={selectCls}
               value={subjectSlug}
-              onChange={(e) => {
-                setSubjectSlug(e.target.value);
-                setSectionSlug("");
-              }}
+              onChange={(e) => setSubjectSlug(e.target.value)}
             >
               {SUBJECTS.map((s) => (
                 <option key={s.slug} value={s.slug}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="intro-section">Section (optional)</Label>
-            <select
-              id="intro-section"
-              className={selectCls}
-              value={sectionSlug}
-              onChange={(e) => setSectionSlug(e.target.value)}
-              disabled={sections.length === 0}
-            >
-              <option value="">Whole subject page</option>
-              {sections.map((s) => (
-                <option key={s.slug} value={s.slug}>
-                  {"\u00A0\u00A0".repeat(s.depth - 1)}
                   {s.name}
                 </option>
               ))}
@@ -99,14 +70,14 @@ export function AdminSubjectIntros() {
       </div>
 
       <section className="space-y-3">
-        <h3 className="text-lg font-bold">Saved introductions ({saved.data?.length ?? 0})</h3>
-        {!saved.data?.length ? (
+        <h3 className="text-lg font-bold">Saved introductions ({savedSubjects.length})</h3>
+        {!savedSubjects.length ? (
           <p className="card-surface p-8 text-center text-sm text-muted-foreground">
             No introductions yet. Pick a subject above and add an image or paragraph.
           </p>
         ) : (
           <ul className="grid gap-3 md:grid-cols-2">
-            {saved.data.map((row) => (
+            {savedSubjects.map((row) => (
               <SavedIntroRow key={row.slug} row={row} onEdit={() => pick(row.slug)} />
             ))}
           </ul>

@@ -34,7 +34,7 @@ const STATUSES: Array<[SubmissionStatus, string]> = [
   ["rejected", "Rejected"],
 ];
 
-export function AdminSubmissions({ gkCategories }: { gkCategories: string[] }) {
+export function AdminSubmissions() {
   const qc = useQueryClient();
   const [status, setStatus] = useState<SubmissionStatus>("pending");
   const [page, setPage] = useState(1);
@@ -137,7 +137,6 @@ export function AdminSubmissions({ gkCategories }: { gkCategories: string[] }) {
         initial={editing}
         pending={approve.isPending}
         onSubmit={(v) => editing && approve.mutate({ id: editing.id, edits: v })}
-        gkCategories={gkCategories}
         title="Edit & approve submission"
         submitLabel="Save and approve"
       />
@@ -190,7 +189,6 @@ function SubmissionCard({
     <article className="card-surface p-5">
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <Badge variant="soft">{sub.subject}</Badge>
-        {sub.topic && <Badge variant="violet">{sub.topic}</Badge>}
         {sub.exam_category && <Badge variant="outline">{sub.exam_category}</Badge>}
         <span className="ml-auto">
           {sub.submitter_name ? `By ${sub.submitter_name} · ` : "Anonymous · "}

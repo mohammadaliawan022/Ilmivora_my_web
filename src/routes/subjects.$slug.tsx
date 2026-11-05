@@ -1,12 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { BookOpen, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CategoryLink } from "@/components/site/CategoryLink";
 import { SubjectIntro } from "@/components/site/SubjectIntro";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
-import { SectionGrid } from "@/components/mcq/SectionGrid";
 import { SubjectQuizSidebar } from "@/components/mcq/SubjectQuizSidebar";
-import { getCategoryBySlug, getChildren, getPath } from "@/lib/categories";
+import { getCategoryBySlug } from "@/lib/categories";
 
 type Search = { page?: number | undefined; q?: string | undefined };
 
@@ -17,29 +15,21 @@ export const Route = createFileRoute("/subjects/$slug")({
   }),
   loader: ({ params }) => {
     const cat = getCategoryBySlug(params.slug);
-    if (!cat) throw notFound();
-    const path = getPath(cat);
-    return {
-      name: cat.name,
-      domain: cat.domain,
-      isSubject: !cat.parent,
-      rootName: path[0]!.name,
-      path: path.map((p) => ({ name: p.name, slug: p.slug, parent: p.parent })),
-    };
+    if (!cat || cat.parent) throw notFound();
+    return { name: cat.name };
   },
   head: ({ loaderData }) => {
     const name = loaderData?.name;
     if (!name) return { meta: [{ title: "Subject unavailable — Ilmivora" }, { name: "robots", content: "noindex" }] };
-    const context = loaderData.isSubject ? "" : ` (${loaderData.rootName})`;
     return {
       meta: [
-        { title: `${name}${context} MCQs — Ilmivora` },
+        { title: `${name} MCQs — Ilmivora` },
         {
           name: "description",
-          content: `Practise ${name}${context} MCQs with answers and explanations for PPSC, FPSC and NTS exams.`,
+          content: `Practise ${name} MCQs with answers and explanations for PPSC, FPSC and NTS exams.`,
         },
         { property: "og:title", content: `${name} MCQs — Ilmivora` },
-        { property: "og:description", content: `${name}${context} MCQs with explanations.` },
+        { property: "og:description", content: `${name} MCQs with explanations.` },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary" },
       ],
@@ -57,12 +47,11 @@ export const Route = createFileRoute("/subjects/$slug")({
 });
 
 function SubjectPage() {
-  const { name, isSubject, rootName, path } = Route.useLoaderData();
+  const { name } = Route.useLoaderData();
   const { slug } = Route.useParams();
   const { page = 1, q } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const sections = getChildren(name);
-  const filters = isSubject ? { subject: name } : { topic: name };
+  const filters = { subject: name };
 
   return (
     <>
@@ -81,31 +70,12 @@ function SubjectPage() {
 
       <div className="container-page py-8 md:py-10">
         <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
-          <Link to="/subjects" className="font-semibold text-primary hover:underline">All Subjects &amp; Topics</Link>
-          {path.map((p, i) => (
-            <span key={p.slug} className="flex items-center gap-1">
-              <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
-              {i === path.length - 1 ? (
-                <span className="font-medium text-foreground">{p.name}</span>
-              ) : (
-                <CategoryLink cat={p} className="hover:text-foreground">{p.name}</CategoryLink>
-              )}
-            </span>
-          ))}
+          <Link to="/subjects" className="font-semibold text-primary hover:underline">All Subjects</Link>
+          <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+          <span className="font-medium text-foreground">{name}</span>
         </nav>
 
         <SubjectIntro slug={slug} name={name} />
-
-        {sections.length > 0 && (
-          <details className="card-surface mt-6 rounded-2xl p-4">
-            <summary className="cursor-pointer list-none font-semibold text-primary marker:hidden">
-              <span aria-hidden="true" className="mr-2">›</span> Explore {sections.length} sections in {name}
-            </summary>
-            <div className="mt-4 border-t border-border pt-4">
-              <SectionGrid sections={sections} title="Sections" />
-            </div>
-          </details>
-        )}
 
         <div className="mt-7 flex flex-wrap items-center gap-3 text-sm">
           <span className="rounded-xl bg-primary-soft px-4 py-3 font-semibold text-primary">All MCQs</span>
@@ -126,7 +96,7 @@ function SubjectPage() {
               emptyMessage={`No ${name} MCQs have been added yet.`}
             />
           </section>
-          <SubjectQuizSidebar filters={filters} subject={rootName} topic={isSubject ? undefined : name} page={page} />
+          <SubjectQuizSidebar filters={filters} subject={name} page={page} />
         </div>
         <p className="mt-8 text-center text-sm">
           <Link to="/submit-mcq" className="font-semibold text-primary hover:underline">Have a useful question? Submit an MCQ</Link>

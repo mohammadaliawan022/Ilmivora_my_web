@@ -13,7 +13,7 @@ export const Route = createFileRoute("/contact")({
   component: () => (
     <InfoPage eyebrow="Contact" title="Contact us" description="We'd love to hear from you.">
       <p>
-        Found an error in a question, want to suggest a topic, or interested in working with us? Reach
+        Found an error in a question or interested in working with us? Reach
         out and we'll get back to you.
       </p>
       <h2>Email</h2>

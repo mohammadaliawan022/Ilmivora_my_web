@@ -3,14 +3,13 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { QuizLauncher } from "@/components/mcq/QuizLauncher";
 import { EXAM_SECONDS_PER_QUESTION } from "@/lib/mcq";
 
-type Search = { subject?: string | undefined; topic?: string | undefined; exam?: string | undefined };
+type Search = { subject?: string | undefined; exam?: string | undefined };
 
 const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
 
 export const Route = createFileRoute("/exam")({
   validateSearch: (s: Record<string, unknown>): Search => ({
     subject: str(s["subject"]),
-    topic: str(s["topic"]),
     exam: str(s["exam"]),
   }),
   head: () => ({
@@ -29,7 +28,7 @@ export const Route = createFileRoute("/exam")({
 });
 
 function ExamPage() {
-  const { subject, topic, exam } = Route.useSearch();
+  const { subject, exam } = Route.useSearch();
   return (
     <>
       <PageHeader
@@ -39,10 +38,9 @@ function ExamPage() {
       />
       <div className="container-page py-10">
         <QuizLauncher
-          key={`${subject}-${topic}-${exam}`}
+          key={`${subject}-${exam}`}
           mode="exam"
           initialSubject={subject}
-          initialTopic={topic}
           initialExam={exam}
         />
       </div>

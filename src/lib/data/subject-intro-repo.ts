@@ -17,7 +17,8 @@ import { deleteSubjectIntroImage, isPreviewMode, supabaseRest, uploadSubjectIntr
 
 export const INTRO_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
 export const INTRO_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-export const INTRO_MAX_CHARS = 3000;
+// About 200 words of introductory copy (word lengths vary).
+export const INTRO_MAX_CHARS = 1600;
 
 /** Returns an error message, or null when the image file is acceptable. */
 export function validateIntroImage(file: { type: string; size: number }): string | null {

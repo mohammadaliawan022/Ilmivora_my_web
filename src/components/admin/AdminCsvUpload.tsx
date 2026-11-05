@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Download, FileUp, Upload } from "lucide-react";
-import { useState } from "react";
+import { ChevronLeft, ChevronRight, Download, FileUp, Upload, X } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { bulkInsertMcqs } from "@/lib/data/mcq-repo";
@@ -8,19 +8,28 @@ import { OPTIONAL_CSV_COLUMNS, REQUIRED_CSV_COLUMNS, csvToMcqs, type CsvImportRe
 
 const TEMPLATE =
   [...REQUIRED_CSV_COLUMNS, ...OPTIONAL_CSV_COLUMNS].join(",") +
-  '\n"What is the capital of Pakistan?",Karachi,Lahore,Islamabad,Peshawar,C,General Knowledge,"Islamabad became the capital in 1967.",PPSC,\n';
+  '\n"What is the capital of Pakistan?",Karachi,Lahore,Islamabad,Peshawar,C,General Knowledge,"Islamabad became the capital in 1967.",PPSC\n';
+const PREVIEW_PAGE_SIZE = 10;
 
 export function AdminCsvUpload() {
   const qc = useQueryClient();
+  const fileInput = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [result, setResult] = useState<CsvImportResult | null>(null);
+  const [previewPage, setPreviewPage] = useState(1);
+
+  const cancelSelection = () => {
+    setFileName(null);
+    setResult(null);
+    setPreviewPage(1);
+    if (fileInput.current) fileInput.current.value = "";
+  };
 
   const importRows = useMutation({
     mutationFn: () => bulkInsertMcqs(result?.rows ?? []),
     onSuccess: (n) => {
       toast.success(`${n} MCQs imported`);
-      setResult(null);
-      setFileName(null);
+      cancelSelection();
       qc.invalidateQueries({ queryKey: ["mcqs"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -29,6 +38,7 @@ export function AdminCsvUpload() {
   const onFile = async (file: File | undefined) => {
     if (!file) return;
     setFileName(file.name);
+    setPreviewPage(1);
     setResult(csvToMcqs(await file.text()));
   };
 
@@ -62,12 +72,26 @@ export function AdminCsvUpload() {
           <span className="font-semibold">{fileName ?? "Choose a CSV file"}</span>
           <span className="text-xs text-muted-foreground">UTF-8 encoded .csv</span>
           <input
+            ref={fileInput}
             type="file"
             accept=".csv,text/csv"
             className="sr-only"
             onChange={(e) => onFile(e.target.files?.[0])}
           />
         </label>
+        {fileName && (
+          <div className="mt-3 flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={importRows.isPending}
+              onClick={cancelSelection}
+            >
+              <X /> Cancel CSV
+            </Button>
+          </div>
+        )}
       </div>
 
       {result && (
@@ -106,11 +130,42 @@ export function AdminCsvUpload() {
               )}
               {result.rows.length > 0 && (
                 <div className="mt-4 overflow-x-auto">
-                  <p className="mb-2 text-xs font-semibold text-muted-foreground">Preview (first 5)</p>
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      Preview {((previewPage - 1) * PREVIEW_PAGE_SIZE) + 1}–{Math.min(previewPage * PREVIEW_PAGE_SIZE, result.rows.length)} of {result.rows.length}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={previewPage === 1}
+                        onClick={() => setPreviewPage((page) => Math.max(1, page - 1))}
+                        aria-label="Previous preview page"
+                      >
+                        <ChevronLeft /> Previous
+                      </Button>
+                      <span className="text-xs text-muted-foreground">
+                        Page {previewPage} of {Math.ceil(result.rows.length / PREVIEW_PAGE_SIZE)}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={previewPage >= Math.ceil(result.rows.length / PREVIEW_PAGE_SIZE)}
+                        onClick={() => setPreviewPage((page) => Math.min(Math.ceil(result.rows.length / PREVIEW_PAGE_SIZE), page + 1))}
+                        aria-label="Next preview page"
+                      >
+                        Next <ChevronRight />
+                      </Button>
+                    </div>
+                  </div>
                   <table className="w-full text-xs">
                     <tbody className="divide-y divide-border">
-                      {result.rows.slice(0, 5).map((r, i) => (
-                        <tr key={i}>
+                      {result.rows
+                        .slice((previewPage - 1) * PREVIEW_PAGE_SIZE, previewPage * PREVIEW_PAGE_SIZE)
+                        .map((r, i) => (
+                        <tr key={(previewPage - 1) * PREVIEW_PAGE_SIZE + i}>
                           <td className="py-2 pr-3 font-medium">{r.question}</td>
                           <td className="py-2 pr-3 text-muted-foreground">{r.subject}</td>
                           <td className="py-2 font-bold text-success">{r.correct_answer}</td>

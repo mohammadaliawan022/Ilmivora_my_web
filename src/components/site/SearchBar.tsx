@@ -47,7 +47,7 @@ export function SearchBar({
             e.currentTarget.form?.requestSubmit();
           }
         }}
-        placeholder="Search MCQs, subjects or topics…"
+        placeholder="Search MCQs or subjects…"
         aria-label="Search MCQs and subjects"
         className={cn(
           "min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground",

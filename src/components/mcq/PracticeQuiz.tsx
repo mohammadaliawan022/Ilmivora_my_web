@@ -21,12 +21,10 @@ type Answers = Record<string, OptionLetter | undefined>;
 export function PracticeQuiz({
   mcqs,
   label,
-  topic,
   onRestart,
 }: {
   mcqs: Mcq[];
   label: string;
-  topic?: string | null | undefined;
   onRestart: () => void;
 }) {
   const pages = useMemo(() => paginate(mcqs, PRACTICE_PAGE_SIZE), [mcqs]);
@@ -51,7 +49,6 @@ export function PracticeQuiz({
     saveAttempt({
       mode: "practice",
       subject: label,
-      topic,
       ...score,
       durationSec: Math.round((Date.now() - startedAt.current) / 1000),
     });
@@ -161,7 +158,6 @@ function PracticeQuestion({
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-display text-sm font-bold text-primary">Q{number}.</span>
         <Badge variant="soft">{mcq.subject}</Badge>
-        {mcq.topic && <Badge variant="violet">{mcq.topic}</Badge>}
         {mcq.exam_category && <Badge variant="outline">{mcq.exam_category}</Badge>}
       </div>
       <h2 className="mt-3 font-sans text-base font-semibold leading-relaxed tracking-normal md:text-lg">

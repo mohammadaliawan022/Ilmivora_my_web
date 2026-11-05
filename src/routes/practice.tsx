@@ -2,14 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/site/PageHeader";
 import { QuizLauncher } from "@/components/mcq/QuizLauncher";
 
-type Search = { subject?: string | undefined; topic?: string | undefined; exam?: string | undefined };
+type Search = { subject?: string | undefined; exam?: string | undefined };
 
 const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
 
 export const Route = createFileRoute("/practice")({
   validateSearch: (s: Record<string, unknown>): Search => ({
     subject: str(s["subject"]),
-    topic: str(s["topic"]),
     exam: str(s["exam"]),
   }),
   head: () => ({
@@ -28,7 +27,7 @@ export const Route = createFileRoute("/practice")({
 });
 
 function PracticePage() {
-  const { subject, topic, exam } = Route.useSearch();
+  const { subject, exam } = Route.useSearch();
   return (
     <>
       <PageHeader
@@ -38,10 +37,9 @@ function PracticePage() {
       />
       <div className="container-page py-10">
         <QuizLauncher
-          key={`${subject}-${topic}-${exam}`}
+          key={`${subject}-${exam}`}
           mode="practice"
           initialSubject={subject}
-          initialTopic={topic}
           initialExam={exam}
         />
       </div>

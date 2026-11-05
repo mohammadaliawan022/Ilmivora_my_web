@@ -15,7 +15,6 @@ export function McqFormDialog({
   initial,
   onSubmit,
   pending,
-  gkCategories,
   title,
   submitLabel,
 }: {
@@ -24,7 +23,6 @@ export function McqFormDialog({
   initial?: Mcq | McqInput | null | undefined;
   onSubmit: (v: McqInput) => void;
   pending?: boolean | undefined;
-  gkCategories: string[];
   title?: string | undefined;
   submitLabel?: string | undefined;
 }) {
@@ -42,7 +40,6 @@ export function McqFormDialog({
           pending={pending}
           submitLabel={submitLabel ?? (initial ? "Save changes" : "Add MCQ")}
           onCancel={() => onOpenChange(false)}
-          gkCategories={gkCategories}
         />
       </DialogContent>
     </Dialog>

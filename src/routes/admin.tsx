@@ -6,7 +6,6 @@ import {
   ClipboardCheck,
   FileText,
   FolderOpen,
-  FolderTree,
   Image as ImageIcon,
   LayoutGrid,
   LogOut,
@@ -21,17 +20,11 @@ import { AdminCsvUpload } from "@/components/admin/AdminCsvUpload";
 import { AdminAddMcq, AdminDeleteBySubject } from "@/components/admin/AdminExtraPanels";
 import { AdminMcqs } from "@/components/admin/AdminMcqs";
 import { AdminPastPapers } from "@/components/admin/AdminPastPapers";
-import {
-  AdminAnalytics,
-  AdminGkCategories,
-  AdminOverview,
-  AdminSubjects,
-} from "@/components/admin/AdminPanels";
+import { AdminAnalytics, AdminOverview, AdminSubjects } from "@/components/admin/AdminPanels";
 import { AdminSubjectIntros } from "@/components/admin/AdminSubjectIntros";
 import { AdminSubmissions } from "@/components/admin/AdminSubmissions";
 import { Button } from "@/components/ui/button";
 import { submissionCountsQuery } from "@/lib/data/queries";
-import { GK_CATEGORY_NAMES } from "@/lib/gk-categories";
 import { getCurrentAuthUser, isCurrentUserAdmin, isPreviewMode, signOut } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
@@ -44,7 +37,6 @@ const SECTIONS = [
   { id: "delete", label: "Delete by Subject", icon: Trash2 },
   { id: "subjects", label: "Subjects", icon: FolderOpen },
   { id: "intros", label: "Subject Intros", icon: ImageIcon },
-  { id: "gk", label: "GK Categories", icon: FolderTree },
   { id: "papers", label: "Past Papers", icon: FileText },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
 ] as const satisfies ReadonlyArray<{ id: string; label: string; icon: LucideIcon }>;
@@ -59,7 +51,7 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Admin Dashboard — Ilmivora" },
-      { name: "description", content: "Manage MCQs, student submissions, subjects, past papers and GK categories." },
+      { name: "description", content: "Manage MCQs, student submissions, subjects and past papers." },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Admin — Ilmivora" },
       { property: "og:description", content: "Ilmivora content management." },
@@ -75,7 +67,6 @@ function AdminPage() {
   const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
   const [hydrated, setHydrated] = useState(false);
-  const [gk, setGk] = useState<string[]>(GK_CATEGORY_NAMES);
   useEffect(() => setHydrated(true), []);
   const access = useQuery({
     queryKey: ["auth", "admin"],
@@ -189,15 +180,14 @@ function AdminPage() {
           </div>
 
           <div className="mt-6">
-            {active.id === "overview" && <AdminOverview gkCount={gk.length} />}
-            {active.id === "mcqs" && <AdminMcqs gkCategories={gk} />}
-            {active.id === "add" && <AdminAddMcq gkCategories={gk} />}
-            {active.id === "submissions" && <AdminSubmissions gkCategories={gk} />}
+            {active.id === "overview" && <AdminOverview />}
+            {active.id === "mcqs" && <AdminMcqs />}
+            {active.id === "add" && <AdminAddMcq />}
+            {active.id === "submissions" && <AdminSubmissions />}
             {active.id === "csv" && <AdminCsvUpload />}
             {active.id === "delete" && <AdminDeleteBySubject />}
             {active.id === "subjects" && <AdminSubjects />}
             {active.id === "intros" && <AdminSubjectIntros />}
-            {active.id === "gk" && <AdminGkCategories categories={gk} onChange={setGk} />}
             {active.id === "papers" && <AdminPastPapers />}
             {active.id === "analytics" && <AdminAnalytics />}
           </div>

@@ -17,12 +17,12 @@ export const Route = createFileRoute("/about")({
         students preparing for PPSC, FPSC, NTS and other competitive examinations across Pakistan.
       </p>
       <p>
-        Every question comes with the correct answer and a clear explanation, organised by subject and
-        topic so you can focus on what matters for your exam.
+        Every question comes with the correct answer and a clear explanation, organised by subject so
+        you can focus on what matters for your exam.
       </p>
       <h2>What you can do</h2>
       <p>
-        Browse MCQs across 53 subjects and more than 1,200 sections, practise with instant feedback, simulate the real exam with a
+        Browse MCQs across 53 subjects, practise with instant feedback, simulate the real exam with a
         timer, and track your progress over time.
       </p>
     </InfoPage>

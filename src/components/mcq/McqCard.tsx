@@ -16,7 +16,6 @@ export function McqCard({ mcq, index }: { mcq: Mcq; index?: number }) {
           <span className="font-display text-sm font-bold text-primary">Q{index}.</span>
         )}
         <Badge variant="soft">{mcq.subject}</Badge>
-        {mcq.topic && <Badge variant="violet">{mcq.topic}</Badge>}
         {mcq.exam_category && <Badge variant="outline">{mcq.exam_category}</Badge>}
       </div>
       {mcq.submitter_name && (

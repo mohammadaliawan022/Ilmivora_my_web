@@ -10,7 +10,7 @@ import { createMcq, deleteMcqsBySubject, type McqInput } from "@/lib/data/mcq-re
 import { subjectCountsQuery } from "@/lib/data/queries";
 import { SUBJECTS } from "@/lib/subjects";
 
-export function AdminAddMcq({ gkCategories }: { gkCategories: string[] }) {
+export function AdminAddMcq() {
   const qc = useQueryClient();
   const [formKey, setFormKey] = useState(0);
   const save = useMutation({
@@ -32,7 +32,6 @@ export function AdminAddMcq({ gkCategories }: { gkCategories: string[] }) {
         onSubmit={(v) => save.mutate(v)}
         pending={save.isPending}
         submitLabel="Add MCQ"
-        gkCategories={gkCategories}
       />
     </div>
   );

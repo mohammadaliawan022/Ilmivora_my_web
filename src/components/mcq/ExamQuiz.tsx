@@ -29,12 +29,10 @@ import { ScoreSummary } from "./ScoreSummary";
 export function ExamQuiz({
   mcqs,
   label,
-  topic,
   onRestart,
 }: {
   mcqs: Mcq[];
   label: string;
-  topic?: string | null | undefined;
   onRestart: () => void;
 }) {
   const [index, setIndex] = useState(0);
@@ -77,7 +75,6 @@ export function ExamQuiz({
     saveAttempt({
       mode: "exam",
       subject: label,
-      topic,
       ...score,
       durationSec: Math.round((Date.now() - startedAt.current) / 1000),
     });
