@@ -13,6 +13,8 @@ export interface Mcq {
   topic: string | null;
   /** Optional public contributor credit copied from an approved submission. */
   submitter_name?: string | null;
+  /** Hidden from student-facing lists while retained for admin review. */
+  is_hidden?: boolean;
   created_at: string;
 }
 

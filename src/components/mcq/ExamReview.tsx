@@ -45,7 +45,7 @@ export function ExamReview({
                 ))}
               </div>
               {m.explanation && (
-                <p className="mt-4 rounded-lg bg-muted px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+                <p className="mt-4 whitespace-pre-line rounded-lg bg-muted px-4 py-3 text-sm leading-relaxed text-muted-foreground">
                   <span className="font-semibold text-foreground">Explanation: </span>
                   {m.explanation}
                 </p>

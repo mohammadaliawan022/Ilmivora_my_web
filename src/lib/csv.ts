@@ -46,7 +46,35 @@ export const REQUIRED_CSV_COLUMNS = [
   "subject",
 ] as const;
 
-export const OPTIONAL_CSV_COLUMNS = ["explanation", "exam_category"] as const;
+export const OPTIONAL_CSV_COLUMNS = ["explanation", "exam_category", "is_hidden"] as const;
+
+const EXPORT_COLUMNS = [...REQUIRED_CSV_COLUMNS, "explanation", "exam_category", "is_hidden"] as const;
+
+function escapeCsvCell(value: string): string {
+  return `"${value.replaceAll('"', '""')}"`;
+}
+
+/** Serialise MCQs as a UTF-8 CSV that can also be re-imported. */
+export function mcqsToCsv(rows: McqInput[]): string {
+  const header = EXPORT_COLUMNS.join(",");
+  const records = rows.map((row) =>
+    [
+      row.question,
+      row.option_a,
+      row.option_b,
+      row.option_c,
+      row.option_d,
+      row.correct_answer,
+      row.subject,
+      row.explanation ?? "",
+      row.exam_category ?? "",
+      String(Boolean(row.is_hidden)),
+    ]
+      .map(escapeCsvCell)
+      .join(","),
+  );
+  return `\uFEFF${[header, ...records].join("\r\n")}`;
+}
 
 export interface CsvImportResult {
   rows: McqInput[];
@@ -74,6 +102,11 @@ export function csvToMcqs(text: string): CsvImportResult {
       return;
     }
     const answer = get(r, "correct_answer");
+    const hidden = get(r, "is_hidden").toLowerCase();
+    if (hidden && hidden !== "true" && hidden !== "false") {
+      errors.push({ line, message: "is_hidden must be true or false" });
+      return;
+    }
     const opts = ["option_a", "option_b", "option_c", "option_d"].map((o) => get(r, o).toLowerCase());
     if (!/^[a-d]$/i.test(answer) && !opts.includes(answer.toLowerCase())) {
       errors.push({ line, message: "correct_answer must be A–D or match an option" });
@@ -90,6 +123,7 @@ export function csvToMcqs(text: string): CsvImportResult {
       subject: get(r, "subject"),
       exam_category: get(r, "exam_category") || null,
       topic: null,
+      ...(hidden ? { is_hidden: hidden === "true" } : {}),
     });
   });
   return { rows, errors, missingColumns: [] };

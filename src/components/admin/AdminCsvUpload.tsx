@@ -8,7 +8,7 @@ import { OPTIONAL_CSV_COLUMNS, REQUIRED_CSV_COLUMNS, csvToMcqs, type CsvImportRe
 
 const TEMPLATE =
   [...REQUIRED_CSV_COLUMNS, ...OPTIONAL_CSV_COLUMNS].join(",") +
-  '\n"What is the capital of Pakistan?",Karachi,Lahore,Islamabad,Peshawar,C,General Knowledge,"Islamabad became the capital in 1967.",PPSC\n';
+  '\n"What is the capital of Pakistan?",Karachi,Lahore,Islamabad,Peshawar,C,General Knowledge,"Islamabad became the capital in 1967.",PPSC,false\n';
 const PREVIEW_PAGE_SIZE = 10;
 
 export function AdminCsvUpload() {

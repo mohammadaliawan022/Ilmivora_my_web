@@ -190,7 +190,7 @@ function PracticeQuestion({
           {mcq.explanation && (
             <div className="flex gap-3 rounded-xl bg-muted p-4 text-sm leading-relaxed">
               <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-              <p className="text-muted-foreground">
+              <p className="whitespace-pre-line text-muted-foreground">
                 <span className="font-semibold text-foreground">Explanation: </span>
                 {mcq.explanation}
               </p>

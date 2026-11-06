@@ -55,7 +55,7 @@ export function McqCard({ mcq, index }: { mcq: Mcq; index?: number }) {
         </Button>
       </div>
       {revealed && mcq.explanation && (
-        <p className="mt-2 rounded-lg bg-muted px-4 py-3 text-sm leading-relaxed text-muted-foreground animate-rise">
+        <p className="mt-2 whitespace-pre-line rounded-lg bg-muted px-4 py-3 text-sm leading-relaxed text-muted-foreground animate-rise">
           <span className="font-semibold text-foreground">Explanation: </span>
           {mcq.explanation}
         </p>

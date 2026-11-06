@@ -18,6 +18,8 @@ export interface McqFilters {
   topic?: string | undefined;
   examCategory?: string | undefined;
   search?: string | undefined;
+  /** Include hidden records for admin review only. */
+  includeHidden?: boolean | undefined;
 }
 
 export interface Page<T> {
@@ -39,6 +41,7 @@ function applyFilters(rows: Mcq[], f: McqFilters): Mcq[] {
   const q = f.search?.trim().toLowerCase();
   const topics = f.topic ? new Set(getTopicScope(f.topic).map((t) => t.toLowerCase())) : null;
   return rows.filter((m) => {
+    if (!f.includeHidden && m.is_hidden) return false;
     if (f.subject && m.subject.toLowerCase() !== f.subject.toLowerCase()) return false;
     if (f.subjects?.length && !f.subjects.some((s) => s.toLowerCase() === m.subject.toLowerCase())) return false;
     if (topics && !topics.has((m.topic ?? "").toLowerCase())) return false;
@@ -55,6 +58,9 @@ function applyFilters(rows: Mcq[], f: McqFilters): Mcq[] {
 const byNewest = <T extends { created_at: string; id?: string }>(a: T, b: T) =>
   b.created_at.localeCompare(a.created_at) || String(a.id ?? "").localeCompare(String(b.id ?? ""));
 
+const byOldest = <T extends { created_at: string; id?: string }>(a: T, b: T) =>
+  a.created_at.localeCompare(b.created_at) || String(a.id ?? "").localeCompare(String(b.id ?? ""));
+
 function toPage<T>(rows: T[], page: number, pageSize: number): Page<T> {
   const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
   const safePage = Math.min(Math.max(1, page), pageCount);
@@ -64,7 +70,9 @@ function toPage<T>(rows: T[], page: number, pageSize: number): Page<T> {
 
 function makeMcqQuery(filters: McqFilters, page?: number, pageSize?: number) {
   // A unique tie-breaker keeps offset pagination stable when many imported MCQs share a timestamp.
-  const query = new URLSearchParams({ select: "*", order: "created_at.desc,id.asc" });
+  // Keep older questions first so newly uploaded MCQs are appended to the final pages.
+  const query = new URLSearchParams({ select: "*", order: "created_at.asc,id.asc" });
+  if (!filters.includeHidden) query.set("is_hidden", "eq.false");
   if (filters.subject) query.set("subject", `ilike.${filters.subject}`);
   else if (filters.subjects?.length) {
     query.set("subject", `in.(${filters.subjects.map((s) => `"${s.replaceAll('"', '\\"')}"`).join(",")})`);
@@ -101,6 +109,11 @@ async function fetchAllMcqs(filters: McqFilters): Promise<Mcq[]> {
   }
 }
 
+/** Fetch every matching row for an admin export, including hidden MCQs. */
+export async function getMcqsForExport(filters: McqFilters = {}): Promise<Mcq[]> {
+  return fetchAllMcqs({ ...filters, includeHidden: true });
+}
+
 export async function listMcqs(
   filters: McqFilters,
   page = 1,
@@ -122,17 +135,17 @@ export async function listMcqs(
     return { items: data, total, page: safePage, pageSize, pageCount };
   }
   await delay();
-  return toPage(applyFilters(store, filters).sort(byNewest), page, pageSize);
+  return toPage(applyFilters(store, filters).sort(byOldest), page, pageSize);
 }
 
 export async function getRecentMcqs(limit = 6): Promise<Mcq[]> {
   if (!IS_PREVIEW_DATA) {
-    const query = new URLSearchParams({ select: "*", order: "created_at.desc", limit: String(limit) });
+    const query = new URLSearchParams({ select: "*", is_hidden: "eq.false", order: "created_at.desc", limit: String(limit) });
     const { data } = await supabaseRest<Mcq[]>(`mcqs?${query}`);
     return data;
   }
   await delay();
-  return [...store].sort(byNewest).slice(0, limit);
+  return store.filter((m) => !m.is_hidden).sort(byNewest).slice(0, limit);
 }
 
 export async function getQuizQuestions(filters: McqFilters, count: number): Promise<Mcq[]> {
@@ -164,7 +177,10 @@ export async function getSubjectCounts(): Promise<Record<string, number>> {
   }
   await delay(60);
   const counts: Record<string, number> = {};
-  for (const m of store) counts[m.subject] = (counts[m.subject] ?? 0) + 1;
+  for (const m of store) {
+    if (m.is_hidden) continue;
+    counts[m.subject] = (counts[m.subject] ?? 0) + 1;
+  }
   return counts;
 }
 
@@ -180,6 +196,7 @@ export async function getExamCategoryCounts(): Promise<Record<string, number>> {
   await delay(60);
   const counts: Record<string, number> = {};
   for (const m of store) {
+    if (m.is_hidden) continue;
     const k = m.exam_category ?? "Other";
     counts[k] = (counts[k] ?? 0) + 1;
   }
@@ -189,6 +206,23 @@ export async function getExamCategoryCounts(): Promise<Record<string, number>> {
 /* ---------- Admin (preview store only; real writes go through secured server calls) ---------- */
 
 export type McqInput = Omit<Mcq, "id" | "created_at">;
+
+export async function setMcqHidden(id: string, isHidden: boolean): Promise<void> {
+  if (!IS_PREVIEW_DATA) {
+    const query = new URLSearchParams({ id: `eq.${id}`, select: "id" });
+    const { data } = await supabaseRest<Array<{ id: string }>>(`mcqs?${query}`, {
+      method: "PATCH",
+      body: { is_hidden: isHidden },
+      prefer: "return=representation",
+    });
+    if (!data.length) throw new Error("MCQ not found or this account does not have admin access.");
+    return;
+  }
+  await delay();
+  const existing = store.find((m) => m.id === id);
+  if (!existing) throw new Error("MCQ not found");
+  store = store.map((m) => (m.id === id ? { ...m, is_hidden: isHidden } : m));
+}
 
 export async function createMcq(input: McqInput): Promise<Mcq> {
   if (!IS_PREVIEW_DATA) {

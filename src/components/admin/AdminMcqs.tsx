@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Download, Eye, EyeOff, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -15,8 +15,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Pager } from "@/components/site/Pager";
-import { createMcq, deleteMcq, updateMcq, type McqInput } from "@/lib/data/mcq-repo";
+import { createMcq, deleteMcq, getMcqsForExport, setMcqHidden, updateMcq, type McqInput } from "@/lib/data/mcq-repo";
 import { mcqListQuery } from "@/lib/data/queries";
+import { mcqsToCsv } from "@/lib/csv";
 import { getCorrectLetter, type Mcq } from "@/lib/mcq";
 import { SUBJECTS } from "@/lib/subjects";
 import { McqFormDialog } from "./McqFormDialog";
@@ -29,8 +30,9 @@ export function AdminMcqs() {
   const [editing, setEditing] = useState<Mcq | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [toDelete, setToDelete] = useState<Mcq | null>(null);
+  const [exporting, setExporting] = useState(false);
 
-  const list = useQuery(mcqListQuery({ search: search || undefined, subject: subject || undefined }, page, 15));
+  const list = useQuery(mcqListQuery({ search: search || undefined, subject: subject || undefined, includeHidden: true }, page, 15));
   const invalidate = () => qc.invalidateQueries({ queryKey: ["mcqs"] });
 
   const save = useMutation({
@@ -52,6 +54,39 @@ export function AdminMcqs() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const visibility = useMutation({
+    mutationFn: (m: Mcq) => setMcqHidden(m.id, !m.is_hidden),
+    onSuccess: () => {
+      toast.success("MCQ visibility updated");
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const downloadCsv = async () => {
+    setExporting(true);
+    try {
+      const rows = await getMcqsForExport({ search: search || undefined, subject: subject || undefined });
+      if (!rows.length) {
+        toast.error("There are no MCQs to download for these filters.");
+        return;
+      }
+      const blob = new Blob([mcqsToCsv(rows)], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      const filenamePart = subject ? subject.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") : "all-subjects";
+      anchor.href = url;
+      anchor.download = `ilmivora-mcqs-${filenamePart}.csv`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      toast.success(`${rows.length.toLocaleString()} MCQs downloaded`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not download MCQs.");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="space-y-5">
@@ -80,6 +115,9 @@ export function AdminMcqs() {
             <option key={s.slug}>{s.name}</option>
           ))}
         </select>
+        <Button variant="outline" onClick={downloadCsv} disabled={exporting}>
+          <Download /> {exporting ? "Preparing CSV…" : "Download CSV"}
+        </Button>
         <Button
           onClick={() => {
             setEditing(null);
@@ -99,6 +137,7 @@ export function AdminMcqs() {
                 <th className="px-4 py-3 font-semibold">Subject</th>
                 <th className="px-4 py-3 font-semibold">Exam</th>
                 <th className="px-4 py-3 font-semibold">Answer</th>
+                <th className="px-4 py-3 font-semibold">Status</th>
                 <th className="px-4 py-3 text-right font-semibold">Actions</th>
               </tr>
             </thead>
@@ -106,7 +145,7 @@ export function AdminMcqs() {
               {list.isPending &&
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>
-                    <td colSpan={5} className="px-4 py-3">
+                    <td colSpan={6} className="px-4 py-3">
                       <Skeleton className="h-6 w-full" />
                     </td>
                   </tr>
@@ -119,7 +158,18 @@ export function AdminMcqs() {
                   <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{m.subject}</td>
                   <td className="px-4 py-3 text-muted-foreground">{m.exam_category ?? "—"}</td>
                   <td className="px-4 py-3 font-display font-bold text-success">{getCorrectLetter(m) ?? "?"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{m.is_hidden ? "Hidden" : "Visible"}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={m.is_hidden ? "Restore MCQ" : "Hide MCQ"}
+                      title={m.is_hidden ? "Restore for students" : "Hide from students"}
+                      disabled={visibility.isPending}
+                      onClick={() => visibility.mutate(m)}
+                    >
+                      {m.is_hidden ? <Eye /> : <EyeOff />}
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -139,7 +189,7 @@ export function AdminMcqs() {
               ))}
               {list.data && list.data.items.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
                     No MCQs match.
                   </td>
                 </tr>
