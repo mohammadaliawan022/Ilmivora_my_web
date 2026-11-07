@@ -4,7 +4,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getQuizQuestions } from "@/lib/data/mcq-repo";
 import { EXAM_CATEGORIES } from "@/lib/exam-categories";
 import { EXAM_NEGATIVE_MARKS_PER_WRONG, EXAM_SECONDS_PER_QUESTION, type Mcq } from "@/lib/mcq";
@@ -24,7 +30,9 @@ export function QuizLauncher({
   initialSubject?: string | undefined;
   initialExam?: string | undefined;
 }) {
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(initialSubject ? [initialSubject] : []);
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(
+    initialSubject ? [initialSubject] : [],
+  );
   const [subjectSearch, setSubjectSearch] = useState("");
   const [subjectPickerOpen, setSubjectPickerOpen] = useState(false);
   const [exam, setExam] = useState(initialExam ?? ALL);
@@ -43,11 +51,12 @@ export function QuizLauncher({
     onSuccess: (rows) => setQuestions(rows),
   });
 
-  const selectedLabel = selectedSubjects.length === 0
-    ? "Mixed subjects"
-    : selectedSubjects.length === 1
-      ? selectedSubjects[0]!
-      : `Mixed: ${selectedSubjects.join(", ")}`;
+  const selectedLabel =
+    selectedSubjects.length === 0
+      ? "Mixed subjects"
+      : selectedSubjects.length === 1
+        ? selectedSubjects[0]!
+        : `Mixed subjects (${selectedSubjects.length})`;
   const label = selectedLabel;
   const reset = () => {
     setQuestions(null);
@@ -83,28 +92,43 @@ export function QuizLauncher({
 
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           <div className="space-y-3 sm:col-span-2">
-              <Label id="practice-subject-label">Subjects</Label>
-              <div className="relative">
-                <Button
-                  type="button"
-                  variant="outline"
-                  aria-labelledby="practice-subject-label"
-                  aria-expanded={subjectPickerOpen}
-                  aria-controls="practice-subject-options"
-                  className="w-full justify-between font-normal"
-                  onClick={() => setSubjectPickerOpen((open) => !open)}
+            <Label id="practice-subject-label">Subjects</Label>
+            <div
+              className="relative"
+              onKeyDown={(event) => {
+                if (event.key === "Escape" && subjectPickerOpen) {
+                  event.preventDefault();
+                  setSubjectPickerOpen(false);
+                  document.getElementById("practice-subject-trigger")?.focus();
+                }
+              }}
+            >
+              <Button
+                id="practice-subject-trigger"
+                type="button"
+                variant="outline"
+                aria-label={`Subjects: ${selectedSubjects.length === 0 ? "All subjects mixed" : selectedSubjects.length === 1 ? selectedSubjects[0] : `${selectedSubjects.length} selected`}`}
+                aria-expanded={subjectPickerOpen}
+                aria-controls="practice-subject-options"
+                className="w-full justify-between font-normal"
+                onClick={() => setSubjectPickerOpen((open) => !open)}
+              >
+                <span aria-live="polite" aria-atomic="true">
+                  {selectedSubjects.length === 0
+                    ? "All subjects (mixed)"
+                    : selectedSubjects.length === 1
+                      ? selectedSubjects[0]
+                      : `${selectedSubjects.length} subjects selected`}
+                </span>
+                <ChevronDown
+                  className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${subjectPickerOpen ? "rotate-180" : ""}`}
+                />
+              </Button>
+              {subjectPickerOpen && (
+                <div
+                  id="practice-subject-options"
+                  className="absolute left-0 top-full z-30 mt-2 w-full rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-xl"
                 >
-                  <span>
-                    {selectedSubjects.length === 0
-                      ? "All subjects (mixed)"
-                      : selectedSubjects.length === 1
-                        ? selectedSubjects[0]
-                        : `${selectedSubjects.length} subjects selected`}
-                  </span>
-                  <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${subjectPickerOpen ? "rotate-180" : ""}`} />
-                </Button>
-                {subjectPickerOpen && (
-                  <div id="practice-subject-options" className="absolute left-0 top-full z-30 mt-2 w-full rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-xl">
                   <Input
                     value={subjectSearch}
                     onChange={(event) => setSubjectSearch(event.target.value)}
@@ -113,6 +137,11 @@ export function QuizLauncher({
                     className="mb-2"
                   />
                   <div className="max-h-56 space-y-1 overflow-y-auto">
+                    <p className="px-2 pb-1 text-xs text-muted-foreground" aria-live="polite">
+                      {selectedSubjects.length === 0
+                        ? "All subjects are included."
+                        : `${selectedSubjects.length} subject${selectedSubjects.length === 1 ? "" : "s"} selected.`}
+                    </p>
                     <label className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm font-medium hover:bg-accent">
                       <input
                         type="checkbox"
@@ -122,8 +151,13 @@ export function QuizLauncher({
                       />
                       All subjects (mixed)
                     </label>
-                    {SUBJECTS.filter((s) => s.name.toLowerCase().includes(subjectSearch.trim().toLowerCase())).map((s) => (
-                      <label key={s.slug} className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-accent">
+                    {SUBJECTS.filter((s) =>
+                      s.name.toLowerCase().includes(subjectSearch.trim().toLowerCase()),
+                    ).map((s) => (
+                      <label
+                        key={s.slug}
+                        className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-accent"
+                      >
                         <input
                           type="checkbox"
                           checked={selectedSubjects.includes(s.name)}
@@ -131,7 +165,9 @@ export function QuizLauncher({
                             const checked = event.target.checked;
                             setSelectedSubjects((current) =>
                               checked
-                                ? current.includes(s.name) ? current : [...current, s.name]
+                                ? current.includes(s.name)
+                                  ? current
+                                  : [...current, s.name]
                                 : current.filter((name) => name !== s.name),
                             );
                           }}
@@ -140,8 +176,12 @@ export function QuizLauncher({
                         {s.name}
                       </label>
                     ))}
-                    {SUBJECTS.every((s) => !s.name.toLowerCase().includes(subjectSearch.trim().toLowerCase())) && (
-                      <p className="px-2 py-3 text-center text-sm text-muted-foreground">No subjects found.</p>
+                    {SUBJECTS.every(
+                      (s) => !s.name.toLowerCase().includes(subjectSearch.trim().toLowerCase()),
+                    ) && (
+                      <p className="px-2 py-3 text-center text-sm text-muted-foreground">
+                        No subjects found.
+                      </p>
                     )}
                   </div>
                   <div className="mt-3 border-t border-border pt-2 text-center text-xs text-muted-foreground">
@@ -154,9 +194,9 @@ export function QuizLauncher({
                       OK
                     </button>
                   </div>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="exam">Exam category</Label>

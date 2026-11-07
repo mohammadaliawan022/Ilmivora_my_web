@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,23 +48,49 @@ export function McqForm({
 }) {
   const [v, setV] = useState<McqInput>(EMPTY_MCQ);
   const [errors, setErrors] = useState<string[]>([]);
+  const errorSummaryRef = useRef<HTMLUListElement>(null);
+  const hasOptionError = errors.some((error) => error.toLowerCase().includes("options"));
 
   useEffect(() => {
     setErrors([]);
     if (!initial) return setV(EMPTY_MCQ);
-    const { question, option_a, option_b, option_c, option_d, explanation, subject, exam_category } = initial;
+    const {
+      question,
+      option_a,
+      option_b,
+      option_c,
+      option_d,
+      explanation,
+      subject,
+      exam_category,
+    } = initial;
     const letter = getCorrectLetter({ ...EMPTY_MCQ, ...initial, id: "", created_at: "" } as Mcq);
-    setV({ question, option_a, option_b, option_c, option_d, explanation, subject, exam_category, topic: null, correct_answer: letter ?? "A" });
+    setV({
+      question,
+      option_a,
+      option_b,
+      option_c,
+      option_d,
+      explanation,
+      subject,
+      exam_category,
+      topic: null,
+      correct_answer: letter ?? "A",
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetKey]);
 
-  const set = <K extends keyof McqInput>(k: K, val: McqInput[K]) => setV((p) => ({ ...p, [k]: val }));
+  const set = <K extends keyof McqInput>(k: K, val: McqInput[K]) =>
+    setV((p) => ({ ...p, [k]: val }));
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const problems = validateMcqDraft(v, SUBJECT_NAMES);
     setErrors(problems);
-    if (problems.length) return;
+    if (problems.length) {
+      requestAnimationFrame(() => errorSummaryRef.current?.focus());
+      return;
+    }
     onSubmit({
       ...v,
       question: v.question.trim(),
@@ -81,34 +107,76 @@ export function McqForm({
     <form onSubmit={submit} className="space-y-4" noValidate>
       {children}
       <div className="space-y-2">
-          <Label htmlFor="mcq-subj">Subject</Label>
-          <select
-            id="mcq-subj"
-            className={selectCls}
-            value={v.subject}
-            onChange={(e) => set("subject", e.target.value)}
-          >
-            {SUBJECTS.map((s) => (
-              <option key={s.slug}>{s.name}</option>
-            ))}
-          </select>
+        <Label htmlFor="mcq-subj">Subject</Label>
+        <select
+          id="mcq-subj"
+          className={selectCls}
+          aria-invalid={errors.some((error) => error.includes("subject"))}
+          aria-describedby={
+            errors.some((error) => error.includes("subject")) ? "mcq-subject-error" : undefined
+          }
+          value={v.subject}
+          onChange={(e) => set("subject", e.target.value)}
+        >
+          {SUBJECTS.map((s) => (
+            <option key={s.slug}>{s.name}</option>
+          ))}
+        </select>
+        {errors.some((error) => error.includes("subject")) && (
+          <p id="mcq-subject-error" className="text-sm text-destructive">
+            Choose a subject from the list.
+          </p>
+        )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="mcq-q">Question</Label>
-        <Textarea id="mcq-q" value={v.question} onChange={(e) => set("question", e.target.value)} />
+        <Textarea
+          id="mcq-q"
+          value={v.question}
+          onChange={(e) => set("question", e.target.value)}
+          aria-invalid={errors.some((error) => error.includes("Question"))}
+          aria-describedby={
+            errors.some((error) => error.includes("Question")) ? "mcq-q-error" : undefined
+          }
+        />
+        {errors.some((error) => error.includes("Question")) && (
+          <p id="mcq-q-error" className="text-sm text-destructive">
+            Enter a question with at least 10 characters.
+          </p>
+        )}
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {(["a", "b", "c", "d"] as const).map((l) => (
           <div key={l} className="space-y-2">
             <Label htmlFor={`mcq-o${l}`}>Option {l.toUpperCase()}</Label>
-            <Input id={`mcq-o${l}`} value={v[`option_${l}`]} onChange={(e) => set(`option_${l}`, e.target.value)} />
+            <Input
+              id={`mcq-o${l}`}
+              value={v[`option_${l}`]}
+              onChange={(e) => set(`option_${l}`, e.target.value)}
+              aria-invalid={hasOptionError}
+              aria-describedby={hasOptionError ? "mcq-options-error" : undefined}
+            />
+            {l === "a" && hasOptionError && (
+              <p id="mcq-options-error" className="text-sm text-destructive">
+                {errors.find((error) => error.toLowerCase().includes("options")) ===
+                "All four options are required"
+                  ? "Fill in all four options."
+                  : "Make each option different."}
+              </p>
+            )}
           </div>
         ))}
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="mcq-ans">Correct answer</Label>
-          <select id="mcq-ans" className={selectCls} value={v.correct_answer} onChange={(e) => set("correct_answer", e.target.value)}>
+          <select
+            id="mcq-ans"
+            className={selectCls}
+            value={v.correct_answer}
+            onChange={(e) => set("correct_answer", e.target.value)}
+            aria-invalid={errors.some((error) => error.includes("correct answer"))}
+          >
             {["A", "B", "C", "D"].map((l) => (
               <option key={l}>{l}</option>
             ))}
@@ -131,11 +199,21 @@ export function McqForm({
       </div>
       <div className="space-y-2">
         <Label htmlFor="mcq-exp">Explanation (optional)</Label>
-        <Textarea id="mcq-exp" value={v.explanation ?? ""} onChange={(e) => set("explanation", e.target.value)} />
+        <Textarea
+          id="mcq-exp"
+          value={v.explanation ?? ""}
+          onChange={(e) => set("explanation", e.target.value)}
+        />
       </div>
 
       {errors.length > 0 && (
-        <ul role="alert" className="space-y-1 rounded-lg bg-danger-soft px-4 py-3 text-sm text-foreground">
+        <ul
+          ref={errorSummaryRef}
+          tabIndex={-1}
+          role="alert"
+          aria-label="Form errors. Correct these items and submit again."
+          className="space-y-1 rounded-lg bg-danger-soft px-4 py-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
           {errors.map((e) => (
             <li key={e}>• {e}</li>
           ))}
