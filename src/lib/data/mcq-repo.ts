@@ -150,12 +150,19 @@ export async function getRecentMcqs(limit = 6): Promise<Mcq[]> {
 
 export async function getQuizQuestions(filters: McqFilters, count: number): Promise<Mcq[]> {
   if (!IS_PREVIEW_DATA) {
-    const shuffled = await fetchAllMcqs(filters);
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
-    }
-    return shuffled.slice(0, count);
+    const { data } = await supabaseRest<Mcq[]>("rpc/get_random_mcqs", {
+      method: "POST",
+      body: {
+        p_subject: filters.subject ?? null,
+        p_subjects: filters.subjects?.length ? filters.subjects : null,
+        p_topics: filters.topic ? getTopicScope(filters.topic) : null,
+        p_exam_category: filters.examCategory ?? null,
+        p_search: filters.search?.trim() || null,
+        p_include_hidden: filters.includeHidden ?? false,
+        p_count: Math.max(0, Math.min(100, Math.floor(count))),
+      },
+    });
+    return data;
   }
   await delay();
   const rows = applyFilters(store, filters);
