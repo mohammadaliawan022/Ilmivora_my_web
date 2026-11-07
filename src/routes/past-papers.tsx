@@ -38,7 +38,10 @@ function PastPapersPage() {
   useEffect(() => setSearchDraft(q ?? ""), [q]);
 
   const selectExam = (nextExam?: string) =>
-    navigate({ search: (current) => ({ ...current, exam: nextExam, page: undefined }) });
+    navigate({
+      search: (current) => ({ ...current, exam: nextExam, page: undefined }),
+      resetScroll: false,
+    });
 
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -68,7 +71,7 @@ function PastPapersPage() {
         </div>
       </section>
 
-      <main className="container-page grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:py-10">
+      <div className="container-page grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:py-10">
         <div className="min-w-0 space-y-6">
           <form onSubmit={submitSearch} role="search" className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 shadow-card">
             <Search className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
@@ -107,7 +110,10 @@ function PastPapersPage() {
               search={q}
               page={page}
               showSearch={false}
-              onPageChange={(nextPage) => navigate({ search: (current) => ({ ...current, page: nextPage > 1 ? nextPage : undefined }) })}
+              onPageChange={(nextPage) => navigate({
+                search: (current) => ({ ...current, page: nextPage > 1 ? nextPage : undefined }),
+                resetScroll: false,
+              })}
               emptyMessage="No past papers available yet. Questions will appear here once they have an exam category."
             />
           </section>
@@ -145,7 +151,7 @@ function PastPapersPage() {
             </Button>
           </section>
         </aside>
-      </main>
+      </div>
     </>
   );
 }

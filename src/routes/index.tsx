@@ -338,19 +338,19 @@ function Cta() {
           <div>
             <h2 className="text-3xl font-bold md:text-4xl">Track every test. See yourself improve.</h2>
             <p className="mt-3 max-w-lg text-navy-foreground/75">
-              Create a free account to save your results, follow subject-wise progress and pick up
-              where you left off on any device.
+              Review your test results and subject-wise performance. Results are currently saved in
+              this browser, so they stay on this device.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 md:justify-end">
             <Button variant="hero" size="lg" asChild>
-              <Link to="/login" search={{ tab: "signup" }}>
-                <Target /> Create free account
+              <Link to="/practice">
+                <Target /> Start practising
               </Link>
             </Button>
             <Button variant="hero-outline" size="lg" asChild>
               <Link to="/dashboard">
-                <LineChart /> View dashboard
+                <LineChart /> View your progress
               </Link>
             </Button>
           </div>

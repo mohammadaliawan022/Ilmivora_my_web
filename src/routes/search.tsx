@@ -48,14 +48,14 @@ function SearchPage() {
       <div className="container-page grid gap-8 py-10 lg:grid-cols-[240px_1fr]">
         <aside className="space-y-6">
           <FilterGroup title="Exam category">
-            <FilterItem active={!exam} onClick={() => navigate({ search: (s) => ({ ...s, exam: undefined, page: undefined }) })}>
+            <FilterItem active={!exam} onClick={() => navigate({ search: (s) => ({ ...s, exam: undefined, page: undefined }), resetScroll: false })}>
               All exams
             </FilterItem>
             {EXAM_CATEGORIES.map((c) => (
               <FilterItem
                 key={c.code}
                 active={exam === c.code}
-                onClick={() => navigate({ search: (s) => ({ ...s, exam: c.code, page: undefined }) })}
+                onClick={() => navigate({ search: (s) => ({ ...s, exam: c.code, page: undefined }), resetScroll: false })}
               >
                 {c.code === "Other" ? "Others" : c.code}
               </FilterItem>
@@ -65,7 +65,7 @@ function SearchPage() {
             <select
               value={subject ?? ""}
               onChange={(e) =>
-                navigate({ search: (s) => ({ ...s, subject: e.target.value || undefined, page: undefined }) })
+                navigate({ search: (s) => ({ ...s, subject: e.target.value || undefined, page: undefined }), resetScroll: false })
               }
               aria-label="Filter by subject"
               className="h-10 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
@@ -108,7 +108,7 @@ function SearchPage() {
             search={q}
             page={page}
             showSearch={false}
-            onPageChange={(p) => navigate({ search: (s) => ({ ...s, page: p > 1 ? p : undefined }) })}
+            onPageChange={(p) => navigate({ search: (s) => ({ ...s, page: p > 1 ? p : undefined }), resetScroll: false })}
             emptyMessage="No MCQs match these filters yet."
           />
         </div>

@@ -147,11 +147,11 @@ function AdminPage() {
           </nav>
         </aside>
 
-        <main className="min-w-0">
+        <section className="min-w-0" aria-labelledby="admin-section-title">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet">Admin</p>
-              <h1 className="mt-1 text-3xl font-bold md:text-4xl">{active.label}</h1>
+              <h1 id="admin-section-title" className="mt-1 text-3xl font-bold md:text-4xl">{active.label}</h1>
             </div>
             {!isPreviewMode && (
               <Button
@@ -191,7 +191,7 @@ function AdminPage() {
             {active.id === "papers" && <AdminPastPapers />}
             {active.id === "analytics" && <AdminAnalytics />}
           </div>
-        </main>
+        </section>
       </div>
     </div>
   );

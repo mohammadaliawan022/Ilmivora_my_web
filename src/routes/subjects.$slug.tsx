@@ -91,7 +91,10 @@ function SubjectPage() {
               filters={filters}
               page={page}
               search={q}
-              onPageChange={(p) => navigate({ search: (s) => ({ ...s, page: p > 1 ? p : undefined }) })}
+              onPageChange={(p) => navigate({
+                search: (s) => ({ ...s, page: p > 1 ? p : undefined }),
+                resetScroll: false,
+              })}
               onSearchChange={(v) => navigate({ search: { q: v }, resetScroll: false })}
               emptyMessage={`No ${name} MCQs have been added yet.`}
             />

@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { loadAttempts, summarizeAttempts, type TestAttempt } from "@/lib/attempts";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +29,17 @@ function DashboardPage() {
   const [attempts, setAttempts] = useState<TestAttempt[] | null>(null);
   useEffect(() => setAttempts(loadAttempts()), []);
 
-  if (attempts === null) return <div className="container-page min-h-[60vh] py-10" />;
+  if (attempts === null) {
+    return (
+      <div className="container-page min-h-[60vh] py-10" aria-busy="true" aria-label="Loading your progress">
+        <Skeleton className="h-10 w-56" />
+        <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-28 rounded-xl" />)}
+        </div>
+        <p className="sr-only">Loading your progress…</p>
+      </div>
+    );
+  }
 
   const summary = summarizeAttempts(attempts);
   const best = attempts.reduce((m, a) => Math.max(m, a.percentage), 0);
@@ -59,7 +70,7 @@ function DashboardPage() {
       <div className="mt-6 flex items-start gap-3 rounded-xl border border-border bg-primary-soft px-4 py-3 text-sm">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
         <p className="text-accent-foreground">
-          Results are saved on this device for now. Once accounts open, they'll sync to your profile.
+          Results are stored in this browser on this device. They are not linked to your Ilmivora account.
         </p>
       </div>
 

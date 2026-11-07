@@ -198,6 +198,13 @@ export function Header() {
                 {user && (
                   <div className="my-2 border-t border-border pt-2">
                     <p className="truncate px-3 py-2 text-xs text-muted-foreground">{user.email}</p>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setOpen(false)}
+                      className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent"
+                    >
+                      Your progress
+                    </Link>
                     <button
                       type="button"
                       onClick={() => { setOpen(false); logOut(); }}
@@ -208,13 +215,6 @@ export function Header() {
                     </button>
                   </div>
                 )}
-                <Link
-                  to="/admin"
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent"
-                >
-                  Admin
-                </Link>
                 {authReady && !user && (
                   <Button asChild className="mt-3">
                     <Link to="/login" onClick={() => setOpen(false)}>
