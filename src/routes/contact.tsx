@@ -11,6 +11,7 @@ export const Route = createFileRoute("/contact")({
       { property: "og:title", content: "Contact Ilmivora" },
       { property: "og:description", content: "Reach the Ilmivora team." },
     ],
+    links: [{ rel: "canonical", href: "https://ilmivora-1.vercel.app/contact" }],
   }),
   component: () => (
     <InfoPage eyebrow="Contact" title="Contact us" description="Send a question correction for review.">

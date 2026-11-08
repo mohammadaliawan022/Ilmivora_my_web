@@ -21,6 +21,7 @@ export const Route = createFileRoute("/practice")({
       },
       { property: "og:title", content: "Practice Test — Ilmivora" },
       { property: "og:description", content: "Instant-feedback MCQ practice with explanations." },
+      { name: "robots", content: "noindex, follow" },
     ],
   }),
   component: PracticePage,

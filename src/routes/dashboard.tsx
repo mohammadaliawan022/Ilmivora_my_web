@@ -20,6 +20,7 @@ export const Route = createFileRoute("/dashboard")({
       },
       { property: "og:title", content: "My Dashboard — Ilmivora" },
       { property: "og:description", content: "Your exam preparation progress at a glance." },
+      { name: "robots", content: "noindex, follow" },
     ],
   }),
   component: DashboardPage,

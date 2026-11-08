@@ -4,25 +4,31 @@ import { SubjectQuizSidebar } from "@/components/mcq/SubjectQuizSidebar";
 import { SubjectIntro } from "@/components/site/SubjectIntro";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { GK_SUBJECT } from "@/lib/subjects";
+import { getSubjectCounts } from "@/lib/data/mcq-repo";
 
 type Search = { page?: number | undefined; q?: string | undefined };
 
 export const Route = createFileRoute("/general-knowledge/")({
+  loader: async () => {
+    try { return (await getSubjectCounts())[GK_SUBJECT] ?? 0; } catch { return 0; }
+  },
   validateSearch: (s: Record<string, unknown>): Search => ({
     page: Number(s["page"]) > 1 ? Math.floor(Number(s["page"])) : undefined,
     q: typeof s["q"] === "string" && s["q"] ? s["q"] : undefined,
   }),
-  head: () => ({
+  head: ({ loaderData }) => ({
     meta: [
-      { title: "General Knowledge MCQs by Topic — Ilmivora" },
+      { title: "General Knowledge MCQs — Ilmivora" },
       {
         name: "description",
         content:
-          "Browse General Knowledge MCQs for PPSC, FPSC and NTS, with answers and explanations.",
+          "Practise General Knowledge questions with answers and explanations on Ilmivora.",
       },
       { property: "og:title", content: "General Knowledge MCQs — Ilmivora" },
       { property: "og:description", content: "General Knowledge MCQs with answers and explanations." },
+      ...((loaderData ?? 0) > 0 ? [] : [{ name: "robots", content: "noindex, follow" }]),
     ],
+    links: [{ rel: "canonical", href: "https://ilmivora-1.vercel.app/general-knowledge" }],
   }),
   component: GkPage,
 });

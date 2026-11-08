@@ -5,49 +5,57 @@ import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/site/PageHeader";
 import { CategoryLink } from "@/components/site/CategoryLink";
 import { subjectCountsQuery } from "@/lib/data/queries";
+import { getSubjectCounts } from "@/lib/data/mcq-repo";
 import { SUBJECT_GROUPS, SUBJECTS, type SubjectGroup } from "@/lib/subjects";
 import { cn } from "@/lib/utils";
 
 type Search = { group?: SubjectGroup | undefined };
 
 export const Route = createFileRoute("/subjects/")({
+  loader: async () => {
+    try { return await getSubjectCounts(); } catch { return {}; }
+  },
   validateSearch: (s: Record<string, unknown>): Search => ({
     group: SUBJECT_GROUPS.includes(s["group"] as SubjectGroup) ? (s["group"] as SubjectGroup) : undefined,
   }),
-  head: () => ({
+  head: ({ loaderData }) => ({
     meta: [
       { title: "All Subjects — Ilmivora MCQs" },
       {
         name: "description",
-        content:
-          "Browse MCQs across 53 subjects: Pakistan Studies, Islamic Studies, English, Computer Science, Law, Engineering, Medical, Past Papers and more.",
+        content: `Browse ${Object.values(loaderData ?? {}).filter((count) => count > 0).length} subject banks with published MCQs and answers on Ilmivora.`,
       },
       { property: "og:title", content: "All Subjects — Ilmivora" },
       { property: "og:description", content: "Subject-wise MCQs for PPSC, FPSC and NTS preparation." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: [{ rel: "canonical", href: "https://ilmivora-1.vercel.app/subjects" }],
   }),
   component: SubjectsPage,
 });
 
 function SubjectsPage() {
+  const initialCounts = Route.useLoaderData();
   const { group } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [filter, setFilter] = useState("");
-  const { data: counts } = useQuery(subjectCountsQuery());
+  const { data: counts = initialCounts } = useQuery(subjectCountsQuery());
+  const availableCount = Object.values(counts).filter((count) => count > 0).length;
 
   const visible = useMemo(() => {
     const f = filter.trim().toLowerCase();
-    return SUBJECTS.filter((s) => (!group || s.group === group) && (!f || s.name.toLowerCase().includes(f)));
-  }, [group, filter]);
+    return SUBJECTS.filter((s) =>
+      (counts[s.name] ?? 0) > 0 && (!group || s.group === group) && (!f || s.name.toLowerCase().includes(f)),
+    );
+  }, [counts, group, filter]);
 
   return (
     <>
       <PageHeader
         eyebrow="Subjects"
         title="All subjects"
-        description={`${SUBJECTS.length} subjects for PPSC, FPSC, NTS and other competitive exams.`}
+        description={`${availableCount} subject banks with published questions. Coverage grows as new question sets are added.`}
       />
       <div className="container-page py-10">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

@@ -4,11 +4,20 @@ import { SearchBar } from "@/components/site/SearchBar";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { EXAM_CATEGORIES } from "@/lib/exam-categories";
 import { SUBJECTS } from "@/lib/subjects";
+import { getExamCategoryCounts, getSubjectCounts } from "@/lib/data/mcq-repo";
 import { cn } from "@/lib/utils";
 
 type Search = { q?: string | undefined; exam?: string | undefined; subject?: string | undefined; page?: number | undefined };
 
 export const Route = createFileRoute("/search")({
+  loader: async () => {
+    try {
+      const [subjects, exams] = await Promise.all([getSubjectCounts(), getExamCategoryCounts()]);
+      return { subjects, exams };
+    } catch {
+      return { subjects: {}, exams: {} };
+    }
+  },
   validateSearch: (s: Record<string, unknown>): Search => ({
     q: typeof s["q"] === "string" && s["q"] ? s["q"] : undefined,
     exam: typeof s["exam"] === "string" && s["exam"] ? s["exam"] : undefined,
@@ -20,22 +29,25 @@ export const Route = createFileRoute("/search")({
       { title: "Search MCQs — Ilmivora" },
       {
         name: "description",
-        content: "Search thousands of MCQs by keyword, subject and exam category (PPSC, FPSC, NTS).",
+        content: "Search published Ilmivora MCQs by keyword or subject.",
       },
       { property: "og:title", content: "Search MCQs — Ilmivora" },
       { property: "og:description", content: "Find MCQs by keyword, subject or exam." },
+      { name: "robots", content: "noindex, follow" },
     ],
   }),
   component: SearchPage,
 });
 
 function SearchPage() {
+  const counts = Route.useLoaderData();
   const { q, exam, subject, page = 1 } = Route.useSearch();
   const navigate = Route.useNavigate();
   const examLabel = EXAM_CATEGORIES.find((c) => c.code === exam)?.code;
   const matchingSubjects = q
-    ? SUBJECTS.filter((s) => s.name.toLowerCase().includes(q.toLowerCase())).slice(0, 6)
+    ? SUBJECTS.filter((s) => (counts.subjects[s.name] ?? 0) > 0 && s.name.toLowerCase().includes(q.toLowerCase())).slice(0, 6)
     : [];
+  const hasExamCategories = EXAM_CATEGORIES.some((category) => category.code !== "Other" && (counts.exams[category.code] ?? 0) > 0);
 
   return (
     <>
@@ -51,7 +63,7 @@ function SearchPage() {
             <FilterItem active={!exam} onClick={() => navigate({ search: (s) => ({ ...s, exam: undefined, page: undefined }), resetScroll: false })}>
               All exams
             </FilterItem>
-            {EXAM_CATEGORIES.map((c) => (
+            {EXAM_CATEGORIES.filter((c) => c.code !== "Other" && (counts.exams[c.code] ?? 0) > 0).map((c) => (
               <FilterItem
                 key={c.code}
                 active={exam === c.code}
@@ -71,7 +83,7 @@ function SearchPage() {
               className="h-10 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">All subjects</option>
-              {SUBJECTS.map((s) => (
+              {SUBJECTS.filter((s) => (counts.subjects[s.name] ?? 0) > 0).map((s) => (
                 <option key={s.slug} value={s.name}>
                   {s.name}
                 </option>
@@ -80,6 +92,11 @@ function SearchPage() {
           </FilterGroup>
         </aside>
         <div>
+          {!hasExamCategories && (
+            <p className="mb-5 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+              Exam-specific categories are not available yet. You can still browse the published questions by subject in the <Link to="/subjects" className="font-semibold text-primary underline">subject catalogue</Link>.
+            </p>
+          )}
           {matchingSubjects.length > 0 && (
             <div className="mb-6">
               <p className="mb-2 text-sm font-semibold text-muted-foreground">Matching subjects</p>

@@ -25,6 +25,7 @@ export const Route = createFileRoute("/login")({
       },
       { property: "og:title", content: "Log in to Ilmivora" },
       { property: "og:description", content: "Save results and track your preparation." },
+      { name: "robots", content: "noindex, follow" },
     ],
   }),
   component: LoginPage,

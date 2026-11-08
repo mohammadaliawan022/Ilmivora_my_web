@@ -9,6 +9,7 @@ export const Route = createFileRoute("/terms")({
       { property: "og:title", content: "Terms of Use — Ilmivora" },
       { property: "og:description", content: "Terms for using Ilmivora." },
     ],
+    links: [{ rel: "canonical", href: "https://ilmivora-1.vercel.app/terms" }],
   }),
   component: () => (
     <InfoPage eyebrow="Legal" title="Terms of Use">
@@ -20,8 +21,10 @@ export const Route = createFileRoute("/terms")({
       </p>
       <h2>Accuracy</h2>
       <p>
-        We work hard to keep questions accurate, but always confirm critical facts with official
-        sources. Report any errors and we'll correct them.
+        Questions and explanations are educational material and may contain errors or become outdated.
+        Confirm important facts, eligibility requirements, deadlines and examination rules with the
+        relevant official source. Ilmivora is independent and is not affiliated with an examination
+        commission or government body. Using the site does not guarantee an examination result.
       </p>
       <h2>Accounts</h2>
       <p>Keep your login details secure. We may suspend accounts that misuse the service.</p>

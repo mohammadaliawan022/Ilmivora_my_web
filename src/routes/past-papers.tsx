@@ -4,13 +4,17 @@ import { BookOpen, ChevronRight, FileText, GraduationCap, Search } from "lucide-
 import { useEffect, useState, type FormEvent } from "react";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { Button } from "@/components/ui/button";
-import { examCountsQuery, mcqListQuery } from "@/lib/data/queries";
+import { mcqListQuery } from "@/lib/data/queries";
+import { getExamCategoryCounts } from "@/lib/data/mcq-repo";
 import { EXAM_CATEGORIES } from "@/lib/exam-categories";
 import { cn } from "@/lib/utils";
 
 type SearchParams = { exam?: string | undefined; q?: string | undefined; page?: number | undefined };
 
 export const Route = createFileRoute("/past-papers")({
+  loader: async () => {
+    try { return await getExamCategoryCounts(); } catch { return {}; }
+  },
   validateSearch: (search: Record<string, unknown>): SearchParams => ({
     exam: typeof search["exam"] === "string" && EXAM_CATEGORIES.some((category) => category.code === search["exam"])
       ? search["exam"] as string
@@ -18,11 +22,13 @@ export const Route = createFileRoute("/past-papers")({
     q: typeof search["q"] === "string" && search["q"] ? search["q"] : undefined,
     page: Number(search["page"]) > 1 ? Math.floor(Number(search["page"])) : undefined,
   }),
-  head: () => ({
+  head: ({ loaderData }) => ({
     meta: [
       { title: "Past Papers — Ilmivora" },
-      { name: "description", content: "Browse past paper MCQs by competitive exam and practise with Ilmivora." },
+      { name: "description", content: "Browse the current Ilmivora question bank and check which exam-specific past paper categories are available." },
+      { name: "robots", content: EXAM_CATEGORIES.some((category) => category.code !== "Other" && (loaderData?.[category.code] ?? 0) > 0) ? "index, follow" : "noindex, follow" },
     ],
+    links: [{ rel: "canonical", href: "https://ilmivora-1.vercel.app/past-papers" }],
   }),
   component: PastPapersPage,
 });
@@ -31,9 +37,11 @@ function PastPapersPage() {
   const { exam, q, page = 1 } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [searchDraft, setSearchDraft] = useState(q ?? "");
-  const filters = { examCategory: exam, search: q };
+  const filters = { examCategory: exam ?? "__tagged__", search: q };
   const results = useQuery(mcqListQuery(filters, page));
-  const categoryCounts = useQuery(examCountsQuery()).data ?? {};
+  const routeCounts = Route.useLoaderData();
+  const categoryCounts = useQuery({ queryKey: ["mcqs", "exam-counts"], queryFn: getExamCategoryCounts, initialData: routeCounts }).data ?? {};
+  const availableCategories = EXAM_CATEGORIES.filter((category) => category.code !== "Other" && (categoryCounts[category.code] ?? 0) > 0);
 
   useEffect(() => setSearchDraft(q ?? ""), [q]);
 
@@ -66,7 +74,7 @@ function PastPapersPage() {
             Explore <span className="bg-gradient-to-r from-blue-400 via-violet to-purple-500 bg-clip-text text-transparent">Past Papers</span>
           </h1>
           <p className="mx-auto mt-4 max-w-3xl text-base text-navy-foreground/75 md:text-lg">
-            Prepare for competitive exams with organized, exam-wise past paper questions.
+            Browse available questions and see which exam categories have verified questions.
           </p>
         </div>
       </section>
@@ -91,7 +99,7 @@ function PastPapersPage() {
             <ExamPill active={!exam} onClick={() => selectExam()}>
               All Papers
             </ExamPill>
-            {EXAM_CATEGORIES.map((category) => (
+            {availableCategories.map((category) => (
               <ExamPill key={category.code} active={exam === category.code} onClick={() => selectExam(category.code)}>
                 {category.code}
               </ExamPill>
@@ -114,8 +122,13 @@ function PastPapersPage() {
                 search: (current) => ({ ...current, page: nextPage > 1 ? nextPage : undefined }),
                 resetScroll: false,
               })}
-              emptyMessage="No past papers available yet. Questions will appear here once they have an exam category."
+              emptyMessage="No exam-tagged past paper questions are available yet. Browse current questions by subject or use the study guide to plan your preparation."
             />
+            {availableCategories.length === 0 && (
+              <p className="mt-4 text-sm text-muted-foreground">
+                <Link to="/subjects" className="font-semibold text-primary underline">Browse available subjects</Link> or read the <Link to="/study-guides" className="font-semibold text-primary underline">MCQ study guide</Link>.
+              </p>
+            )}
           </section>
         </div>
 
@@ -126,7 +139,7 @@ function PastPapersPage() {
               <SidebarCategory active={!exam} count={results.data?.total} onClick={() => selectExam()}>
                 All Papers
               </SidebarCategory>
-              {EXAM_CATEGORIES.map((category) => (
+              {availableCategories.map((category) => (
                 <SidebarCategory
                   key={category.code}
                   active={exam === category.code}

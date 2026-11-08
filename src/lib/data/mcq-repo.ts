@@ -48,7 +48,8 @@ function applyFilters(rows: Mcq[], f: McqFilters): Mcq[] {
     if (f.subject && m.subject.toLowerCase() !== f.subject.toLowerCase()) return false;
     if (f.subjects?.length && !f.subjects.some((s) => s.toLowerCase() === m.subject.toLowerCase())) return false;
     if (topics && !topics.has((m.topic ?? "").toLowerCase())) return false;
-    if (f.examCategory && (m.exam_category ?? "").toLowerCase() !== f.examCategory.toLowerCase())
+    if (f.examCategory === "__tagged__" && !m.exam_category) return false;
+    if (f.examCategory && f.examCategory !== "__tagged__" && (m.exam_category ?? "").toLowerCase() !== f.examCategory.toLowerCase())
       return false;
     if (q) {
       const hay = `${m.question} ${m.option_a} ${m.option_b} ${m.option_c} ${m.option_d} ${m.subject}`.toLowerCase();
@@ -86,7 +87,8 @@ function makeMcqQuery(filters: McqFilters, page?: number, pageSize?: number) {
     const values = topics.length ? topics : [filters.topic];
     query.set("topic", `in.(${values.map((t) => `"${t.replaceAll('"', '\\"')}"`).join(",")})`);
   }
-  if (filters.examCategory) query.set("exam_category", `ilike.${filters.examCategory}`);
+  if (filters.examCategory === "__tagged__") query.set("exam_category", "not.is.null");
+  else if (filters.examCategory) query.set("exam_category", `ilike.${filters.examCategory}`);
   const search = filters.search?.trim().replace(/[(),"]/g, " ");
   if (search) {
     const pattern = `*${search}*`;
@@ -182,9 +184,11 @@ export async function getQuizQuestions(filters: McqFilters, count: number): Prom
 
 export async function getSubjectCounts(): Promise<Record<string, number>> {
   if (!IS_PREVIEW_DATA) {
-    const counts: Record<string, number> = {};
-    for (const mcq of await fetchAllMcqs({})) counts[mcq.subject] = (counts[mcq.subject] ?? 0) + 1;
-    return counts;
+    const { data } = await supabaseRest<Record<string, number>>("rpc/get_mcq_subject_counts", {
+      method: "POST",
+      body: {},
+    });
+    return data;
   }
   await delay(60);
   const counts: Record<string, number> = {};
@@ -197,12 +201,11 @@ export async function getSubjectCounts(): Promise<Record<string, number>> {
 
 export async function getExamCategoryCounts(): Promise<Record<string, number>> {
   if (!IS_PREVIEW_DATA) {
-    const counts: Record<string, number> = {};
-    for (const mcq of await fetchAllMcqs({})) {
-      const category = mcq.exam_category ?? "Other";
-      counts[category] = (counts[category] ?? 0) + 1;
-    }
-    return counts;
+    const { data } = await supabaseRest<Record<string, number>>("rpc/get_mcq_exam_category_counts", {
+      method: "POST",
+      body: {},
+    });
+    return data;
   }
   await delay(60);
   const counts: Record<string, number> = {};

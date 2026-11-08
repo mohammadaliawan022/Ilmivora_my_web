@@ -5,6 +5,7 @@ import { SubjectIntro } from "@/components/site/SubjectIntro";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { SubjectQuizSidebar } from "@/components/mcq/SubjectQuizSidebar";
 import { getCategoryBySlug } from "@/lib/categories";
+import { getSubjectCounts } from "@/lib/data/mcq-repo";
 
 type Search = { page?: number | undefined; q?: string | undefined };
 
@@ -16,7 +17,9 @@ export const Route = createFileRoute("/subjects/$slug")({
   loader: ({ params }) => {
     const cat = getCategoryBySlug(params.slug);
     if (!cat || cat.parent) throw notFound();
-    return { name: cat.name };
+    return getSubjectCounts()
+      .then((counts) => ({ name: cat.name, slug: params.slug, questionCount: counts[cat.name] ?? 0 }))
+      .catch(() => ({ name: cat.name, slug: params.slug, questionCount: 0 }));
   },
   head: ({ loaderData }) => {
     const name = loaderData?.name;
@@ -32,7 +35,9 @@ export const Route = createFileRoute("/subjects/$slug")({
         { property: "og:description", content: `${name} MCQs with explanations.` },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary" },
+        ...(loaderData.questionCount > 0 ? [] : [{ name: "robots", content: "noindex, follow" }]),
       ],
+      links: [{ rel: "canonical", href: `https://ilmivora-1.vercel.app/subjects/${loaderData.slug}` }],
     };
   },
   notFoundComponent: () => (

@@ -20,6 +20,8 @@ import { Route as PastPapersRouteImport } from './routes/past-papers'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as StudyGuidesRouteImport } from './routes/study-guides'
 import { Route as SubmitMcqRouteImport } from './routes/submit-mcq'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as GeneralKnowledgeIndexRouteImport } from './routes/general-knowledge.index'
@@ -82,6 +84,16 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyGuidesRoute = StudyGuidesRouteImport.update({
+  id: '/study-guides',
+  path: '/study-guides',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubmitMcqRoute = SubmitMcqRouteImport.update({
   id: '/submit-mcq',
   path: '/submit-mcq',
@@ -125,6 +137,8 @@ export interface FileRoutesByFullPath {
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/study-guides': typeof StudyGuidesRoute
   '/submit-mcq': typeof SubmitMcqRoute
   '/terms': typeof TermsRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
@@ -144,6 +158,8 @@ export interface FileRoutesByTo {
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/study-guides': typeof StudyGuidesRoute
   '/submit-mcq': typeof SubmitMcqRoute
   '/terms': typeof TermsRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
@@ -164,6 +180,8 @@ export interface FileRoutesById {
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/study-guides': typeof StudyGuidesRoute
   '/submit-mcq': typeof SubmitMcqRoute
   '/terms': typeof TermsRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
@@ -185,6 +203,8 @@ export interface FileRouteTypes {
     | '/practice'
     | '/privacy'
     | '/search'
+    | '/sitemap.xml'
+    | '/study-guides'
     | '/submit-mcq'
     | '/terms'
     | '/general-knowledge/$topic'
@@ -204,6 +224,8 @@ export interface FileRouteTypes {
     | '/practice'
     | '/privacy'
     | '/search'
+    | '/sitemap.xml'
+    | '/study-guides'
     | '/submit-mcq'
     | '/terms'
     | '/general-knowledge/$topic'
@@ -223,6 +245,8 @@ export interface FileRouteTypes {
     | '/practice'
     | '/privacy'
     | '/search'
+    | '/sitemap.xml'
+    | '/study-guides'
     | '/submit-mcq'
     | '/terms'
     | '/general-knowledge/$topic'
@@ -243,6 +267,8 @@ export interface RootRouteChildren {
   PracticeRoute: typeof PracticeRoute
   PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StudyGuidesRoute: typeof StudyGuidesRoute
   SubmitMcqRoute: typeof SubmitMcqRoute
   TermsRoute: typeof TermsRoute
   GeneralKnowledgeTopicRoute: typeof GeneralKnowledgeTopicRoute
@@ -330,6 +356,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study-guides': {
+      id: '/study-guides'
+      path: '/study-guides'
+      fullPath: '/study-guides'
+      preLoaderRoute: typeof StudyGuidesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/submit-mcq': {
       id: '/submit-mcq'
       path: '/submit-mcq'
@@ -387,6 +427,8 @@ const rootRouteChildren: RootRouteChildren = {
   PracticeRoute: PracticeRoute,
   PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StudyGuidesRoute: StudyGuidesRoute,
   SubmitMcqRoute: SubmitMcqRoute,
   TermsRoute: TermsRoute,
   GeneralKnowledgeTopicRoute: GeneralKnowledgeTopicRoute,

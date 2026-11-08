@@ -16,39 +16,50 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SearchBar } from "@/components/site/SearchBar";
 import { OptionButton } from "@/components/mcq/OptionButton";
 import { recentMcqsQuery } from "@/lib/data/queries";
+import { getExamCategoryCounts, getSubjectCounts } from "@/lib/data/mcq-repo";
 import { EXAM_CATEGORIES } from "@/lib/exam-categories";
 import { EXAM_SECONDS_PER_QUESTION, type OptionLetter } from "@/lib/mcq";
 import { GK_DOMAIN, POPULAR_SUBJECT_SLUGS, SUBJECT_GROUPS, SUBJECTS, getSubjectBySlug } from "@/lib/subjects";
 import { formatDistanceToNow } from "date-fns";
 
 export const Route = createFileRoute("/")({
+  loader: async () => {
+    try {
+      const [subjects, exams] = await Promise.all([getSubjectCounts(), getExamCategoryCounts()]);
+      return { subjects, exams };
+    } catch {
+      return { subjects: {}, exams: {} };
+    }
+  },
   head: () => ({
     meta: [
       { title: "Ilmivora — Prepare Smarter for PPSC, FPSC & NTS" },
       {
         name: "description",
         content:
-          "Thousands of MCQs across 53 subjects with practice tests, timed exam mode and progress tracking for Pakistan's competitive exams.",
+          "Thousands of subject-wise MCQs with answers and explanations, practice tests and timed exam mode for competitive exam preparation in Pakistan.",
       },
       { property: "og:title", content: "Ilmivora — Prepare Smarter. Achieve More." },
       {
         property: "og:description",
-        content: "MCQ preparation for PPSC, FPSC, NTS and other competitive exams in Pakistan.",
+        content: "Subject-based MCQ practice and exam preparation for aspirants across Pakistan.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://ilmivora-1.vercel.app/" }],
   }),
   component: Index,
 });
 
 function Index() {
+  const { subjects, exams } = Route.useLoaderData();
   return (
     <>
       <Hero />
-      <PopularSubjects />
-      <ExamCategories />
-      <FeaturedGroups />
+      <PopularSubjects counts={subjects} />
+      <ExamCategories counts={exams} />
+      <FeaturedGroups counts={subjects} />
       <RecentMcqs />
-      <Stats />
+      <Stats counts={subjects} />
       <Cta />
     </>
   );
@@ -75,8 +86,8 @@ function Hero() {
             <span className="text-brand brightness-150">Achieve More.</span>
           </h1>
           <p className="mt-5 max-w-xl text-base text-navy-foreground/75 md:text-lg">
-            Subject-wise MCQs with clear explanations, instant-feedback practice and a timed exam
-            mode built around how Pakistan's commissions actually test.
+            Subject-wise MCQs with answers and explanations, instant-feedback practice and a timed exam
+            mode to help you build recall and learn from mistakes.
           </p>
           <SearchBar size="lg" className="mt-8 max-w-xl" />
           <div className="mt-6 flex flex-wrap gap-3">
@@ -166,14 +177,18 @@ function SectionHead({
   );
 }
 
-function PopularSubjects() {
-  const popular = POPULAR_SUBJECT_SLUGS.map((s) => getSubjectBySlug(s)!).filter(Boolean);
+function PopularSubjects({ counts }: { counts: Record<string, number> }) {
+  const popular = POPULAR_SUBJECT_SLUGS.flatMap((slug) => {
+    const subject = getSubjectBySlug(slug);
+    return subject && (counts[subject.name] ?? 0) > 0 ? [subject] : [];
+  });
+  if (!popular.length) return null;
   return (
     <section className="container-page py-20">
       <SectionHead
         eyebrow="Popular subjects"
         title="Where most aspirants begin"
-        action={{ to: "/subjects", label: `All ${SUBJECTS.length} subjects` }}
+        action={{ to: "/subjects", label: `Browse ${Object.values(counts).filter((n) => n > 0).length} available subjects` }}
       />
       <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
         {popular.map((s) => (
@@ -194,13 +209,16 @@ function PopularSubjects() {
   );
 }
 
-function ExamCategories() {
+function ExamCategories({ counts }: { counts: Record<string, number> }) {
+  const available = EXAM_CATEGORIES.filter((category) => category.code !== "Other" && (counts[category.code] ?? 0) > 0);
   return (
     <section className="bg-secondary/60 py-20">
       <div className="container-page">
-        <SectionHead eyebrow="Browse by exam" title="Prepare for your commission" />
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {EXAM_CATEGORIES.map((c, i) => (
+        {available.length ? (
+          <>
+            <SectionHead eyebrow="Browse by exam" title="Prepare for your commission" />
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {available.map((c, i) => (
             <Link
               key={c.code}
               to="/search"
@@ -218,19 +236,35 @@ function ExamCategories() {
               </span>
             </Link>
           ))}
-        </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet">Study by subject</p>
+              <h2 className="mt-2 text-2xl font-bold md:text-3xl">Build a strong foundation first</h2>
+              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                The current question bank is organised by subject. Exam-specific question sets will appear when verified exam labels are available.
+              </p>
+            </div>
+            <Button variant="outline" asChild><Link to="/study-guides">Read the preparation guide <ArrowRight /></Link></Button>
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
-function FeaturedGroups() {
+function FeaturedGroups({ counts }: { counts: Record<string, number> }) {
+  const available = SUBJECTS.filter((subject) => (counts[subject.name] ?? 0) > 0);
+  const groups = SUBJECT_GROUPS.filter((group) => group !== GK_DOMAIN && available.some((subject) => subject.group === group));
+  if (!groups.length) return null;
   return (
     <section className="container-page py-20">
       <SectionHead eyebrow="Fields of study" title="Explore by field of study" />
       <div className="mt-8 grid gap-4 md:grid-cols-3">
-        {SUBJECT_GROUPS.filter((g) => g !== GK_DOMAIN).map((g, i) => {
-          const subjects = SUBJECTS.filter((s) => s.group === g);
+        {groups.map((g, i) => {
+          const subjects = available.filter((s) => s.group === g);
           return (
             <Link
               key={g}
@@ -308,10 +342,12 @@ function RecentMcqs() {
   );
 }
 
-function Stats() {
+function Stats({ counts }: { counts: Record<string, number> }) {
+  const totalQuestions = Object.values(counts).reduce((total, count) => total + count, 0);
+  const availableSubjects = Object.values(counts).filter((count) => count > 0).length;
   const stats = [
-    { icon: BookMarked, value: "10,000+", label: "MCQs with explanations" },
-    { icon: Layers, value: String(SUBJECTS.length), label: "Subjects covered" },
+    { icon: BookMarked, value: totalQuestions.toLocaleString(), label: "Published MCQs" },
+    { icon: Layers, value: String(availableSubjects), label: "Subjects with questions" },
     { icon: Clock, value: `${EXAM_SECONDS_PER_QUESTION}s`, label: "Per question in exam mode" },
   ];
   return (

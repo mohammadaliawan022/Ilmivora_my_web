@@ -7,8 +7,8 @@ type AuthSession = {
 };
 
 const sessionKey = "ilmivora.supabase.session";
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
-const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const supabaseUrl = import.meta.env["VITE_SUPABASE_URL"]?.replace(/\/$/, "");
+const publishableKey = import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && publishableKey);
 export const isPreviewMode = !isSupabaseConfigured || import.meta.env.MODE === "test";
@@ -75,12 +75,12 @@ export async function supabaseRest<T>(
     ...options.headers,
   };
   if (options.body !== undefined) headers["content-type"] = "application/json";
-  if (options.prefer) headers.prefer = options.prefer;
+  if (options.prefer) headers["prefer"] = options.prefer;
 
   const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
     method: options.method ?? "GET",
     headers,
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
   });
   const text = await response.text();
   const data = text ? (JSON.parse(text) as T & { message?: string; details?: string }) : (null as T);

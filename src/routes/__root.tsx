@@ -86,7 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Prepare for PPSC, FPSC, NTS and other competitive exams in Pakistan with subject-wise MCQs, practice tests and timed exam mode.",
+          "Prepare for competitive exams in Pakistan with subject-wise MCQs, clear explanations, practice tests and timed exam mode.",
       },
       { name: "author", content: "Ilmivora" },
       { property: "og:site_name", content: "Ilmivora" },

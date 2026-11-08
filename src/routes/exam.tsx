@@ -22,6 +22,7 @@ export const Route = createFileRoute("/exam")({
       },
       { property: "og:title", content: "Exam Mode — Ilmivora" },
       { property: "og:description", content: "Timed MCQ exams with a detailed final review." },
+      { name: "robots", content: "noindex, follow" },
     ],
   }),
   component: ExamPage,

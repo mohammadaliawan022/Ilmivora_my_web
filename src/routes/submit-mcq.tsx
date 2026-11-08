@@ -22,6 +22,7 @@ export const Route = createFileRoute("/submit-mcq")({
       { property: "og:description", content: "Contribute MCQs for PPSC, FPSC and NTS preparation." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex, follow" },
     ],
   }),
   component: SubmitPage,
