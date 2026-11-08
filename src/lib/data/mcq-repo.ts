@@ -20,6 +20,8 @@ export interface McqFilters {
   search?: string | undefined;
   /** Include hidden records for admin review only. */
   includeHidden?: boolean | undefined;
+  /** Filter to one CSV import batch. */
+  csvUploadId?: string | undefined;
 }
 
 export interface Page<T> {
@@ -42,6 +44,7 @@ function applyFilters(rows: Mcq[], f: McqFilters): Mcq[] {
   const topics = f.topic ? new Set(getTopicScope(f.topic).map((t) => t.toLowerCase())) : null;
   return rows.filter((m) => {
     if (!f.includeHidden && m.is_hidden) return false;
+    if (f.csvUploadId && m.csv_upload_id !== f.csvUploadId) return false;
     if (f.subject && m.subject.toLowerCase() !== f.subject.toLowerCase()) return false;
     if (f.subjects?.length && !f.subjects.some((s) => s.toLowerCase() === m.subject.toLowerCase())) return false;
     if (topics && !topics.has((m.topic ?? "").toLowerCase())) return false;
@@ -73,6 +76,7 @@ function makeMcqQuery(filters: McqFilters, page?: number, pageSize?: number) {
   // Keep older questions first so newly uploaded MCQs are appended to the final pages.
   const query = new URLSearchParams({ select: "*", order: "created_at.asc,id.asc" });
   if (!filters.includeHidden) query.set("is_hidden", "eq.false");
+  if (filters.csvUploadId) query.set("csv_upload_id", `eq.${filters.csvUploadId}`);
   if (filters.subject) query.set("subject", `ilike.${filters.subject}`);
   else if (filters.subjects?.length) {
     query.set("subject", `in.(${filters.subjects.map((s) => `"${s.replaceAll('"', '\\"')}"`).join(",")})`);
@@ -296,12 +300,12 @@ export async function deleteMcqsBySubject(subject: string): Promise<number> {
   return before - store.length;
 }
 
-export async function bulkInsertMcqs(rows: McqInput[]): Promise<number> {
+export async function bulkInsertMcqs(rows: McqInput[], csvUploadId?: string): Promise<number> {
   if (!IS_PREVIEW_DATA) {
     if (!rows.length) return 0;
     const { data } = await supabaseRest<Mcq[]>("mcqs?select=id", {
       method: "POST",
-      body: rows,
+      body: csvUploadId ? rows.map((row) => ({ ...row, csv_upload_id: csvUploadId })) : rows,
       prefer: "return=representation",
     });
     return data.length;
@@ -310,6 +314,7 @@ export async function bulkInsertMcqs(rows: McqInput[]): Promise<number> {
   const now = Date.now();
   const created = rows.map((r, i) => ({
     ...r,
+    ...(csvUploadId ? { csv_upload_id: csvUploadId } : {}),
     id: `local-${crypto.randomUUID()}`,
     created_at: new Date(now - i).toISOString(),
   }));

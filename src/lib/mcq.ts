@@ -15,6 +15,8 @@ export interface Mcq {
   submitter_name?: string | null;
   /** Hidden from student-facing lists while retained for admin review. */
   is_hidden?: boolean;
+  /** The CSV import batch this question came from, when applicable. */
+  csv_upload_id?: string | null;
   created_at: string;
 }
 
