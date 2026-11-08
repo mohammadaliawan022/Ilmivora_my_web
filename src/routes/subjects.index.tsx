@@ -23,7 +23,7 @@ export const Route = createFileRoute("/subjects/")({
       { title: "All Subjects — Ilmivora MCQs" },
       {
         name: "description",
-        content: `Browse ${Object.values(loaderData ?? {}).filter((count) => count > 0).length} subject banks with published MCQs and answers on Ilmivora.`,
+        content: "Browse available Ilmivora MCQ banks and syllabus-aligned subject areas for PPSC, FPSC and NTS preparation.",
       },
       { property: "og:title", content: "All Subjects — Ilmivora" },
       { property: "og:description", content: "Subject-wise MCQs for PPSC, FPSC and NTS preparation." },
@@ -46,7 +46,7 @@ function SubjectsPage() {
   const visible = useMemo(() => {
     const f = filter.trim().toLowerCase();
     return SUBJECTS.filter((s) =>
-      (counts[s.name] ?? 0) > 0 && (!group || s.group === group) && (!f || s.name.toLowerCase().includes(f)),
+      (!group || s.group === group) && (!f || s.name.toLowerCase().includes(f)),
     );
   }, [counts, group, filter]);
 
@@ -55,9 +55,21 @@ function SubjectsPage() {
       <PageHeader
         eyebrow="Subjects"
         title="All subjects"
-        description={`${availableCount} subject banks with published questions. Coverage grows as new question sets are added.`}
+        description={`${availableCount} subject banks currently have questions. The catalogue also lists syllabus subjects for which questions have not been added yet.`}
       />
       <div className="container-page py-10">
+        <section className="mb-8 rounded-2xl border border-border bg-card p-5 text-sm leading-relaxed text-muted-foreground" aria-label="Official syllabus references">
+          <p>
+            PPSC syllabuses vary by advertised post. FPSC CSS has compulsory and optional papers, while NTS tests use different subject groups. A subject listed here is not required for every exam; always check the current official notice.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 font-medium">
+            <a className="text-primary underline" href="https://www.ppsc.gop.pk/" target="_blank" rel="noreferrer">PPSC official site</a>
+            <a className="text-primary underline" href="https://www.fpsc.gov.pk/Syllabuses?section=CSS+Syllabi" target="_blank" rel="noreferrer">FPSC CSS syllabus</a>
+            <a className="text-primary underline" href="https://www.fpsc.gov.pk/Syllabuses?section=GR+Syllabus" target="_blank" rel="noreferrer">FPSC general recruitment syllabuses</a>
+            <a className="text-primary underline" href="https://www.nts.org.pk/Products/NTSNAT/nat-paper-pattern.php" target="_blank" rel="noreferrer">NTS NAT test contents</a>
+            <a className="text-primary underline" href="https://www.nts.org.pk/Products/NTSGATSUB/gat-s-paper-dist.php" target="_blank" rel="noreferrer">NTS GAT subject areas</a>
+          </div>
+        </section>
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap gap-2">
             <Chip active={!group} onClick={() => navigate({ search: {} })}>
@@ -79,25 +91,33 @@ function SubjectsPage() {
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {visible.map((s) => (
-            <CategoryLink
-              key={s.slug}
-              cat={{ name: s.name, slug: s.slug }}
-              className="card-surface card-interactive group flex items-center gap-4 p-4"
-            >
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                <s.icon className="h-5 w-5" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold">{s.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  {s.group}
-                  {counts && ` · ${(counts[s.name] ?? 0).toLocaleString()} MCQs`}
+          {visible.map((s) => {
+            const questionCount = counts[s.name] ?? 0;
+            const card = (
+              <>
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+                  <s.icon className="h-5 w-5" aria-hidden="true" />
                 </span>
-              </span>
-              <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
-            </CategoryLink>
-          ))}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-semibold">{s.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {questionCount > 0 ? `${s.group} · ${questionCount.toLocaleString()} questions` : "Question bank not added yet"}
+                  </span>
+                </span>
+                {questionCount > 0 && <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />}
+              </>
+            );
+
+            return questionCount > 0 ? (
+              <CategoryLink key={s.slug} cat={{ name: s.name, slug: s.slug }} className="card-surface card-interactive group flex items-center gap-4 p-4">
+                {card}
+              </CategoryLink>
+            ) : (
+              <div key={s.slug} aria-label={`${s.name}: question bank not added yet`} className="card-surface flex items-center gap-4 p-4 opacity-70">
+                {card}
+              </div>
+            );
+          })}
         </div>
         {visible.length === 0 && (
           <p className="mt-10 text-center text-muted-foreground">Nothing matches “{filter}”.</p>
