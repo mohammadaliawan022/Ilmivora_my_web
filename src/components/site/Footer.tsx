@@ -19,6 +19,7 @@ export function Footer() {
           links={[
             { to: "/subjects", label: "All Subjects" },
             { to: "/study-guides", label: "Study Guide" },
+            { to: "/jobs", label: "Government Jobs" },
             { to: "/practice", label: "Practice Test" },
             { to: "/exam", label: "Exam Mode" },
           ]}
@@ -56,6 +57,7 @@ type FooterLink = {
   to:
     | "/subjects"
     | "/study-guides"
+    | "/jobs"
     | "/practice"
     | "/exam"
     | "/login"

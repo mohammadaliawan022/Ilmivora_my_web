@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ExamRouteImport } from './routes/exam'
+import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PastPapersRouteImport } from './routes/past-papers'
 import { Route as PracticeRouteImport } from './routes/practice'
@@ -57,6 +58,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const ExamRoute = ExamRouteImport.update({
   id: '/exam',
   path: '/exam',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
+  '/jobs': typeof JobsRoute
   '/login': typeof LoginRoute
   '/past-papers': typeof PastPapersRoute
   '/practice': typeof PracticeRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
+  '/jobs': typeof JobsRoute
   '/login': typeof LoginRoute
   '/past-papers': typeof PastPapersRoute
   '/practice': typeof PracticeRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
+  '/jobs': typeof JobsRoute
   '/login': typeof LoginRoute
   '/past-papers': typeof PastPapersRoute
   '/practice': typeof PracticeRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/exam'
+    | '/jobs'
     | '/login'
     | '/past-papers'
     | '/practice'
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/exam'
+    | '/jobs'
     | '/login'
     | '/past-papers'
     | '/practice'
@@ -240,6 +251,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/exam'
+    | '/jobs'
     | '/login'
     | '/past-papers'
     | '/practice'
@@ -262,6 +274,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   ExamRoute: typeof ExamRoute
+  JobsRoute: typeof JobsRoute
   LoginRoute: typeof LoginRoute
   PastPapersRoute: typeof PastPapersRoute
   PracticeRoute: typeof PracticeRoute
@@ -319,6 +332,13 @@ declare module '@tanstack/react-router' {
       path: '/exam'
       fullPath: '/exam'
       preLoaderRoute: typeof ExamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -422,6 +442,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   ExamRoute: ExamRoute,
+  JobsRoute: JobsRoute,
   LoginRoute: LoginRoute,
   PastPapersRoute: PastPapersRoute,
   PracticeRoute: PracticeRoute,

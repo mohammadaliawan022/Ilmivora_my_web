@@ -11,6 +11,7 @@ import { ThemeToggle } from "./ThemeToggle";
 const NAV = [
   { to: "/subjects", label: "Subjects" },
   { to: "/past-papers", label: "Past Papers" },
+  { to: "/jobs", label: "Jobs" },
   { to: "/practice", label: "Practice" },
   { to: "/exam", label: "Exam Mode" },
   { to: "/submit-mcq", label: "Submit MCQ" },
