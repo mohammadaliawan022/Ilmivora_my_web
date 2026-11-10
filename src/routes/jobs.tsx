@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useRef, useState } from "react";
 import {
   ArrowUpRight,
   BadgeCheck,
@@ -85,6 +86,14 @@ export const Route = createFileRoute("/jobs")({
 
 function JobsPage() {
   const jobs = useQuery(publishedJobsQuery());
+  const [selectedSource, setSelectedSource] = useState<string | null>(null);
+  const currentJobsRef = useRef<HTMLElement>(null);
+  const visibleJobs = jobs.data?.filter((job) => !selectedSource || job.recruitment_source === selectedSource);
+
+  const selectSource = (source: string) => {
+    setSelectedSource(source);
+    currentJobsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <>
@@ -95,22 +104,22 @@ function JobsPage() {
       />
 
       <div className="container-page py-10 md:py-14">
-        <section className="mb-12" aria-labelledby="current-jobs-heading">
+        <section ref={currentJobsRef} className="mb-12 scroll-mt-24" aria-labelledby="current-jobs-heading">
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Current vacancies</p>
-              <h2 id="current-jobs-heading" className="mt-1 font-display text-2xl font-bold">Current job listings</h2>
+              <h2 id="current-jobs-heading" className="mt-1 font-display text-2xl font-bold">{selectedSource ? `${selectedSource} jobs` : "Current job listings"}</h2>
             </div>
-            {jobs.data?.length ? <span className="text-sm text-muted-foreground">{jobs.data.length} open {jobs.data.length === 1 ? "listing" : "listings"}</span> : null}
+            <div className="flex items-center gap-3">{visibleJobs?.length ? <span className="text-sm text-muted-foreground">{visibleJobs.length} open {visibleJobs.length === 1 ? "listing" : "listings"}</span> : null}{selectedSource && <button type="button" onClick={() => setSelectedSource(null)} className="text-sm font-semibold text-primary hover:underline">Show all jobs</button>}</div>
           </div>
           {jobs.isPending ? <div className="card-surface p-8 text-center text-sm text-muted-foreground">Loading current listings…</div>
             : jobs.isError ? <div role="alert" className="card-surface p-8 text-center text-sm text-muted-foreground">Job listings are temporarily unavailable. Please check again shortly.</div>
-            : jobs.data.length === 0 ? <div className="card-surface flex flex-col items-center p-8 text-center">
+            : visibleJobs?.length === 0 ? <div className="card-surface flex flex-col items-center p-8 text-center">
               <BriefcaseBusiness aria-hidden="true" className="h-8 w-8 text-primary" />
-              <h3 className="mt-3 font-semibold">No active listings at the moment</h3>
-              <p className="mt-1 max-w-lg text-sm text-muted-foreground">New vacancies will appear here when they are added. You can also check the official recruitment portals below.</p>
+              <h3 className="mt-3 font-semibold">No current {selectedSource ?? "job"} listings</h3>
+              <p className="mt-1 max-w-lg text-sm text-muted-foreground">New vacancies will appear here when they are added. Check the official portal below for the latest notices.</p>
             </div>
-            : <div className="grid gap-4 md:grid-cols-2">{jobs.data.map((job) => <PublicJobCard key={job.id} job={job} />)}</div>}
+            : <div className="grid gap-4 md:grid-cols-2">{visibleJobs?.map((job) => <PublicJobCard key={job.id} job={job} />)}</div>}
         </section>
 
         <section className="mb-8 flex gap-4 rounded-2xl border border-primary/20 bg-primary-soft p-5 md:p-6" aria-label="Important notice">
@@ -142,13 +151,16 @@ function JobsPage() {
               </div>
               <h3 className="mt-4 font-display text-lg font-bold">{portal.name}</h3>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{portal.description}</p>
+              <button type="button" onClick={() => selectSource(portal.shortName)} className="mt-5 inline-flex w-fit items-center gap-2 rounded-lg font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                View {portal.shortName} jobs on Ilmivora
+              </button>
               <a
                 href={portal.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-5 inline-flex w-fit items-center gap-2 rounded-lg font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                View {portal.shortName} opportunities
+                Open official portal
                 <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
@@ -189,6 +201,7 @@ function PublicJobCard({ job }: { job: JobListing }) {
   return (
     <article className="card-surface flex flex-col p-5 md:p-6">
       <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-primary">
+        <span className="rounded-full bg-primary-soft px-3 py-1">{job.recruitment_source}</span>
         <span className="rounded-full bg-primary-soft px-3 py-1">{job.employment_type}</span>
         <span className="text-muted-foreground">{job.location}</span>
       </div>

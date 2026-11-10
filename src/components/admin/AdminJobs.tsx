@@ -12,6 +12,7 @@ import {
   updateJob,
   type JobListing,
   type JobListingInput,
+  JOB_SOURCES,
   type JobStatus,
 } from "@/lib/data/job-repo";
 import { adminJobsQuery } from "@/lib/data/queries";
@@ -21,6 +22,7 @@ const blankForm: JobListingInput = {
   organization: "",
   location: "",
   employment_type: "Government",
+  recruitment_source: "PPSC",
   qualification: "",
   description: "",
   deadline: null,
@@ -77,6 +79,7 @@ export function AdminJobs() {
       organization: job.organization,
       location: job.location,
       employment_type: job.employment_type,
+      recruitment_source: job.recruitment_source,
       qualification: job.qualification ?? "",
       description: job.description,
       deadline: job.deadline,
@@ -133,6 +136,11 @@ export function AdminJobs() {
           <div className="space-y-2"><Label htmlFor="job-organization">Department / organisation</Label><Input id="job-organization" required maxLength={180} value={form.organization} onChange={(event) => set("organization", event.target.value)} placeholder="Punjab Public Service Commission" /></div>
           <div className="space-y-2"><Label htmlFor="job-location">Location</Label><Input id="job-location" required maxLength={120} value={form.location} onChange={(event) => set("location", event.target.value)} placeholder="Lahore, Punjab" /></div>
           <div className="space-y-2"><Label htmlFor="job-type">Employment type / scale</Label><Input id="job-type" required maxLength={80} value={form.employment_type} onChange={(event) => set("employment_type", event.target.value)} placeholder="Regular · BS-17" /></div>
+          <div className="space-y-2"><Label htmlFor="job-source">Recruitment section</Label>
+            <select id="job-source" className="h-10 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring" value={form.recruitment_source} onChange={(event) => set("recruitment_source", event.target.value as JobListingInput["recruitment_source"])}>
+              {JOB_SOURCES.map((source) => <option key={source} value={source}>{source === "Other" ? "Other / not listed" : source}</option>)}
+            </select>
+          </div>
           <div className="space-y-2"><Label htmlFor="job-deadline">Last date to apply</Label><Input id="job-deadline" type="date" value={form.deadline ?? ""} onChange={(event) => set("deadline", event.target.value || null)} /></div>
           <div className="space-y-2"><Label htmlFor="job-status">Listing status</Label>
             <select id="job-status" className="h-10 w-full rounded-lg border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring" value={form.status} onChange={(event) => set("status", event.target.value as JobStatus)}>
@@ -158,7 +166,7 @@ export function AdminJobs() {
             <li key={job.id} className="card-surface flex flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold">{job.title}</h3><span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${statusClass[job.status]}`}>{job.status}</span></div>
-                <p className="mt-1 text-sm text-muted-foreground">{job.organization} · {job.location} · {job.employment_type}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{job.recruitment_source} · {job.organization} · {job.location} · {job.employment_type}</p>
                 <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground"><CalendarDays aria-hidden="true" className="h-3.5 w-3.5" /> Apply by {displayDate(job.deadline)}</p>
               </div>
               <div className="flex shrink-0 items-center gap-1 self-end sm:self-auto">

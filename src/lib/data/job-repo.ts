@@ -1,6 +1,8 @@
 import { isPreviewMode, supabaseRest } from "../supabase";
 
 export type JobStatus = "draft" | "published";
+export const JOB_SOURCES = ["PPSC", "FPSC", "NJP", "PJP", "KP Jobs", "SPSC", "NTS", "Other"] as const;
+export type JobSource = (typeof JOB_SOURCES)[number];
 
 export interface JobListing {
   id: string;
@@ -8,6 +10,7 @@ export interface JobListing {
   organization: string;
   location: string;
   employment_type: string;
+  recruitment_source: JobSource;
   qualification: string | null;
   description: string;
   deadline: string | null;
