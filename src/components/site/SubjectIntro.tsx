@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { subjectIntroQuery } from "@/lib/data/queries";
+import { subjectIntroQuery } from "@/shared/data/queries";
 
 /** Admin-written cover image + introduction shown above a subject's MCQs. */
 export function SubjectIntro({ slug, name }: { slug: string; name: string }) {

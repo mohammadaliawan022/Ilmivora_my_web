@@ -1,6 +1,6 @@
 import { Check, X } from "lucide-react";
-import type { OptionLetter } from "@/lib/mcq";
-import { cn } from "@/lib/utils";
+import type { OptionLetter } from "@/shared/mcq";
+import { cn } from "@/shared/utils";
 
 export type OptionState = "idle" | "selected" | "correct" | "wrong" | "dimmed";
 

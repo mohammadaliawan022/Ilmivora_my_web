@@ -3,7 +3,7 @@ import { useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { saveAttempt } from "@/lib/attempts";
+import { saveAttempt } from "@/shared/attempts";
 import {
   PRACTICE_PAGE_SIZE,
   getCorrectLetter,
@@ -12,7 +12,7 @@ import {
   scoreExam,
   type Mcq,
   type OptionLetter,
-} from "@/lib/mcq";
+} from "@/shared/mcq";
 import { OptionButton, type OptionState } from "./OptionButton";
 import { ScoreSummary } from "./ScoreSummary";
 

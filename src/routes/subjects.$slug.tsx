@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { SubjectIntro } from "@/components/site/SubjectIntro";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { SubjectQuizSidebar } from "@/components/mcq/SubjectQuizSidebar";
-import { getCategoryBySlug } from "@/lib/categories";
-import { getSubjectCounts } from "@/lib/data/mcq-repo";
+import { getCategoryBySlug } from "@/shared/categories";
+import { getSubjectCounts } from "@/shared/data/mcq-repo";
 
 type Search = { page?: number | undefined; q?: string | undefined };
 

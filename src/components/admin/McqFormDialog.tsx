@@ -6,8 +6,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { McqForm } from "@/components/mcq/McqForm";
-import type { McqInput } from "@/lib/data/mcq-repo";
-import type { Mcq } from "@/lib/mcq";
+import type { McqInput } from "@/shared/data/mcq-repo";
+import type { Mcq } from "@/shared/mcq";
 
 export function McqFormDialog({
   open,

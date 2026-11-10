@@ -22,10 +22,10 @@ import {
   type McqInput,
   type McqSubmission,
   type SubmissionStatus,
-} from "@/lib/data/mcq-repo";
-import { submissionCountsQuery, submissionListQuery } from "@/lib/data/queries";
-import { getCorrectLetter, getOptions, type Mcq } from "@/lib/mcq";
-import { cn } from "@/lib/utils";
+} from "@/shared/data/mcq-repo";
+import { submissionCountsQuery, submissionListQuery } from "@/shared/data/queries";
+import { getCorrectLetter, getOptions, type Mcq } from "@/shared/mcq";
+import { cn } from "@/shared/utils";
 import { McqFormDialog } from "./McqFormDialog";
 
 const STATUSES: Array<[SubmissionStatus, string]> = [

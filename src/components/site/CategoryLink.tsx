@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import type { Category } from "@/lib/categories";
-import { GK_SUBJECT } from "@/lib/subjects";
+import type { Category } from "@/shared/categories";
+import { GK_SUBJECT } from "@/shared/subjects";
 
 /** Links a subject to its page. */
 export function CategoryLink({

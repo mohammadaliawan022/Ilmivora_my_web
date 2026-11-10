@@ -14,8 +14,8 @@ import {
   type JobListingInput,
   JOB_SOURCES,
   type JobStatus,
-} from "@/lib/data/job-repo";
-import { adminJobsQuery } from "@/lib/data/queries";
+} from "@/shared/data/job-repo";
+import { adminJobsQuery } from "@/shared/data/queries";
 
 const blankForm: JobListingInput = {
   title: "",

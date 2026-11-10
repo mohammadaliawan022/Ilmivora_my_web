@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/site/PageHeader";
 import { QuizLauncher } from "@/components/mcq/QuizLauncher";
-import { EXAM_NEGATIVE_MARKS_PER_WRONG, EXAM_SECONDS_PER_QUESTION } from "@/lib/mcq";
+import { EXAM_NEGATIVE_MARKS_PER_WRONG, EXAM_SECONDS_PER_QUESTION } from "@/shared/mcq";
 
 type Search = { subject?: string | undefined; exam?: string | undefined };
 

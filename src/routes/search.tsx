@@ -2,10 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/site/PageHeader";
 import { SearchBar } from "@/components/site/SearchBar";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
-import { EXAM_CATEGORIES } from "@/lib/exam-categories";
-import { SUBJECTS } from "@/lib/subjects";
-import { getExamCategoryCounts, getSubjectCounts } from "@/lib/data/mcq-repo";
-import { cn } from "@/lib/utils";
+import { EXAM_CATEGORIES } from "@/shared/exam-categories";
+import { SUBJECTS } from "@/shared/subjects";
+import { getExamCategoryCounts, getSubjectCounts } from "@/shared/data/mcq-repo";
+import { cn } from "@/shared/utils";
 
 type Search = { q?: string | undefined; exam?: string | undefined; subject?: string | undefined; page?: number | undefined };
 

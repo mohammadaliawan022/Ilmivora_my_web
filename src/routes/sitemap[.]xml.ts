@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getSubjectCounts } from "@/lib/data/mcq-repo";
-import { SUBJECTS } from "@/lib/subjects";
+import { getSubjectCounts } from "@/shared/data/mcq-repo";
+import { SUBJECTS } from "@/shared/subjects";
 
 const SITE_ORIGIN = "https://ilmivora-1.vercel.app";
 

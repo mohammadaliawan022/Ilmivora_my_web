@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { createPastPaper, deletePastPaper, type PastPaperInput } from "@/lib/data/past-paper-repo";
-import { pastPapersQuery } from "@/lib/data/queries";
-import { EXAM_CATEGORIES } from "@/lib/exam-categories";
+import { createPastPaper, deletePastPaper, type PastPaperInput } from "@/shared/data/past-paper-repo";
+import { pastPapersQuery } from "@/shared/data/queries";
+import { EXAM_CATEGORIES } from "@/shared/exam-categories";
 
 export function AdminPastPapers() {
   const queryClient = useQueryClient();

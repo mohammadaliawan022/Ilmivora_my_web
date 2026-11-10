@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/site/PageHeader";
 import { McqForm } from "@/components/mcq/McqForm";
-import { submitMcq, type McqInput } from "@/lib/data/mcq-repo";
+import { submitMcq, type McqInput } from "@/shared/data/mcq-repo";
 
 export const Route = createFileRoute("/submit-mcq")({
   head: () => ({

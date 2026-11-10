@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { McqInput } from "@/lib/data/mcq-repo";
-import { EXAM_CATEGORIES } from "@/lib/exam-categories";
-import { getCorrectLetter, validateMcqDraft, type Mcq } from "@/lib/mcq";
-import { SUBJECTS } from "@/lib/subjects";
+import type { McqInput } from "@/shared/data/mcq-repo";
+import { EXAM_CATEGORIES } from "@/shared/exam-categories";
+import { getCorrectLetter, validateMcqDraft, type Mcq } from "@/shared/mcq";
+import { SUBJECTS } from "@/shared/subjects";
 
 export const EMPTY_MCQ: McqInput = {
   question: "",

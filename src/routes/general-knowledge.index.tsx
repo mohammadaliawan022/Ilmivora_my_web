@@ -3,8 +3,8 @@ import { BookOpen, ChevronRight } from "lucide-react";
 import { SubjectQuizSidebar } from "@/components/mcq/SubjectQuizSidebar";
 import { SubjectIntro } from "@/components/site/SubjectIntro";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
-import { GK_SUBJECT } from "@/lib/subjects";
-import { getSubjectCounts } from "@/lib/data/mcq-repo";
+import { GK_SUBJECT } from "@/shared/subjects";
+import { getSubjectCounts } from "@/shared/data/mcq-repo";
 
 type Search = { page?: number | undefined; q?: string | undefined };
 

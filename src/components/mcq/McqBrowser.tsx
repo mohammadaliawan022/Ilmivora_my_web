@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Pager } from "@/components/site/Pager";
-import { mcqListQuery } from "@/lib/data/queries";
-import type { McqFilters } from "@/lib/data/mcq-repo";
+import { mcqListQuery } from "@/shared/data/queries";
+import type { McqFilters } from "@/shared/data/mcq-repo";
 import { McqCard } from "./McqCard";
 
 /** Paginated, searchable MCQ list. Page and search live in the URL via props. */

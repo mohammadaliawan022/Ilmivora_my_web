@@ -26,9 +26,9 @@ import { AdminAnalytics, AdminOverview, AdminSubjects } from "@/components/admin
 import { AdminSubjectIntros } from "@/components/admin/AdminSubjectIntros";
 import { AdminSubmissions } from "@/components/admin/AdminSubmissions";
 import { Button } from "@/components/ui/button";
-import { submissionCountsQuery } from "@/lib/data/queries";
-import { getCurrentAuthUser, isCurrentUserAdmin, isPreviewMode, signOut } from "@/lib/supabase";
-import { cn } from "@/lib/utils";
+import { submissionCountsQuery } from "@/shared/data/queries";
+import { getCurrentAuthUser, isCurrentUserAdmin, isPreviewMode, signOut } from "@/shared/supabase";
+import { cn } from "@/shared/utils";
 
 const SECTIONS = [
   { id: "overview", label: "Overview", icon: LayoutGrid },

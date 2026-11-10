@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { McqForm, selectCls } from "@/components/mcq/McqForm";
-import { createMcq, deleteMcqsBySubject, type McqInput } from "@/lib/data/mcq-repo";
-import { subjectCountsQuery } from "@/lib/data/queries";
-import { SUBJECTS } from "@/lib/subjects";
+import { createMcq, deleteMcqsBySubject, type McqInput } from "@/shared/data/mcq-repo";
+import { subjectCountsQuery } from "@/shared/data/queries";
+import { SUBJECTS } from "@/shared/subjects";
 
 export function AdminAddMcq() {
   const qc = useQueryClient();

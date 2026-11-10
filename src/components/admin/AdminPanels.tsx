@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { BookMarked, ClipboardCheck, FileText, Layers, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { examCountsQuery, mcqListQuery, subjectCountsQuery, submissionCountsQuery } from "@/lib/data/queries";
-import { loadAttempts, summarizeAttempts, type TestAttempt } from "@/lib/attempts";
-import { SUBJECTS } from "@/lib/subjects";
+import { examCountsQuery, mcqListQuery, subjectCountsQuery, submissionCountsQuery } from "@/shared/data/queries";
+import { loadAttempts, summarizeAttempts, type TestAttempt } from "@/shared/attempts";
+import { SUBJECTS } from "@/shared/subjects";
 
 const CHART_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 const tooltipStyle = { background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 };

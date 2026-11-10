@@ -34,13 +34,13 @@ src/
 │   ├── site/     Header, footer, breadcrumbs, page headers and subject intros
 │   └── ui/       Shared low-level UI components
 ├── hooks/        Shared React hooks
-├── lib/
+├── shared/
 │   ├── data/     Async data repositories and React Query definitions
 │   ├── categories.ts       Subject and section tree helpers
 │   ├── category-data.ts   Owner-provided subject and section catalogue
 │   ├── mcq.ts              MCQ types and quiz rules
 │   └── supabase.ts         Supabase Auth, REST and Storage helpers
-└── test/         Vitest tests and test setup
+└── tests/        Vitest tests and test setup
 
 public/           Static files served as-is
 ```
@@ -48,10 +48,10 @@ public/           Static files served as-is
 ### Where to make common changes
 
 - **Pages and URLs:** add or edit a route in `src/routes/`. TanStack's generated route tree is `src/routeTree.gen.ts`; it is generated from the route files.
-- **MCQ data:** use `src/lib/data/mcq-repo.ts` through the async functions in `src/lib/data/queries.ts`. UI components should not access the database directly.
-- **Question and exam behavior:** update `src/lib/mcq.ts` and its corresponding tests.
-- **Subjects and sections:** use `src/lib/categories.ts`. The catalogue in `src/lib/category-data.ts` is owner data; do not invent or manually add categories.
-- **Subject images and introductions:** use `src/lib/data/subject-intro-repo.ts` and the admin UI in `src/components/admin/AdminSubjectIntros.tsx`.
+- **MCQ data:** use `src/shared/data/mcq-repo.ts` through the async functions in `src/shared/data/queries.ts`. UI components should not access the database directly.
+- **Question and exam behavior:** update `src/shared/mcq.ts` and its corresponding tests.
+- **Subjects and sections:** use `src/shared/categories.ts`. The catalogue in `src/shared/category-data.ts` is owner data; do not invent or manually add categories.
+- **Subject images and introductions:** use `src/shared/data/subject-intro-repo.ts` and the admin UI in `src/components/admin/AdminSubjectIntros.tsx`.
 - **Admin sections:** edit components in `src/components/admin/`. Admin tabs are selected by the `?tab=` URL parameter on `/admin`.
 - **Shared navigation and styling:** `src/components/site/` and the application styles in `src/styles.css`.
 
@@ -68,4 +68,4 @@ Never commit `.env.local` or service-role keys. Public database access is contro
 
 ## Tests
 
-Tests live under `src/test/`. They cover the app routes, MCQ rules, and subject introduction repository. Run them with `npm test` when you want to check changes.
+Tests live under `src/tests/`. They cover the app routes, MCQ rules, and subject introduction repository. Run them with `npm test` when you want to check changes.

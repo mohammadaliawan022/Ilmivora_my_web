@@ -15,11 +15,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Pager } from "@/components/site/Pager";
-import { createMcq, deleteMcq, getMcqsForExport, setMcqHidden, updateMcq, type McqInput } from "@/lib/data/mcq-repo";
-import { mcqListQuery } from "@/lib/data/queries";
-import { mcqsToCsv } from "@/lib/csv";
-import { getCorrectLetter, type Mcq } from "@/lib/mcq";
-import { SUBJECTS } from "@/lib/subjects";
+import { createMcq, deleteMcq, getMcqsForExport, setMcqHidden, updateMcq, type McqInput } from "@/shared/data/mcq-repo";
+import { mcqListQuery } from "@/shared/data/queries";
+import { mcqsToCsv } from "@/shared/csv";
+import { getCorrectLetter, type Mcq } from "@/shared/mcq";
+import { SUBJECTS } from "@/shared/subjects";
 import { McqFormDialog } from "./McqFormDialog";
 
 export function AdminMcqs() {

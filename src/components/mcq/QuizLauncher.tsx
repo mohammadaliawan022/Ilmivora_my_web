@@ -11,10 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getQuizQuestions } from "@/lib/data/mcq-repo";
-import { EXAM_CATEGORIES } from "@/lib/exam-categories";
-import { EXAM_NEGATIVE_MARKS_PER_WRONG, EXAM_SECONDS_PER_QUESTION, type Mcq } from "@/lib/mcq";
-import { SUBJECTS } from "@/lib/subjects";
+import { getQuizQuestions } from "@/shared/data/mcq-repo";
+import { EXAM_CATEGORIES } from "@/shared/exam-categories";
+import { EXAM_NEGATIVE_MARKS_PER_WRONG, EXAM_SECONDS_PER_QUESTION, type Mcq } from "@/shared/mcq";
+import { SUBJECTS } from "@/shared/subjects";
 import { ExamQuiz } from "./ExamQuiz";
 import { PracticeQuiz } from "./PracticeQuiz";
 

@@ -11,11 +11,11 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { reportLovableError } from "../shared/lovable-error-reporting";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
-import { THEME_INIT_SCRIPT, ThemeProvider } from "@/lib/theme";
+import { THEME_INIT_SCRIPT, ThemeProvider } from "@/shared/theme";
 
 function NotFoundComponent() {
   return (

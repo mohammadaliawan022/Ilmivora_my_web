@@ -3,9 +3,9 @@ import { CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, CircleAlert, Cloc
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { bulkInsertMcqs, listMcqs } from "@/lib/data/mcq-repo";
-import { createCsvUpload, finishCsvUpload, listCsvUploads, type CsvUpload } from "@/lib/data/csv-upload-repo";
-import { OPTIONAL_CSV_COLUMNS, REQUIRED_CSV_COLUMNS, csvToMcqs, type CsvImportResult } from "@/lib/csv";
+import { bulkInsertMcqs, listMcqs } from "@/shared/data/mcq-repo";
+import { createCsvUpload, finishCsvUpload, listCsvUploads, type CsvUpload } from "@/shared/data/csv-upload-repo";
+import { OPTIONAL_CSV_COLUMNS, REQUIRED_CSV_COLUMNS, csvToMcqs, type CsvImportResult } from "@/shared/csv";
 
 const TEMPLATE =
   [...REQUIRED_CSV_COLUMNS, ...OPTIONAL_CSV_COLUMNS].join(",") +

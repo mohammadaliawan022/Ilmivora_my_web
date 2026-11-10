@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { BookOpen, Clock, GraduationCap, ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { mcqListQuery } from "@/lib/data/queries";
-import type { McqFilters } from "@/lib/data/mcq-repo";
-import { EXAM_NEGATIVE_MARKS_PER_WRONG } from "@/lib/mcq";
+import { mcqListQuery } from "@/shared/data/queries";
+import type { McqFilters } from "@/shared/data/mcq-repo";
+import { EXAM_NEGATIVE_MARKS_PER_WRONG } from "@/shared/mcq";
 
 export function SubjectQuizSidebar({
   filters,

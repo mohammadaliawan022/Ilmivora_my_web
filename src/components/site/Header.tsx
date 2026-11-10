@@ -3,7 +3,7 @@ import { LogOut, Menu, Search, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { getCurrentAuthUser, signOut, subscribeToAuthChanges } from "@/lib/supabase";
+import { getCurrentAuthUser, signOut, subscribeToAuthChanges } from "@/shared/supabase";
 import { Logo } from "./Logo";
 import { SearchBar } from "./SearchBar";
 import { ThemeToggle } from "./ThemeToggle";

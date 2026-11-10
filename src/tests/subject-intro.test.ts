@@ -4,7 +4,7 @@ import {
   saveSubjectIntro,
   validateIntroImage,
   validateIntroInput,
-} from "@/lib/data/subject-intro-repo";
+} from "@/shared/data/subject-intro-repo";
 
 describe("subject introductions", () => {
   it("accepts images up to 2 MB and rejects larger ones", () => {

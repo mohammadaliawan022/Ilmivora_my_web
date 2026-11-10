@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 
 export function SearchBar({
   defaultValue = "",

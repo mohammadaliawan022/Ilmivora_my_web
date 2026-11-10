@@ -15,11 +15,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchBar } from "@/components/site/SearchBar";
 import { OptionButton } from "@/components/mcq/OptionButton";
-import { recentMcqsQuery } from "@/lib/data/queries";
-import { getExamCategoryCounts, getSubjectCounts } from "@/lib/data/mcq-repo";
-import { EXAM_CATEGORIES } from "@/lib/exam-categories";
-import { EXAM_SECONDS_PER_QUESTION, type OptionLetter } from "@/lib/mcq";
-import { GK_DOMAIN, POPULAR_SUBJECT_SLUGS, SUBJECT_GROUPS, SUBJECTS, getSubjectBySlug } from "@/lib/subjects";
+import { recentMcqsQuery } from "@/shared/data/queries";
+import { getExamCategoryCounts, getSubjectCounts } from "@/shared/data/mcq-repo";
+import { EXAM_CATEGORIES } from "@/shared/exam-categories";
+import { EXAM_SECONDS_PER_QUESTION, type OptionLetter } from "@/shared/mcq";
+import { GK_DOMAIN, POPULAR_SUBJECT_SLUGS, SUBJECT_GROUPS, SUBJECTS, getSubjectBySlug } from "@/shared/subjects";
 import { formatDistanceToNow } from "date-fns";
 
 export const Route = createFileRoute("/")({

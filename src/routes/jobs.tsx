@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/site/PageHeader";
-import { publishedJobsQuery } from "@/lib/data/queries";
-import type { JobListing } from "@/lib/data/job-repo";
+import { publishedJobsQuery } from "@/shared/data/queries";
+import type { JobListing } from "@/shared/data/job-repo";
 
 const OFFICIAL_PORTALS = [
   {
@@ -149,7 +149,11 @@ function JobsPage() {
                 </span>
                 <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">{portal.type}</span>
               </div>
-              <h3 className="mt-4 font-display text-lg font-bold">{portal.name}</h3>
+              <h3 className="mt-4 font-display text-lg font-bold">
+                <a href={portal.href} target="_blank" rel="noopener noreferrer" className="rounded-sm underline-offset-4 hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  {portal.name}<span className="sr-only"> (opens official website in a new tab)</span>
+                </a>
+              </h3>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{portal.description}</p>
               <button type="button" onClick={() => selectSource(portal.shortName)} className="mt-5 inline-flex w-fit items-center gap-2 rounded-lg font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 View {portal.shortName} jobs on Ilmivora

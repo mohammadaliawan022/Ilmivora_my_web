@@ -4,10 +4,10 @@ import { BookOpen, ChevronRight, FileText, GraduationCap, Search } from "lucide-
 import { useEffect, useState, type FormEvent } from "react";
 import { McqBrowser } from "@/components/mcq/McqBrowser";
 import { Button } from "@/components/ui/button";
-import { mcqListQuery } from "@/lib/data/queries";
-import { getExamCategoryCounts } from "@/lib/data/mcq-repo";
-import { EXAM_CATEGORIES } from "@/lib/exam-categories";
-import { cn } from "@/lib/utils";
+import { mcqListQuery } from "@/shared/data/queries";
+import { getExamCategoryCounts } from "@/shared/data/mcq-repo";
+import { EXAM_CATEGORIES } from "@/shared/exam-categories";
+import { cn } from "@/shared/utils";
 
 type SearchParams = { exam?: string | undefined; q?: string | undefined; page?: number | undefined };
 

@@ -2,8 +2,8 @@ import { Check, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getCorrectLetter, getOptions, type Mcq } from "@/lib/mcq";
-import { cn } from "@/lib/utils";
+import { getCorrectLetter, getOptions, type Mcq } from "@/shared/mcq";
+import { cn } from "@/shared/utils";
 
 export function McqCard({ mcq, index }: { mcq: Mcq; index?: number }) {
   const [revealed, setRevealed] = useState(false);

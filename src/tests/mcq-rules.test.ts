@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { csvToMcqs } from "@/lib/csv";
+import { csvToMcqs } from "@/shared/csv";
 import {
   EXAM_SECONDS_PER_QUESTION,
   PRACTICE_PAGE_SIZE,
@@ -8,10 +8,10 @@ import {
   scoreExam,
   validateMcqDraft,
   type Mcq,
-} from "@/lib/mcq";
-import { SUBJECTS } from "@/lib/subjects";
-import { CATEGORIES, DOMAINS, getTopicScope } from "@/lib/categories";
-import { GK_CATEGORY_NAMES, GK_CATEGORY_TARGET_COUNT } from "@/lib/gk-categories";
+} from "@/shared/mcq";
+import { SUBJECTS } from "@/shared/subjects";
+import { CATEGORIES, DOMAINS, getTopicScope } from "@/shared/categories";
+import { GK_CATEGORY_NAMES, GK_CATEGORY_TARGET_COUNT } from "@/shared/gk-categories";
 import {
   approveSubmission,
   deleteMcqsBySubject,
@@ -19,7 +19,7 @@ import {
   listSubmissions,
   rejectSubmission,
   submitMcq,
-} from "@/lib/data/mcq-repo";
+} from "@/shared/data/mcq-repo";
 
 const base: Mcq = {
   id: "1",

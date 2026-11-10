@@ -1,5 +1,5 @@
 import { CheckCircle2, MinusCircle, XCircle } from "lucide-react";
-import { getCorrectLetter, getOptions, type Mcq, type OptionLetter } from "@/lib/mcq";
+import { getCorrectLetter, getOptions, type Mcq, type OptionLetter } from "@/shared/mcq";
 import { OptionButton } from "./OptionButton";
 
 export function ExamReview({

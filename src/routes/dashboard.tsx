@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { loadAttempts, summarizeAttempts, type TestAttempt } from "@/lib/attempts";
-import { cn } from "@/lib/utils";
+import { loadAttempts, summarizeAttempts, type TestAttempt } from "@/shared/attempts";
+import { cn } from "@/shared/utils";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({

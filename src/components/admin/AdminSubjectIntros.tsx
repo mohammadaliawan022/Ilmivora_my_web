@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { selectCls } from "@/components/mcq/McqForm";
-import { subjectIntroListQuery, subjectIntroQuery } from "@/lib/data/queries";
+import { subjectIntroListQuery, subjectIntroQuery } from "@/shared/data/queries";
 import {
   INTRO_MAX_CHARS,
   deleteSubjectIntro,
@@ -15,8 +15,8 @@ import {
   validateIntroImage,
   validateIntroInput,
   type SubjectIntro,
-} from "@/lib/data/subject-intro-repo";
-import { SUBJECTS } from "@/lib/subjects";
+} from "@/shared/data/subject-intro-repo";
+import { SUBJECTS } from "@/shared/subjects";
 
 const readAsDataUrl = (file: File) =>
   new Promise<string>((resolve, reject) => {

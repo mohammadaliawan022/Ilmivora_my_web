@@ -1,5 +1,5 @@
-import type { ExamScore } from "@/lib/mcq";
-import { cn } from "@/lib/utils";
+import type { ExamScore } from "@/shared/mcq";
+import { cn } from "@/shared/utils";
 
 export function ScoreSummary({ score, title }: { score: ExamScore; title: string }) {
   const hasNegativeMarking = score.penaltyPerIncorrect > 0;

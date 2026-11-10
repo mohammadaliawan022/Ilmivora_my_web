@@ -4,10 +4,10 @@ import { ArrowUpRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/site/PageHeader";
 import { CategoryLink } from "@/components/site/CategoryLink";
-import { subjectCountsQuery } from "@/lib/data/queries";
-import { getSubjectCounts } from "@/lib/data/mcq-repo";
-import { SUBJECT_GROUPS, SUBJECTS, type SubjectGroup } from "@/lib/subjects";
-import { cn } from "@/lib/utils";
+import { subjectCountsQuery } from "@/shared/data/queries";
+import { getSubjectCounts } from "@/shared/data/mcq-repo";
+import { SUBJECT_GROUPS, SUBJECTS, type SubjectGroup } from "@/shared/subjects";
+import { cn } from "@/shared/utils";
 
 type Search = { group?: SubjectGroup | undefined };
 

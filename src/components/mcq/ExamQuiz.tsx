@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { saveAttempt } from "@/lib/attempts";
+import { saveAttempt } from "@/shared/attempts";
 import {
   EXAM_NEGATIVE_MARKS_PER_WRONG,
   EXAM_SECONDS_PER_QUESTION,
@@ -21,8 +21,8 @@ import {
   scoreExam,
   type Mcq,
   type OptionLetter,
-} from "@/lib/mcq";
-import { cn } from "@/lib/utils";
+} from "@/shared/mcq";
+import { cn } from "@/shared/utils";
 import { ExamReview } from "./ExamReview";
 import { OptionButton } from "./OptionButton";
 import { ScoreSummary } from "./ScoreSummary";
