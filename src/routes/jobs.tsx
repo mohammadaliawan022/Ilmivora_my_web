@@ -1,13 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowUpRight,
   BadgeCheck,
   BriefcaseBusiness,
+  CalendarDays,
   CalendarCheck2,
   ClipboardList,
   ShieldCheck,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/site/PageHeader";
+import { publishedJobsQuery } from "@/lib/data/queries";
+import type { JobListing } from "@/lib/data/job-repo";
 
 const OFFICIAL_PORTALS = [
   {
@@ -79,6 +84,8 @@ export const Route = createFileRoute("/jobs")({
 });
 
 function JobsPage() {
+  const jobs = useQuery(publishedJobsQuery());
+
   return (
     <>
       <PageHeader
@@ -88,6 +95,24 @@ function JobsPage() {
       />
 
       <div className="container-page py-10 md:py-14">
+        <section className="mb-12" aria-labelledby="current-jobs-heading">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Current vacancies</p>
+              <h2 id="current-jobs-heading" className="mt-1 font-display text-2xl font-bold">Current job listings</h2>
+            </div>
+            {jobs.data?.length ? <span className="text-sm text-muted-foreground">{jobs.data.length} open {jobs.data.length === 1 ? "listing" : "listings"}</span> : null}
+          </div>
+          {jobs.isPending ? <div className="card-surface p-8 text-center text-sm text-muted-foreground">Loading current listings…</div>
+            : jobs.isError ? <div role="alert" className="card-surface p-8 text-center text-sm text-muted-foreground">Job listings are temporarily unavailable. Please check again shortly.</div>
+            : jobs.data.length === 0 ? <div className="card-surface flex flex-col items-center p-8 text-center">
+              <BriefcaseBusiness aria-hidden="true" className="h-8 w-8 text-primary" />
+              <h3 className="mt-3 font-semibold">No active listings at the moment</h3>
+              <p className="mt-1 max-w-lg text-sm text-muted-foreground">New vacancies will appear here when they are added. You can also check the official recruitment portals below.</p>
+            </div>
+            : <div className="grid gap-4 md:grid-cols-2">{jobs.data.map((job) => <PublicJobCard key={job.id} job={job} />)}</div>}
+        </section>
+
         <section className="mb-8 flex gap-4 rounded-2xl border border-primary/20 bg-primary-soft p-5 md:p-6" aria-label="Important notice">
           <ShieldCheck aria-hidden="true" className="mt-0.5 h-6 w-6 shrink-0 text-primary" />
           <div>
@@ -153,5 +178,28 @@ function JobsPage() {
         </p>
       </div>
     </>
+  );
+}
+
+function PublicJobCard({ job }: { job: JobListing }) {
+  const deadline = job.deadline
+    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${job.deadline}T00:00:00Z`))
+    : "See official notice";
+
+  return (
+    <article className="card-surface flex flex-col p-5 md:p-6">
+      <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-primary">
+        <span className="rounded-full bg-primary-soft px-3 py-1">{job.employment_type}</span>
+        <span className="text-muted-foreground">{job.location}</span>
+      </div>
+      <h3 className="mt-4 font-display text-xl font-bold">{job.title}</h3>
+      <p className="mt-1 text-sm font-medium text-muted-foreground">{job.organization}</p>
+      {job.qualification && <p className="mt-3 text-sm leading-relaxed"><strong>Eligibility:</strong> {job.qualification}</p>}
+      <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{job.description}</p>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+        <p className="flex items-center gap-2 text-sm"><CalendarDays aria-hidden="true" className="h-4 w-4 text-primary" /><span><span className="text-muted-foreground">Last date: </span><strong>{deadline}</strong></span></p>
+        <Button asChild><a href={job.apply_url} target="_blank" rel="noopener noreferrer">View / apply <ArrowUpRight aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a></Button>
+      </div>
+    </article>
   );
 }

@@ -12,6 +12,13 @@ import {
 
 import { getSubjectIntro, listSubjectIntros } from "./subject-intro-repo";
 import { listPastPapers } from "./past-paper-repo";
+import { listAdminJobs, listPublishedJobs } from "./job-repo";
+
+export const publishedJobsQuery = () =>
+  queryOptions({ queryKey: ["jobs", "published"], queryFn: listPublishedJobs });
+
+export const adminJobsQuery = () =>
+  queryOptions({ queryKey: ["jobs", "admin"], queryFn: listAdminJobs });
 
 export const pastPapersQuery = () =>
   queryOptions({ queryKey: ["past-papers"], queryFn: listPastPapers });

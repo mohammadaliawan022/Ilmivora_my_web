@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BarChart3,
   BookOpen,
+  BriefcaseBusiness,
   ClipboardCheck,
   FileText,
   FolderOpen,
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AdminCsvUpload } from "@/components/admin/AdminCsvUpload";
+import { AdminJobs } from "@/components/admin/AdminJobs";
 import { AdminAddMcq, AdminDeleteBySubject } from "@/components/admin/AdminExtraPanels";
 import { AdminMcqs } from "@/components/admin/AdminMcqs";
 import { AdminPastPapers } from "@/components/admin/AdminPastPapers";
@@ -38,6 +40,7 @@ const SECTIONS = [
   { id: "subjects", label: "Subjects", icon: FolderOpen },
   { id: "intros", label: "Subject Intros", icon: ImageIcon },
   { id: "papers", label: "Past Papers", icon: FileText },
+  { id: "jobs", label: "Jobs", icon: BriefcaseBusiness },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
 ] as const satisfies ReadonlyArray<{ id: string; label: string; icon: LucideIcon }>;
 
@@ -189,6 +192,7 @@ function AdminPage() {
             {active.id === "subjects" && <AdminSubjects />}
             {active.id === "intros" && <AdminSubjectIntros />}
             {active.id === "papers" && <AdminPastPapers />}
+            {active.id === "jobs" && <AdminJobs />}
             {active.id === "analytics" && <AdminAnalytics />}
           </div>
         </section>
