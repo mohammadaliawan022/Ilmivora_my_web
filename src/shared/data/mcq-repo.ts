@@ -182,6 +182,33 @@ export async function getQuizQuestions(filters: McqFilters, count: number): Prom
   return shuffled.slice(0, count);
 }
 
+/** Re-fetch featured questions by ID so edits in the admin panel appear on the homepage. */
+export async function getMcqsByIds(ids: string[]): Promise<Mcq[]> {
+  const safeIds = [...new Set(ids.filter((id) => /^\d+$/.test(id)))];
+  if (!safeIds.length) return [];
+
+  if (!IS_PREVIEW_DATA) {
+    const query = new URLSearchParams({
+      select: "*",
+      id: `in.(${safeIds.join(",")})`,
+      is_hidden: "eq.false",
+    });
+    const { data } = await supabaseRest<Mcq[]>(`mcqs?${query}`);
+    const byId = new Map(data.map((mcq) => [mcq.id, mcq]));
+    return safeIds.flatMap((id) => {
+      const mcq = byId.get(id);
+      return mcq ? [mcq] : [];
+    });
+  }
+
+  await delay();
+  const byId = new Map(store.filter((mcq) => !mcq.is_hidden).map((mcq) => [mcq.id, mcq]));
+  return safeIds.flatMap((id) => {
+    const mcq = byId.get(id);
+    return mcq ? [mcq] : [];
+  });
+}
+
 export async function getSubjectCounts(): Promise<Record<string, number>> {
   if (!IS_PREVIEW_DATA) {
     const { data } = await supabaseRest<Record<string, number>>("rpc/get_mcq_subject_counts", {

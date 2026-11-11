@@ -16,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SearchBar } from "@/components/site/SearchBar";
 import { OptionButton } from "@/components/mcq/OptionButton";
 import { recentMcqsQuery } from "@/shared/data/queries";
-import { getExamCategoryCounts, getQuizQuestions, getSubjectCounts } from "@/shared/data/mcq-repo";
+import { getExamCategoryCounts, getMcqsByIds, getQuizQuestions, getSubjectCounts } from "@/shared/data/mcq-repo";
 import { EXAM_CATEGORIES } from "@/shared/exam-categories";
 import { EXAM_SECONDS_PER_QUESTION, getCorrectLetter, getOptions, type Mcq, type OptionLetter } from "@/shared/mcq";
 import { GK_DOMAIN, POPULAR_SUBJECT_SLUGS, SUBJECT_GROUPS, SUBJECTS, getSubjectBySlug } from "@/shared/subjects";
@@ -125,30 +125,36 @@ function HeroQuestion({ questions }: { questions: Mcq[] }) {
     initialized.current = true;
 
     const storageKey = "ilmivora-home-featured-mcqs";
-    let pool = questions.slice(0, 4);
-    let index = pool.length > 1 ? 1 : 0;
+    const fallbackPool = questions.slice(0, 4);
 
-    try {
-      const saved = JSON.parse(window.localStorage.getItem(storageKey) ?? "null") as {
-        questions?: Mcq[];
-        nextIndex?: number;
-      } | null;
-      if (
-        saved?.questions?.length === 4 &&
-        saved.questions.every((item) => item?.id && item?.question && getOptions(item).every((option) => option.text.trim())) &&
-        Number.isInteger(saved.nextIndex)
-      ) {
-        pool = saved.questions;
-        index = (saved.nextIndex! + pool.length) % pool.length;
+    void (async () => {
+      let pool = fallbackPool;
+      let index = pool.length > 1 ? 1 : 0;
+
+      try {
+        const saved = JSON.parse(window.localStorage.getItem(storageKey) ?? "null") as {
+          ids?: string[];
+          questions?: Mcq[];
+          nextIndex?: number;
+        } | null;
+        const savedIds = saved?.ids ?? saved?.questions?.map((item) => item.id);
+        if (savedIds?.length === 4 && savedIds.every((id) => /^\d+$/.test(id)) && Number.isInteger(saved?.nextIndex)) {
+          const freshPool = await getMcqsByIds(savedIds).catch(() => []);
+          if (freshPool.length === 4 && freshPool.every((item) => getCorrectLetter(item) && getOptions(item).every((option) => option.text.trim()))) {
+            pool = freshPool;
+            index = (saved!.nextIndex! + pool.length) % pool.length;
+          }
+        }
+
+        setMcq(pool[index] ?? pool[0] ?? null);
+        window.localStorage.setItem(
+          storageKey,
+          JSON.stringify({ ids: pool.map((item) => item.id), nextIndex: (index + 1) % pool.length }),
+        );
+      } catch {
+        setMcq(pool[index] ?? pool[0] ?? null);
       }
-      setMcq(pool[index] ?? pool[0] ?? null);
-      window.localStorage.setItem(
-        storageKey,
-        JSON.stringify({ questions: pool, nextIndex: (index + 1) % pool.length }),
-      );
-    } catch {
-      setMcq(pool[index] ?? pool[0] ?? null);
-    }
+    })();
   }, [questions]);
 
   return (
