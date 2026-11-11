@@ -3,14 +3,14 @@ import { Logo } from "./Logo";
 
 export function Footer() {
   return (
-    <footer className="mt-20 border-t border-border bg-background text-foreground">
+    <footer className="mt-24 bg-navy text-navy-foreground">
       <div className="container-page grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
-          <Logo />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+          <Logo inverted />
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-navy-foreground/70">
             MCQ preparation for PPSC, FPSC, NTS and other competitive examinations in Pakistan.
           </p>
-          <p className="mt-6 text-left font-urdu text-lg text-muted-foreground" dir="rtl" lang="ur">
+          <p className="mt-6 text-left font-urdu text-lg text-navy-foreground/50" dir="rtl" lang="ur">
             علم ہی طاقت ہے
           </p>
         </div>
@@ -43,8 +43,8 @@ export function Footer() {
           ]}
         />
       </div>
-      <div className="border-t border-border">
-        <div className="container-page flex flex-col gap-2 py-5 text-xs text-muted-foreground sm:flex-row sm:justify-between">
+      <div className="border-t border-navy-foreground/10">
+        <div className="container-page flex flex-col gap-2 py-5 text-xs text-navy-foreground/60 sm:flex-row sm:justify-between">
           <span>© {new Date().getFullYear()} Ilmivora. All rights reserved.</span>
           <span>Made for aspirants across Pakistan.</span>
         </div>
@@ -74,13 +74,13 @@ type FooterLink = {
 function FooterCol({ title, links }: { title: string; links: FooterLink[] }) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <h3 className="text-sm font-semibold text-navy-foreground">{title}</h3>
       <ul className="mt-4 space-y-2.5">
         {links.map((l) => (
           <li key={l.to}>
             <Link
               to={l.to}
-              className="text-sm text-muted-foreground transition-colors hover:text-primary"
+              className="text-sm text-navy-foreground/70 transition-colors hover:text-navy-foreground"
             >
               {l.label}
             </Link>
