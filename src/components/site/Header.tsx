@@ -9,6 +9,7 @@ import { SearchBar } from "./SearchBar";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
+  { to: "/", label: "Home" },
   { to: "/subjects", label: "Subjects" },
   { to: "/past-papers", label: "Past Papers" },
   { to: "/jobs", label: "Jobs" },

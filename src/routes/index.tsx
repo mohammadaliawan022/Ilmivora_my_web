@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   BookMarked,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Layers,
   LineChart,
@@ -16,20 +18,23 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SearchBar } from "@/components/site/SearchBar";
 import { OptionButton } from "@/components/mcq/OptionButton";
 import { recentMcqsQuery } from "@/shared/data/queries";
-import { getExamCategoryCounts, getSubjectCounts } from "@/shared/data/mcq-repo";
+import { getExamCategoryCounts, getQuizQuestions, getSubjectCounts } from "@/shared/data/mcq-repo";
 import { EXAM_CATEGORIES } from "@/shared/exam-categories";
-import { EXAM_SECONDS_PER_QUESTION, type OptionLetter } from "@/shared/mcq";
+import { EXAM_SECONDS_PER_QUESTION, getCorrectLetter, getOptions, type Mcq, type OptionLetter } from "@/shared/mcq";
 import { GK_DOMAIN, POPULAR_SUBJECT_SLUGS, SUBJECT_GROUPS, SUBJECTS, getSubjectBySlug } from "@/shared/subjects";
 import { formatDistanceToNow } from "date-fns";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    try {
-      const [subjects, exams] = await Promise.all([getSubjectCounts(), getExamCategoryCounts()]);
-      return { subjects, exams };
-    } catch {
-      return { subjects: {}, exams: {} };
-    }
+    const [subjects, exams, candidates] = await Promise.all([
+      getSubjectCounts().catch(() => ({})),
+      getExamCategoryCounts().catch(() => ({})),
+      getQuizQuestions({}, 10).catch(() => []),
+    ]);
+    const featuredMcqs = candidates
+      .filter((mcq) => getCorrectLetter(mcq) !== null && getOptions(mcq).every((option) => option.text.trim()))
+      .slice(0, 5);
+    return { subjects, exams, featuredMcqs };
   },
   head: () => ({
     meta: [
@@ -51,10 +56,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { subjects, exams } = Route.useLoaderData();
+  const { subjects, exams, featuredMcqs } = Route.useLoaderData();
   return (
     <>
-      <Hero />
+      <Hero featuredMcqs={featuredMcqs} />
       <PopularSubjects counts={subjects} />
       <ExamCategories counts={exams} />
       <FeaturedGroups counts={subjects} />
@@ -65,7 +70,7 @@ function Index() {
   );
 }
 
-function Hero() {
+function Hero({ featuredMcqs }: { featuredMcqs: Mcq[] }) {
   return (
     <section className="relative overflow-hidden bg-hero text-navy-foreground">
       <div className="pointer-events-none absolute inset-0 grid-pattern" aria-hidden />
@@ -103,49 +108,64 @@ function Hero() {
             </Button>
           </div>
         </div>
-        <HeroQuestion />
+        <HeroQuestion questions={featuredMcqs} />
       </div>
     </section>
   );
 }
 
-function HeroQuestion() {
-  const [chosen, setChosen] = useState<OptionLetter | null>(null);
-  const correct: OptionLetter = "B";
-  const options: Array<[OptionLetter, string]> = [
-    ["A", "Nanga Parbat"],
-    ["B", "K2"],
-    ["C", "Tirich Mir"],
-    ["D", "Broad Peak"],
-  ];
+function HeroQuestion({ questions }: { questions: Mcq[] }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, OptionLetter>>({});
+  const mcq = questions[activeIndex];
+  const chosen = mcq ? answers[mcq.id] ?? null : null;
+  const correct = mcq ? getCorrectLetter(mcq) : null;
+  const options = mcq ? getOptions(mcq) : [];
+
   return (
     <div className="relative mx-auto w-full max-w-md lg:animate-float-slow">
       <div className="absolute -inset-4 rounded-[2rem] bg-brand opacity-30 blur-2xl" aria-hidden />
       <div className="card-surface relative p-6 text-card-foreground">
         <div className="flex items-center justify-between">
-          <Badge variant="soft">General Knowledge</Badge>
-          <span className="text-xs font-semibold text-muted-foreground">Try one</span>
+          {mcq ? <Badge variant="soft">{mcq.subject}</Badge> : <Badge variant="soft">MCQ practice</Badge>}
+          <span className="text-xs font-semibold text-muted-foreground">
+            {questions.length ? `${activeIndex + 1} of ${questions.length}` : "Try one"}
+          </span>
         </div>
-        <p className="mt-4 text-lg font-semibold leading-snug">
-          Which is the highest mountain peak in Pakistan?
-        </p>
-        <div className="mt-4 grid gap-2.5">
-          {options.map(([l, t]) => (
-            <OptionButton
-              key={l}
-              letter={l}
-              text={t}
-              disabled={!!chosen}
-              state={!chosen ? "idle" : l === correct ? "correct" : l === chosen ? "wrong" : "dimmed"}
-              onClick={() => setChosen(l)}
-            />
-          ))}
-        </div>
-        <p className="mt-4 min-h-10 text-sm text-muted-foreground">
-          {chosen
-            ? "K2 (8,611 m) in the Karakoram is Pakistan's highest peak and the world's second highest."
-            : "Pick an answer to see instant feedback."}
-        </p>
+        {mcq ? (
+          <>
+            <p className="mt-4 text-lg font-semibold leading-snug">{mcq.question}</p>
+            <div className="mt-4 grid gap-2.5">
+              {options.map(({ letter, text }) => (
+                <OptionButton
+                  key={letter}
+                  letter={letter}
+                  text={text}
+                  disabled={!!chosen}
+                  state={!chosen ? "idle" : letter === correct ? "correct" : letter === chosen ? "wrong" : "dimmed"}
+                  onClick={() => setAnswers((previous) => ({ ...previous, [mcq.id]: letter }))}
+                />
+              ))}
+            </div>
+            <p className="mt-4 min-h-10 text-sm text-muted-foreground">
+              {chosen
+                ? `${chosen === correct ? "Correct! " : `Not quite. The correct answer is ${correct}. `}${mcq.explanation?.trim() || "Review this question and keep practising."}`
+                : "Pick an answer to see instant feedback."}
+            </p>
+            {questions.length > 1 && (
+              <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+                <Button variant="ghost" size="sm" disabled={activeIndex === 0} onClick={() => setActiveIndex((index) => index - 1)} aria-label="Previous featured MCQ">
+                  <ChevronLeft /> Previous
+                </Button>
+                <Button variant="ghost" size="sm" disabled={activeIndex === questions.length - 1} onClick={() => setActiveIndex((index) => index + 1)} aria-label="Next featured MCQ">
+                  Next <ChevronRight />
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="mt-4 text-sm text-muted-foreground">New practice questions will appear here soon.</p>
+        )}
       </div>
     </div>
   );
