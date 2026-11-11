@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Menu, Search, UserRound } from "lucide-react";
+import { ChevronDown, LogOut, Menu, Search, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -7,10 +7,15 @@ import { getCurrentAuthUser, signOut, subscribeToAuthChanges } from "@/shared/su
 import { Logo } from "./Logo";
 import { SearchBar } from "./SearchBar";
 import { ThemeToggle } from "./ThemeToggle";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const NAV = [
+  { to: "/", label: "Overview" },
   { to: "/subjects", label: "Subjects" },
   { to: "/past-papers", label: "Past Papers" },
+] as const;
+
+const OTHER_NAV = [
   { to: "/jobs", label: "Jobs" },
   { to: "/practice", label: "Practice" },
   { to: "/exam", label: "Exam Mode" },
@@ -150,12 +155,24 @@ export function Header() {
             <Link
               key={n.to}
               to={n.to}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              activeProps={{ className: "bg-accent text-foreground" }}
+              className="rounded-none border-b-2 border-transparent px-3 py-5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              activeProps={{ className: "border-primary text-primary" }}
             >
               {n.label}
             </Link>
           ))}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-none border-b-2 border-transparent px-3 py-5 text-sm font-medium text-muted-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              Other <ChevronDown aria-hidden="true" className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {OTHER_NAV.map((item) => (
+                <DropdownMenuItem key={item.to} asChild>
+                  <Link to={item.to}>{item.label}</Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
         <div className="flex items-center gap-1">
           <Button
@@ -185,7 +202,7 @@ export function Header() {
                 <SheetTitle className="text-left">Menu</SheetTitle>
               </SheetHeader>
               <nav className="mt-4 flex flex-col gap-1 px-4" aria-label="Mobile">
-                {NAV.map((n) => (
+                {[...NAV, ...OTHER_NAV].map((n) => (
                   <Link
                     key={n.to}
                     to={n.to}

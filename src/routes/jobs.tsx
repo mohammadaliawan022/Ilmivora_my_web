@@ -15,54 +15,47 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { publishedJobsQuery } from "@/shared/data/queries";
 import type { JobListing } from "@/shared/data/job-repo";
 
-const OFFICIAL_PORTALS = [
+const RECRUITMENT_SOURCES = [
   {
     name: "Punjab Public Service Commission",
     shortName: "PPSC",
     description: "Punjab government posts, advertisements, eligibility details and application instructions.",
-    href: "https://www.ppsc.gop.pk/",
     type: "Punjab recruitment",
   },
   {
     name: "Federal Public Service Commission",
     shortName: "FPSC",
     description: "Federal vacancies, CSS notices, general recruitment advertisements and candidate applications.",
-    href: "https://www.fpsc.gov.pk/",
     type: "Federal recruitment",
   },
   {
     name: "National Jobs Portal",
     shortName: "NJP",
     description: "Vacancies published by verified Government of Pakistan organisations.",
-    href: "https://www.njp.gov.pk/index.php/jobs",
     type: "Federal job portal",
   },
   {
     name: "Punjab Job Portal",
     shortName: "PJP",
     description: "Search and apply for vacancies posted by Punjab government departments.",
-    href: "https://jobs.punjab.gov.pk/new_recruit/jobs",
     type: "Punjab job portal",
   },
   {
     name: "Khyber Pakhtunkhwa Job Portal",
     shortName: "KP Jobs",
     description: "Browse vacancies and recruitment notices from Khyber Pakhtunkhwa departments.",
-    href: "https://jobs.kp.gov.pk/",
     type: "Khyber Pakhtunkhwa",
   },
   {
     name: "Sindh Public Service Commission",
     shortName: "SPSC",
     description: "Sindh government service advertisements, application notices and candidate updates.",
-    href: "https://spsc.gov.pk/advertisement.php",
     type: "Sindh recruitment",
   },
   {
     name: "National Testing Service",
     shortName: "NTS",
     description: "Open recruitment projects and application notices administered through NTS.",
-    href: "https://www.nts.org.pk/new/projectsnew.php",
     type: "Testing and recruitment projects",
   },
 ] as const;
@@ -73,10 +66,10 @@ export const Route = createFileRoute("/jobs")({
       { title: "Government Jobs in Pakistan | Ilmivora" },
       {
         name: "description",
-        content: "Find official PPSC, FPSC, NTS and government job portals in Pakistan, with safe application and deadline-checking guidance.",
+        content: "Browse public-sector job listings by recruitment source, including PPSC, FPSC, NTS and government departments.",
       },
       { property: "og:title", content: "Government Jobs in Pakistan | Ilmivora" },
-      { property: "og:description", content: "Quick links to official job advertisements and application portals for Pakistan's public-sector vacancies." },
+      { property: "og:description", content: "Browse public-sector job listings by recruitment source, including PPSC, FPSC, NTS and government departments." },
       { name: "robots", content: "index, follow" },
     ],
     links: [{ rel: "canonical", href: "https://ilmivora-1.vercel.app/jobs" }],
@@ -100,7 +93,7 @@ function JobsPage() {
       <PageHeader
         eyebrow="Career opportunities"
         title="Find your next opportunity"
-        description="Browse official government recruitment portals and check each vacancy’s eligibility, deadline and application instructions at the source."
+        description="Browse current vacancies by recruitment source and review each listing’s eligibility, deadline and application instructions."
       />
 
       <div className="container-page py-10 md:py-14">
@@ -117,7 +110,7 @@ function JobsPage() {
             : visibleJobs?.length === 0 ? <div className="card-surface flex flex-col items-center p-8 text-center">
               <BriefcaseBusiness aria-hidden="true" className="h-8 w-8 text-primary" />
               <h3 className="mt-3 font-semibold">No current {selectedSource ?? "job"} listings</h3>
-              <p className="mt-1 max-w-lg text-sm text-muted-foreground">New vacancies will appear here when they are added. Check the official portal below for the latest notices.</p>
+              <p className="mt-1 max-w-lg text-sm text-muted-foreground">New vacancies will appear here when they are added. Choose another recruitment source below to browse its listings.</p>
             </div>
             : <div className="grid gap-4 md:grid-cols-2">{visibleJobs?.map((job) => <PublicJobCard key={job.id} job={job} />)}</div>}
         </section>
@@ -127,7 +120,7 @@ function JobsPage() {
           <div>
             <h2 className="font-display text-lg font-bold">Apply through the official portal</h2>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Ilmivora shares links to recruitment sources; it does not accept job applications or verify individual vacancies. Always confirm the advertisement, eligibility and closing date on the relevant government website before applying or paying a fee.
+              Ilmivora lists vacancies but does not accept job applications or verify individual listings. Always confirm the advertisement, eligibility and closing date on the relevant government website before applying or paying a fee.
             </p>
           </div>
         </section>
@@ -137,11 +130,11 @@ function JobsPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Official sources</p>
             <h2 className="mt-1 font-display text-2xl font-bold">Government job portals</h2>
           </div>
-          <span className="hidden text-sm text-muted-foreground sm:inline">{OFFICIAL_PORTALS.length} verified links</span>
+          <span className="hidden text-sm text-muted-foreground sm:inline">{RECRUITMENT_SOURCES.length} recruitment sources</span>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {OFFICIAL_PORTALS.map((portal) => (
+          {RECRUITMENT_SOURCES.map((portal) => (
             <article key={portal.shortName} className="card-surface flex min-h-56 flex-col p-5 transition-colors hover:border-primary/40">
               <div className="flex items-start justify-between gap-4">
                 <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary-soft text-primary" aria-hidden="true">
@@ -149,25 +142,11 @@ function JobsPage() {
                 </span>
                 <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">{portal.type}</span>
               </div>
-              <h3 className="mt-4 font-display text-lg font-bold">
-                <a href={portal.href} target="_blank" rel="noopener noreferrer" className="rounded-sm underline-offset-4 hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  {portal.name}<span className="sr-only"> (opens official website in a new tab)</span>
-                </a>
-              </h3>
+              <h3 className="mt-4 font-display text-lg font-bold">{portal.name}</h3>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{portal.description}</p>
               <button type="button" onClick={() => selectSource(portal.shortName)} className="mt-5 inline-flex w-fit items-center gap-2 rounded-lg font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 View {portal.shortName} jobs on Ilmivora
               </button>
-              <a
-                href={portal.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-5 inline-flex w-fit items-center gap-2 rounded-lg font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                Open official portal
-                <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
             </article>
           ))}
         </div>
