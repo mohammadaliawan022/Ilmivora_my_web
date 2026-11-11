@@ -19,7 +19,7 @@ import { recentMcqsQuery } from "@/shared/data/queries";
 import { getExamCategoryCounts, getMcqsByIds, getQuizQuestions, getSubjectCounts } from "@/shared/data/mcq-repo";
 import { EXAM_CATEGORIES } from "@/shared/exam-categories";
 import { EXAM_SECONDS_PER_QUESTION, getCorrectLetter, getOptions, type Mcq, type OptionLetter } from "@/shared/mcq";
-import { GK_DOMAIN, POPULAR_SUBJECT_SLUGS, SUBJECT_GROUPS, SUBJECTS, getSubjectBySlug } from "@/shared/subjects";
+import { POPULAR_SUBJECT_SLUGS, SUBJECT_GROUPS, SUBJECTS, getSubjectBySlug } from "@/shared/subjects";
 import { formatDistanceToNow } from "date-fns";
 
 export const Route = createFileRoute("/")({
@@ -59,8 +59,8 @@ function Index() {
     <>
       <Hero featuredMcqs={featuredMcqs} />
       <PopularSubjects counts={subjects} />
-      <ExamCategories counts={exams} />
       <FeaturedGroups counts={subjects} />
+      <ExamCategories counts={exams} />
       <RecentMcqs />
       <Stats counts={subjects} />
       <Cta />
@@ -301,45 +301,47 @@ function ExamCategories({ counts }: { counts: Record<string, number> }) {
 }
 
 function FeaturedGroups({ counts }: { counts: Record<string, number> }) {
-  const available = SUBJECTS.filter((subject) => (counts[subject.name] ?? 0) > 0);
-  const groups = SUBJECT_GROUPS.filter((group) => group !== GK_DOMAIN && available.some((subject) => subject.group === group));
+  const groups = SUBJECT_GROUPS.map((group) => {
+    const subjects = SUBJECTS.filter((subject) => subject.group === group);
+    const questionCount = subjects.reduce((total, subject) => total + (counts[subject.name] ?? 0), 0);
+    return { group, subjects, questionCount };
+  }).filter(({ subjects }) => subjects.length > 0);
   if (!groups.length) return null;
   return (
     <section className="container-page py-20">
-      <SectionHead eyebrow="Fields of study" title="Explore by field of study" />
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
-        {groups.map((g, i) => {
-          const subjects = available.filter((s) => s.group === g);
+      <SectionHead
+        eyebrow="Browse the catalogue"
+        title="Explore subjects by super-domain"
+        action={{ to: "/subjects", label: "View all subjects" }}
+      />
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <Link to="/subjects" className="card-surface card-interactive flex min-h-44 flex-col justify-between p-6">
+          <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary-soft text-primary">
+            <Layers className="h-5 w-5" />
+          </span>
+          <span>
+            <span className="block text-lg font-bold">All subjects</span>
+            <span className="mt-1 block text-sm text-muted-foreground">Browse all {SUBJECTS.length} subjects</span>
+          </span>
+        </Link>
+        {groups.map(({ group, subjects, questionCount }) => {
+          const Icon = subjects[0]!.icon;
           return (
             <Link
-              key={g}
+              key={group}
               to="/subjects"
-              search={{ group: g }}
-              className={
-                "card-surface card-interactive flex flex-col justify-between p-6 " +
-                (i === 0 ? "md:row-span-2 bg-brand text-primary-foreground" : "")
-              }
+              search={{ group }}
+              className="card-surface card-interactive flex min-h-44 flex-col justify-between p-6"
             >
-              <div>
-                <h3 className={i === 0 ? "text-3xl font-bold" : "text-xl font-bold"}>{g}</h3>
-                <p className={i === 0 ? "mt-1 text-sm opacity-80" : "mt-1 text-sm text-muted-foreground"}>
-                  {subjects.length} subjects
-                </p>
-              </div>
-              <div className="mt-6 flex flex-wrap gap-1.5">
-                {subjects.map((s) => (
-                  <span
-                    key={s.slug}
-                    className={
-                      i === 0
-                        ? "rounded-full bg-primary-foreground/15 px-2.5 py-1 text-xs font-medium"
-                        : "rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground"
-                    }
-                  >
-                    {s.name}
-                  </span>
-                ))}
-              </div>
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary-soft text-primary">
+                <Icon className="h-5 w-5" />
+              </span>
+              <span>
+                <span className="block text-lg font-bold leading-snug">{group}</span>
+                <span className="mt-1 block text-sm text-muted-foreground">
+                  {subjects.length} subjects{questionCount ? ` · ${questionCount.toLocaleString()} questions` : ""}
+                </span>
+              </span>
             </Link>
           );
         })}
