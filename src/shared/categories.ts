@@ -12,14 +12,82 @@ export interface Category {
   parent: string | null;
 }
 
-export const CATEGORIES: Category[] = CATEGORY_ROWS.map(([name, domain, parent, slug]) => ({
-  name,
-  slug,
-  domain,
-  parent: parent || null,
-}));
+/** Consolidated higher-level domains used to organise the subject catalogue. */
+const SUPER_DOMAIN_BY_SOURCE_DOMAIN: Record<string, string> = {
+  "General Knowledge & Affairs": "General Knowledge & Current Affairs",
+  "Science & Technology": "Natural & Environmental Sciences",
+  "Mathematics & Statistics": "Mathematics & Reasoning",
+  "Languages & Literature": "Languages & Literature",
+  "Social Sciences & Humanities": "Society, Governance & Law",
+  "Education & Applied Sciences": "Education & Applied Studies",
+  "Management Sciences": "Business & Management",
+  Engineering: "Engineering & Technology",
+  "Medical Sciences": "Health & Medical Sciences",
+  "Recruitment & Service Tests": "Recruitment & Exam Preparation",
+  "Reasoning & Intelligence": "Mathematics & Reasoning",
+};
 
-/** Fields of study, in the order they first appear in the owner's list. */
+/** A few subjects need a more specific super-domain than their legacy label. */
+const SUBJECT_SUPER_DOMAIN_OVERRIDES: Record<string, string> = {
+  "islamic-studies": "History, Culture & Religion",
+  "islamic-history-and-culture": "History, Culture & Religion",
+  "comparative-study-of-major-religions": "History, Culture & Religion",
+  philosophy: "History, Culture & Religion",
+  history: "History, Culture & Religion",
+  "history-of-pakistan-and-india": "History, Culture & Religion",
+  "british-history": "History, Culture & Religion",
+  "european-history": "History, Culture & Religion",
+  "history-of-usa": "History, Culture & Religion",
+  "computer-science": "Computing & Digital Technology",
+  "computer-science-theory": "Computing & Digital Technology",
+  bioinformatics: "Computing & Digital Technology",
+  "pakistan-current-affairs-mcqs": "General Knowledge & Current Affairs",
+  "world-current-affairs-mcqs": "General Knowledge & Current Affairs",
+  "agriculture": "Agriculture, Forestry & Environment",
+  forestry: "Agriculture, Forestry & Environment",
+  "agriculture-and-forestry": "Agriculture, Forestry & Environment",
+  "agriculture-economics": "Agriculture, Forestry & Environment",
+  "agriculture-extension": "Agriculture, Forestry & Environment",
+  "agriculture-crop-production": "Agriculture, Forestry & Environment",
+  "agriculture-crop-protection": "Agriculture, Forestry & Environment",
+  "agriculture-food-sciences": "Agriculture, Forestry & Environment",
+  "agriculture-plant-genetics": "Agriculture, Forestry & Environment",
+  "forestry-and-range-management": "Agriculture, Forestry & Environment",
+  wildlife: "Agriculture, Forestry & Environment",
+  "fine-arts": "Arts & Communication",
+  "drawing-mcq": "Arts & Communication",
+  "photography-mcqs": "Arts & Communication",
+  "mass-communication": "Arts & Communication",
+  "journalism-and-mass-communication": "Arts & Communication",
+};
+
+const categoryRowByName = new Map(CATEGORY_ROWS.map((row) => [row[0].toLowerCase(), row]));
+
+function getRootRow(row: (typeof CATEGORY_ROWS)[number]) {
+  let root = row;
+  const visited = new Set<string>();
+  while (root[2]) {
+    const parentKey = root[2].toLowerCase();
+    const parent = categoryRowByName.get(parentKey);
+    if (!parent || visited.has(parentKey)) break;
+    visited.add(parentKey);
+    root = parent;
+  }
+  return root;
+}
+
+export const CATEGORIES: Category[] = CATEGORY_ROWS.map((row) => {
+  const [name, sourceDomain, parent, slug] = row;
+  const root = getRootRow(row);
+  return {
+    name,
+    slug,
+    domain: SUBJECT_SUPER_DOMAIN_OVERRIDES[root[3]] ?? SUPER_DOMAIN_BY_SOURCE_DOMAIN[root[1]] ?? sourceDomain,
+    parent: parent || null,
+  };
+});
+
+/** Subject super-domains, in the order they first appear in the catalogue. */
 export const DOMAINS: string[] = [...new Set(CATEGORIES.map((c) => c.domain))];
 
 const bySlug = new Map(CATEGORIES.map((c) => [c.slug, c]));

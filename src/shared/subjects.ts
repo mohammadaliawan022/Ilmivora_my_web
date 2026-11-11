@@ -149,7 +149,7 @@ export const POPULAR_SUBJECT_SLUGS = [
 ];
 
 export const GK_SUBJECT = "General Knowledge";
-export const GK_DOMAIN = "General Knowledge & Affairs";
+export const GK_DOMAIN = "General Knowledge & Current Affairs";
 
 export function getSubjectBySlug(slug: string): Subject | undefined {
   return SUBJECTS.find((s) => s.slug === slug);
