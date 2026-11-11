@@ -3,15 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   BookMarked,
-  ChevronLeft,
-  ChevronRight,
   Clock,
   Layers,
   LineChart,
   Sparkles,
   Target,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,11 +27,11 @@ export const Route = createFileRoute("/")({
     const [subjects, exams, candidates] = await Promise.all([
       getSubjectCounts().catch(() => ({})),
       getExamCategoryCounts().catch(() => ({})),
-      getQuizQuestions({}, 10).catch(() => []),
+      getQuizQuestions({}, 20).catch(() => []),
     ]);
     const featuredMcqs = candidates
       .filter((mcq) => getCorrectLetter(mcq) !== null && getOptions(mcq).every((option) => option.text.trim()))
-      .slice(0, 5);
+      .slice(0, 4);
     return { subjects, exams, featuredMcqs };
   },
   head: () => ({
@@ -115,12 +113,43 @@ function Hero({ featuredMcqs }: { featuredMcqs: Mcq[] }) {
 }
 
 function HeroQuestion({ questions }: { questions: Mcq[] }) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [mcq, setMcq] = useState<Mcq | null>(null);
   const [answers, setAnswers] = useState<Record<string, OptionLetter>>({});
-  const mcq = questions[activeIndex];
+  const initialized = useRef(false);
   const chosen = mcq ? answers[mcq.id] ?? null : null;
   const correct = mcq ? getCorrectLetter(mcq) : null;
   const options = mcq ? getOptions(mcq) : [];
+
+  useEffect(() => {
+    if (initialized.current || !questions.length) return;
+    initialized.current = true;
+
+    const storageKey = "ilmivora-home-featured-mcqs";
+    let pool = questions.slice(0, 4);
+    let index = pool.length > 1 ? 1 : 0;
+
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(storageKey) ?? "null") as {
+        questions?: Mcq[];
+        nextIndex?: number;
+      } | null;
+      if (
+        saved?.questions?.length === 4 &&
+        saved.questions.every((item) => item?.id && item?.question && getOptions(item).every((option) => option.text.trim())) &&
+        Number.isInteger(saved.nextIndex)
+      ) {
+        pool = saved.questions;
+        index = (saved.nextIndex! + pool.length) % pool.length;
+      }
+      setMcq(pool[index] ?? pool[0] ?? null);
+      window.localStorage.setItem(
+        storageKey,
+        JSON.stringify({ questions: pool, nextIndex: (index + 1) % pool.length }),
+      );
+    } catch {
+      setMcq(pool[index] ?? pool[0] ?? null);
+    }
+  }, [questions]);
 
   return (
     <div className="relative mx-auto w-full max-w-md lg:animate-float-slow">
@@ -129,7 +158,7 @@ function HeroQuestion({ questions }: { questions: Mcq[] }) {
         <div className="flex items-center justify-between">
           {mcq ? <Badge variant="soft">{mcq.subject}</Badge> : <Badge variant="soft">MCQ practice</Badge>}
           <span className="text-xs font-semibold text-muted-foreground">
-            {questions.length ? `${activeIndex + 1} of ${questions.length}` : "Try one"}
+            {mcq ? "Featured question" : "Try one"}
           </span>
         </div>
         {mcq ? (
@@ -152,16 +181,6 @@ function HeroQuestion({ questions }: { questions: Mcq[] }) {
                 ? `${chosen === correct ? "Correct! " : `Not quite. The correct answer is ${correct}. `}${mcq.explanation?.trim() || "Review this question and keep practising."}`
                 : "Pick an answer to see instant feedback."}
             </p>
-            {questions.length > 1 && (
-              <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-                <Button variant="ghost" size="sm" disabled={activeIndex === 0} onClick={() => setActiveIndex((index) => index - 1)} aria-label="Previous featured MCQ">
-                  <ChevronLeft /> Previous
-                </Button>
-                <Button variant="ghost" size="sm" disabled={activeIndex === questions.length - 1} onClick={() => setActiveIndex((index) => index + 1)} aria-label="Next featured MCQ">
-                  Next <ChevronRight />
-                </Button>
-              </div>
-            )}
           </>
         ) : (
           <p className="mt-4 text-sm text-muted-foreground">New practice questions will appear here soon.</p>
