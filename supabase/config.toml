@@ -1,0 +1,4 @@
+[functions.sync-official-jobs]
+# The function validates its dedicated JOB_SYNC_TOKEN itself. Disable gateway
+# JWT verification so a non-JWT cron token can be used without exposing a DB key.
+verify_jwt = false

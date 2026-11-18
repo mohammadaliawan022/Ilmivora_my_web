@@ -1,0 +1,36 @@
+name: Daily official Pakistani jobs agent
+
+on:
+  schedule:
+    # 02:00 Pakistan Standard Time (UTC+5).
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          JOB_SYNC_TOKEN: ${{ secrets.JOB_SYNC_TOKEN }}
+        run: |
+          test -n "$SUPABASE_URL" || { echo "Missing SUPABASE_URL repository secret"; exit 1; }
+          test -n "$SUPABASE_PUBLISHABLE_KEY" || { echo "Missing SUPABASE_PUBLISHABLE_KEY repository secret"; exit 1; }
+          test -n "$JOB_SYNC_TOKEN" || { echo "Missing JOB_SYNC_TOKEN repository secret"; exit 1; }
+      - name: Collect and summarise official listings
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          JOB_SYNC_TOKEN: ${{ secrets.JOB_SYNC_TOKEN }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --request POST "$SUPABASE_URL/functions/v1/sync-official-jobs" \
+            --header "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+            --header "Authorization: Bearer $JOB_SYNC_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data '{}'
