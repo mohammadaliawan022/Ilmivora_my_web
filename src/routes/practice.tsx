@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/site/PageHeader";
 import { QuizLauncher } from "@/components/mcq/QuizLauncher";
+import { PracticeAssistantPanel } from "@/components/mcq/PracticeAssistantPanel";
 
 type Search = { subject?: string | undefined; exam?: string | undefined };
 
@@ -37,12 +38,17 @@ function PracticePage() {
         description="10 questions per page — answer each one and learn from every explanation."
       />
       <div className="container-page py-10">
-        <QuizLauncher
-          key={`${subject}-${exam}`}
-          mode="practice"
-          initialSubject={subject}
-          initialExam={exam}
-        />
+        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="min-w-0">
+            <QuizLauncher
+              key={`${subject}-${exam}`}
+              mode="practice"
+              initialSubject={subject}
+              initialExam={exam}
+            />
+          </div>
+          <PracticeAssistantPanel {...(subject ? { subject } : {})} />
+        </div>
       </div>
     </>
   );
