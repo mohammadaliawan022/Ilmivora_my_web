@@ -487,10 +487,17 @@ Deno.serve(async (request) => {
       await upsertJobs(summarised);
       return { source, status: "synced", imported: summarised.length, model: HF_MODEL };
     } catch (error) {
-      return { source, status: "error", message: error instanceof Error ? error.message : "Source collection failed." };
+      const message = error instanceof Error ? error.message : "Source collection failed.";
+      console.error(`[official-jobs] ${source}: ${message}`);
+      return { source, status: "error", message };
     }
   }));
 
-  const failed = results.filter((item) => item.status === "error").length;
-  return Response.json({ agent: "Ilmivora Official Jobs Agent", model: HF_MODEL, started_at: runStartedAt, completed_at: new Date().toISOString(), results }, { status: failed ? 502 : 200 });
+  const synced = results.filter((item) => item.status === "synced").length;
+  const failed = results.length - synced;
+  console.info(`[official-jobs] completed: ${synced} sources synced, ${failed} failed`);
+  return Response.json(
+    { agent: "Ilmivora Official Jobs Agent", model: HF_MODEL, started_at: runStartedAt, completed_at: new Date().toISOString(), synced_sources: synced, failed_sources: failed, results },
+    { status: synced > 0 ? 200 : 502 },
+  );
 });
