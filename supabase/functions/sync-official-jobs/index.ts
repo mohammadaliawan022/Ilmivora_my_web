@@ -352,7 +352,10 @@ function uniqueJobs(jobs: OfficialJob[]): OfficialJob[] {
 type JobSummary = { source_external_id: string; description: string; qualification: string | null };
 
 async function summariseJobsWithOpenModel(jobs: OfficialJob[]): Promise<OfficialJob[]> {
-  if (!HF_TOKEN) throw new Error("The open-model agent is not configured. Add HF_TOKEN to the Supabase Edge Function secrets.");
+  if (!HF_TOKEN) {
+    console.warn("[official-jobs] HF_TOKEN is not configured; publishing source-based descriptions without AI summaries.");
+    return jobs;
+  }
 
   const summaries = new Map<string, JobSummary>();
   for (let offset = 0; offset < jobs.length; offset += 8) {
@@ -393,6 +396,10 @@ async function summariseJobsWithOpenModel(jobs: OfficialJob[]): Promise<Official
     });
     if (!response.ok) {
       const detail = cleanText(await response.text()).slice(0, 500);
+      if (response.status === 402) {
+        console.warn("[official-jobs] Hugging Face inference has no available credits; publishing source-based descriptions for this batch.");
+        return jobs;
+      }
       throw new Error(`Hugging Face inference returned HTTP ${response.status}${detail ? `: ${detail}` : ""}.`);
     }
 
