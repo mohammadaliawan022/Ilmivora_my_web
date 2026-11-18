@@ -49,7 +49,7 @@ const SECRET_KEYS = (() => {
 const DATABASE_ADMIN_KEY = SECRET_KEYS.default ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const JOB_SYNC_TOKEN = Deno.env.get("JOB_SYNC_TOKEN");
 const HF_TOKEN = Deno.env.get("HF_TOKEN");
-const HF_MODEL = Deno.env.get("HF_MODEL") ?? "Qwen/Qwen2.5-7B-Instruct:cheapest";
+const HF_MODEL = Deno.env.get("HF_MODEL") ?? "openai/gpt-oss-20b:cheapest";
 const MAX_SOURCE_BYTES = 5_500_000;
 
 function cleanText(value: string): string {
@@ -117,7 +117,7 @@ async function fetchHtml(source: RecruitmentSource, url = SOURCE_URLS[source]): 
   if (!safeUrl) throw new Error(`Refused an untrusted URL for ${source}.`);
   const response = await fetch(safeUrl, {
     headers: { "user-agent": "IlmivoraJobIndex/1.0 (+https://ilmivora-1.vercel.app/jobs)" },
-    signal: AbortSignal.timeout(20_000),
+    signal: AbortSignal.timeout(35_000),
   });
   if (!response.ok) throw new Error(`${source} returned HTTP ${response.status}.`);
   const length = Number(response.headers.get("content-length") ?? "0");
@@ -391,7 +391,10 @@ async function summariseJobsWithOpenModel(jobs: OfficialJob[]): Promise<Official
       }),
       signal: AbortSignal.timeout(45_000),
     });
-    if (!response.ok) throw new Error(`Hugging Face inference returned HTTP ${response.status}.`);
+    if (!response.ok) {
+      const detail = cleanText(await response.text()).slice(0, 500);
+      throw new Error(`Hugging Face inference returned HTTP ${response.status}${detail ? `: ${detail}` : ""}.`);
+    }
 
     const payload = (await response.json()) as {
       choices?: Array<{ message?: { content?: string | null } }>;
