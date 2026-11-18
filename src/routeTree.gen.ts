@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AskRouteImport } from './routes/ask'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ExamRouteImport } from './routes/exam'
@@ -25,6 +26,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StudyGuidesRouteImport } from './routes/study-guides'
 import { Route as SubmitMcqRouteImport } from './routes/submit-mcq'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ApiIlmivoraChatRouteImport } from './routes/api.ilmivora-chat'
 import { Route as GeneralKnowledgeIndexRouteImport } from './routes/general-knowledge.index'
 import { Route as GeneralKnowledgeTopicRouteImport } from './routes/general-knowledge.$topic'
 import { Route as SubjectsIndexRouteImport } from './routes/subjects.index'
@@ -43,6 +45,11 @@ const AboutRoute = AboutRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AskRoute = AskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -110,6 +117,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiIlmivoraChatRoute = ApiIlmivoraChatRouteImport.update({
+  id: '/api/ilmivora-chat',
+  path: '/api/ilmivora-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GeneralKnowledgeIndexRoute = GeneralKnowledgeIndexRouteImport.update({
   id: '/general-knowledge/',
   path: '/general-knowledge/',
@@ -135,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/ask': typeof AskRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
@@ -148,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/study-guides': typeof StudyGuidesRoute
   '/submit-mcq': typeof SubmitMcqRoute
   '/terms': typeof TermsRoute
+  '/api/ilmivora-chat': typeof ApiIlmivoraChatRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
   '/subjects/$slug': typeof SubjectsSlugRoute
   '/general-knowledge/': typeof GeneralKnowledgeIndexRoute
@@ -157,6 +171,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/ask': typeof AskRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
@@ -170,6 +185,7 @@ export interface FileRoutesByTo {
   '/study-guides': typeof StudyGuidesRoute
   '/submit-mcq': typeof SubmitMcqRoute
   '/terms': typeof TermsRoute
+  '/api/ilmivora-chat': typeof ApiIlmivoraChatRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
   '/subjects/$slug': typeof SubjectsSlugRoute
   '/general-knowledge': typeof GeneralKnowledgeIndexRoute
@@ -180,6 +196,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/ask': typeof AskRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/exam': typeof ExamRoute
@@ -193,6 +210,7 @@ export interface FileRoutesById {
   '/study-guides': typeof StudyGuidesRoute
   '/submit-mcq': typeof SubmitMcqRoute
   '/terms': typeof TermsRoute
+  '/api/ilmivora-chat': typeof ApiIlmivoraChatRoute
   '/general-knowledge/$topic': typeof GeneralKnowledgeTopicRoute
   '/subjects/$slug': typeof SubjectsSlugRoute
   '/general-knowledge/': typeof GeneralKnowledgeIndexRoute
@@ -204,6 +222,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/ask'
     | '/contact'
     | '/dashboard'
     | '/exam'
@@ -217,6 +236,7 @@ export interface FileRouteTypes {
     | '/study-guides'
     | '/submit-mcq'
     | '/terms'
+    | '/api/ilmivora-chat'
     | '/general-knowledge/$topic'
     | '/subjects/$slug'
     | '/general-knowledge/'
@@ -226,6 +246,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/ask'
     | '/contact'
     | '/dashboard'
     | '/exam'
@@ -239,6 +260,7 @@ export interface FileRouteTypes {
     | '/study-guides'
     | '/submit-mcq'
     | '/terms'
+    | '/api/ilmivora-chat'
     | '/general-knowledge/$topic'
     | '/subjects/$slug'
     | '/general-knowledge'
@@ -248,6 +270,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/ask'
     | '/contact'
     | '/dashboard'
     | '/exam'
@@ -261,6 +284,7 @@ export interface FileRouteTypes {
     | '/study-guides'
     | '/submit-mcq'
     | '/terms'
+    | '/api/ilmivora-chat'
     | '/general-knowledge/$topic'
     | '/subjects/$slug'
     | '/general-knowledge/'
@@ -271,6 +295,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
+  AskRoute: typeof AskRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   ExamRoute: typeof ExamRoute
@@ -284,6 +309,7 @@ export interface RootRouteChildren {
   StudyGuidesRoute: typeof StudyGuidesRoute
   SubmitMcqRoute: typeof SubmitMcqRoute
   TermsRoute: typeof TermsRoute
+  ApiIlmivoraChatRoute: typeof ApiIlmivoraChatRoute
   GeneralKnowledgeTopicRoute: typeof GeneralKnowledgeTopicRoute
   SubjectsSlugRoute: typeof SubjectsSlugRoute
   GeneralKnowledgeIndexRoute: typeof GeneralKnowledgeIndexRoute
@@ -311,6 +337,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ask': {
+      id: '/ask'
+      path: '/ask'
+      fullPath: '/ask'
+      preLoaderRoute: typeof AskRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -404,6 +437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ilmivora-chat': {
+      id: '/api/ilmivora-chat'
+      path: '/api/ilmivora-chat'
+      fullPath: '/api/ilmivora-chat'
+      preLoaderRoute: typeof ApiIlmivoraChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/general-knowledge/': {
       id: '/general-knowledge/'
       path: '/general-knowledge'
@@ -439,6 +479,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
+  AskRoute: AskRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   ExamRoute: ExamRoute,
@@ -452,6 +493,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudyGuidesRoute: StudyGuidesRoute,
   SubmitMcqRoute: SubmitMcqRoute,
   TermsRoute: TermsRoute,
+  ApiIlmivoraChatRoute: ApiIlmivoraChatRoute,
   GeneralKnowledgeTopicRoute: GeneralKnowledgeTopicRoute,
   SubjectsSlugRoute: SubjectsSlugRoute,
   GeneralKnowledgeIndexRoute: GeneralKnowledgeIndexRoute,

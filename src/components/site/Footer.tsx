@@ -18,6 +18,7 @@ export function Footer() {
           title="Prepare"
           links={[
             { to: "/subjects", label: "All Subjects" },
+            { to: "/ask", label: "Ask Ilmivora" },
             { to: "/study-guides", label: "Study Guide" },
             { to: "/jobs", label: "Government Jobs" },
             { to: "/practice", label: "Practice Test" },
@@ -56,6 +57,7 @@ export function Footer() {
 type FooterLink = {
   to:
     | "/subjects"
+    | "/ask"
     | "/study-guides"
     | "/jobs"
     | "/practice"

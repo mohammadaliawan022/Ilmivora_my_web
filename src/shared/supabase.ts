@@ -63,6 +63,11 @@ async function getAccessToken(): Promise<string | null> {
   }
 }
 
+/** Get a fresh Supabase access token for authenticated server routes. */
+export async function getCurrentAccessToken(): Promise<string | null> {
+  return getAccessToken();
+}
+
 export async function supabaseRest<T>(
   path: string,
   options: { method?: string; body?: unknown; prefer?: string; headers?: Record<string, string> } = {},
