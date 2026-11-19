@@ -4,28 +4,32 @@ import { useRef, useState } from "react";
 import {
   ArrowUpRight,
   BadgeCheck,
+  Building2,
   BriefcaseBusiness,
   CalendarDays,
   CalendarCheck2,
   ClipboardList,
+  Landmark,
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/site/PageHeader";
 import { publishedJobsQuery } from "@/shared/data/queries";
-import type { JobListing } from "@/shared/data/job-repo";
+import type { JobListing, JobSector } from "@/shared/data/job-repo";
 
 const RECRUITMENT_SOURCES = [
   {
     name: "Punjab Public Service Commission",
     shortName: "PPSC",
-    description: "Punjab government posts, advertisements, eligibility details and application instructions.",
+    description:
+      "Punjab government posts, advertisements, eligibility details and application instructions.",
     type: "Punjab recruitment",
   },
   {
     name: "Federal Public Service Commission",
     shortName: "FPSC",
-    description: "Federal vacancies, CSS notices, general recruitment advertisements and candidate applications.",
+    description:
+      "Federal vacancies, CSS notices, general recruitment advertisements and candidate applications.",
     type: "Federal recruitment",
   },
   {
@@ -49,7 +53,8 @@ const RECRUITMENT_SOURCES = [
   {
     name: "Sindh Public Service Commission",
     shortName: "SPSC",
-    description: "Sindh government service advertisements, application notices and candidate updates.",
+    description:
+      "Sindh government service advertisements, application notices and candidate updates.",
     type: "Sindh recruitment",
   },
   {
@@ -63,13 +68,18 @@ const RECRUITMENT_SOURCES = [
 export const Route = createFileRoute("/jobs")({
   head: () => ({
     meta: [
-      { title: "Government Jobs in Pakistan | Ilmivora" },
+      { title: "Government and Private Jobs in Pakistan | Ilmivora" },
       {
         name: "description",
-        content: "Browse public-sector job listings by recruitment source, including PPSC, FPSC, NTS and government departments.",
+        content:
+          "Browse government and private job listings in Pakistan, with eligibility, deadlines and application details.",
       },
-      { property: "og:title", content: "Government Jobs in Pakistan | Ilmivora" },
-      { property: "og:description", content: "Browse public-sector job listings by recruitment source, including PPSC, FPSC, NTS and government departments." },
+      { property: "og:title", content: "Government and Private Jobs in Pakistan | Ilmivora" },
+      {
+        property: "og:description",
+        content:
+          "Browse government and private job listings in Pakistan, with eligibility, deadlines and application details.",
+      },
       { name: "robots", content: "index, follow" },
     ],
     links: [{ rel: "canonical", href: "https://ilmivora-1.vercel.app/jobs" }],
@@ -79,12 +89,25 @@ export const Route = createFileRoute("/jobs")({
 
 function JobsPage() {
   const jobs = useQuery(publishedJobsQuery());
+  const [selectedSector, setSelectedSector] = useState<JobSector>("government");
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const currentJobsRef = useRef<HTMLElement>(null);
-  const visibleJobs = jobs.data?.filter((job) => !selectedSource || job.recruitment_source === selectedSource);
+  const visibleJobs = jobs.data?.filter(
+    (job) =>
+      job.sector === selectedSector &&
+      (!selectedSource || job.recruitment_source === selectedSource),
+  );
+  const governmentCount = jobs.data?.filter((job) => job.sector === "government").length ?? 0;
+  const privateCount = jobs.data?.filter((job) => job.sector === "private").length ?? 0;
 
   const selectSource = (source: string) => {
     setSelectedSource(source);
+    currentJobsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const selectSector = (sector: JobSector) => {
+    setSelectedSector(sector);
+    setSelectedSource(null);
     currentJobsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
@@ -97,79 +120,229 @@ function JobsPage() {
       />
 
       <div className="container-page py-10 md:py-14">
-        <section ref={currentJobsRef} className="mb-12 scroll-mt-24" aria-labelledby="current-jobs-heading">
+        <div className="mb-7 grid gap-3 sm:grid-cols-2" role="group" aria-label="Job category">
+          <button
+            type="button"
+            aria-pressed={selectedSector === "government"}
+            onClick={() => selectSector("government")}
+            className={`flex items-center gap-4 rounded-2xl border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selectedSector === "government" ? "border-primary bg-primary-soft" : "border-border bg-card hover:border-primary/40"}`}
+          >
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Landmark aria-hidden="true" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">Government Jobs</span>
+              <span className="text-sm text-muted-foreground">
+                Public service and department vacancies
+              </span>
+            </span>
+            <span className="rounded-full bg-background px-2.5 py-1 text-xs font-semibold">
+              {governmentCount}
+            </span>
+          </button>
+          <button
+            type="button"
+            aria-pressed={selectedSector === "private"}
+            onClick={() => selectSector("private")}
+            className={`flex items-center gap-4 rounded-2xl border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selectedSector === "private" ? "border-primary bg-primary-soft" : "border-border bg-card hover:border-primary/40"}`}
+          >
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Building2 aria-hidden="true" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">Private Jobs</span>
+              <span className="text-sm text-muted-foreground">
+                Company and organisation vacancies
+              </span>
+            </span>
+            <span className="rounded-full bg-background px-2.5 py-1 text-xs font-semibold">
+              {privateCount}
+            </span>
+          </button>
+        </div>
+
+        <section
+          id="job-listings-panel"
+          ref={currentJobsRef}
+          className="mb-12 scroll-mt-24"
+          aria-labelledby="current-jobs-heading"
+        >
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Current vacancies</p>
-              <h2 id="current-jobs-heading" className="mt-1 font-display text-2xl font-bold">{selectedSource ? `${selectedSource} jobs` : "Current job listings"}</h2>
+              <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
+                Current vacancies
+              </p>
+              <h2 id="current-jobs-heading" className="mt-1 font-display text-2xl font-bold">
+                {selectedSource
+                  ? `${selectedSource} jobs`
+                  : `${selectedSector === "government" ? "Government" : "Private"} job listings`}
+              </h2>
             </div>
-            <div className="flex items-center gap-3">{visibleJobs?.length ? <span className="text-sm text-muted-foreground">{visibleJobs.length} open {visibleJobs.length === 1 ? "listing" : "listings"}</span> : null}{selectedSource && <button type="button" onClick={() => setSelectedSource(null)} className="text-sm font-semibold text-primary hover:underline">Show all jobs</button>}</div>
-          </div>
-          {jobs.isPending ? <div className="card-surface p-8 text-center text-sm text-muted-foreground">Loading current listings…</div>
-            : jobs.isError ? <div role="alert" className="card-surface p-8 text-center text-sm text-muted-foreground">Job listings are temporarily unavailable. Please check again shortly.</div>
-            : visibleJobs?.length === 0 ? <div className="card-surface flex flex-col items-center p-8 text-center">
-              <BriefcaseBusiness aria-hidden="true" className="h-8 w-8 text-primary" />
-              <h3 className="mt-3 font-semibold">No current {selectedSource ?? "job"} listings</h3>
-              <p className="mt-1 max-w-lg text-sm text-muted-foreground">New vacancies will appear here when they are added. Choose another recruitment source below to browse its listings.</p>
-            </div>
-            : <div className="grid gap-4 md:grid-cols-2">{visibleJobs?.map((job) => <PublicJobCard key={job.id} job={job} />)}</div>}
-        </section>
-
-        <section className="mb-8 flex gap-4 rounded-2xl border border-primary/20 bg-primary-soft p-5 md:p-6" aria-label="Important notice">
-          <ShieldCheck aria-hidden="true" className="mt-0.5 h-6 w-6 shrink-0 text-primary" />
-          <div>
-            <h2 className="font-display text-lg font-bold">Apply through the official portal</h2>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Ilmivora lists vacancies but does not accept job applications or verify individual listings. Always confirm the advertisement, eligibility and closing date on the relevant government website before applying or paying a fee.
-            </p>
-          </div>
-        </section>
-
-        <div className="mb-5 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Official sources</p>
-            <h2 className="mt-1 font-display text-2xl font-bold">Government job portals</h2>
-          </div>
-          <span className="hidden text-sm text-muted-foreground sm:inline">{RECRUITMENT_SOURCES.length} recruitment sources</span>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {RECRUITMENT_SOURCES.map((portal) => (
-            <article key={portal.shortName} className="card-surface flex min-h-56 flex-col p-5 transition-colors hover:border-primary/40">
-              <div className="flex items-start justify-between gap-4">
-                <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary-soft text-primary" aria-hidden="true">
-                  <BriefcaseBusiness className="h-5 w-5" />
+            <div className="flex items-center gap-3">
+              {visibleJobs?.length ? (
+                <span className="text-sm text-muted-foreground">
+                  {visibleJobs.length} open {visibleJobs.length === 1 ? "listing" : "listings"}
                 </span>
-                <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">{portal.type}</span>
-              </div>
-              <h3 className="mt-4 font-display text-lg font-bold">{portal.name}</h3>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{portal.description}</p>
-              <button type="button" onClick={() => selectSource(portal.shortName)} className="mt-5 inline-flex w-fit items-center gap-2 rounded-lg font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                View {portal.shortName} jobs on Ilmivora
-              </button>
-            </article>
-          ))}
-        </div>
-
-        <section className="mt-12 grid gap-8 rounded-2xl border border-border bg-card p-6 md:grid-cols-[1fr_1.2fr] md:p-8" aria-labelledby="apply-safely">
-          <div>
-            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
-              <ClipboardList aria-hidden="true" className="h-5 w-5" />
+              ) : null}
+              {selectedSource && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedSource(null)}
+                  className="text-sm font-semibold text-primary hover:underline"
+                >
+                  Show all jobs
+                </button>
+              )}
             </div>
-            <h2 id="apply-safely" className="font-display text-2xl font-bold">Before you apply</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              A careful check can help you avoid missed deadlines and misleading job advertisements.
-            </p>
           </div>
-          <ul className="space-y-4 text-sm leading-relaxed text-muted-foreground">
-            <li className="flex gap-3"><BadgeCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><span><strong className="text-foreground">Check eligibility:</strong> match your qualification, age, domicile and experience to the official advertisement.</span></li>
-            <li className="flex gap-3"><CalendarCheck2 aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><span><strong className="text-foreground">Confirm the deadline:</strong> use the closing date shown on the official portal, as dates can change.</span></li>
-            <li className="flex gap-3"><ShieldCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><span><strong className="text-foreground">Avoid unofficial payments:</strong> follow only the fee and payment instructions printed in the official notice.</span></li>
-          </ul>
+          {jobs.isPending ? (
+            <div className="card-surface p-8 text-center text-sm text-muted-foreground">
+              Loading current listings…
+            </div>
+          ) : jobs.isError ? (
+            <div
+              role="alert"
+              className="card-surface p-8 text-center text-sm text-muted-foreground"
+            >
+              Job listings are temporarily unavailable. Please check again shortly.
+            </div>
+          ) : visibleJobs?.length === 0 ? (
+            <div className="card-surface flex flex-col items-center p-8 text-center">
+              <BriefcaseBusiness aria-hidden="true" className="h-8 w-8 text-primary" />
+              <h3 className="mt-3 font-semibold">
+                No current{" "}
+                {selectedSource ?? (selectedSector === "government" ? "government" : "private")}{" "}
+                listings
+              </h3>
+              <p className="mt-1 max-w-lg text-sm text-muted-foreground">
+                New vacancies will appear here when they are added. You can switch categories above
+                to browse other jobs.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {visibleJobs?.map((job) => (
+                <PublicJobCard key={job.id} job={job} />
+              ))}
+            </div>
+          )}
         </section>
+
+        {selectedSector === "government" && (
+          <section
+            className="mb-8 flex gap-4 rounded-2xl border border-primary/20 bg-primary-soft p-5 md:p-6"
+            aria-label="Important notice"
+          >
+            <ShieldCheck aria-hidden="true" className="mt-0.5 h-6 w-6 shrink-0 text-primary" />
+            <div>
+              <h2 className="font-display text-lg font-bold">Apply through the official portal</h2>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                Ilmivora collects listings from selected official Pakistani portals but does not
+                accept job applications. Always confirm the advertisement, eligibility and closing
+                date on the relevant government website before applying or paying a fee.
+              </p>
+            </div>
+          </section>
+        )}
+
+        {selectedSector === "government" && (
+          <>
+            <div className="mb-5 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
+                  Official sources
+                </p>
+                <h2 className="mt-1 font-display text-2xl font-bold">Government job portals</h2>
+              </div>
+              <span className="hidden text-sm text-muted-foreground sm:inline">
+                {RECRUITMENT_SOURCES.length} recruitment sources
+              </span>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {RECRUITMENT_SOURCES.map((portal) => (
+                <article
+                  key={portal.shortName}
+                  className="card-surface flex min-h-56 flex-col p-5 transition-colors hover:border-primary/40"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <span
+                      className="grid h-12 w-12 place-items-center rounded-xl bg-primary-soft text-primary"
+                      aria-hidden="true"
+                    >
+                      <BriefcaseBusiness className="h-5 w-5" />
+                    </span>
+                    <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
+                      {portal.type}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 font-display text-lg font-bold">{portal.name}</h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                    {portal.description}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => selectSource(portal.shortName)}
+                    className="mt-5 inline-flex w-fit items-center gap-2 rounded-lg font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    View {portal.shortName} jobs on Ilmivora
+                  </button>
+                </article>
+              ))}
+            </div>
+          </>
+        )}
+
+        {selectedSector === "government" && (
+          <section
+            className="mt-12 grid gap-8 rounded-2xl border border-border bg-card p-6 md:grid-cols-[1fr_1.2fr] md:p-8"
+            aria-labelledby="apply-safely"
+          >
+            <div>
+              <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                <ClipboardList aria-hidden="true" className="h-5 w-5" />
+              </div>
+              <h2 id="apply-safely" className="font-display text-2xl font-bold">
+                Before you apply
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                A careful check can help you avoid missed deadlines and misleading job
+                advertisements.
+              </p>
+            </div>
+            <ul className="space-y-4 text-sm leading-relaxed text-muted-foreground">
+              <li className="flex gap-3">
+                <BadgeCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                <span>
+                  <strong className="text-foreground">Check eligibility:</strong> match your
+                  qualification, age, domicile and experience to the official advertisement.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <CalendarCheck2
+                  aria-hidden="true"
+                  className="mt-0.5 h-5 w-5 shrink-0 text-primary"
+                />
+                <span>
+                  <strong className="text-foreground">Confirm the deadline:</strong> use the closing
+                  date shown on the official portal, as dates can change.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <ShieldCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                <span>
+                  <strong className="text-foreground">Avoid unofficial payments:</strong> follow
+                  only the fee and payment instructions printed in the official notice.
+                </span>
+              </li>
+            </ul>
+          </section>
+        )}
 
         <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">
-          Ilmivora is an independent educational resource and is not affiliated with any government agency or recruitment commission. Portal links are provided for convenience; the relevant authority’s notice is the final source of information.
+          Ilmivora is an independent listings service and is not affiliated with the organisations
+          advertising vacancies. Always verify job details with the employer or official recruitment
+          source before applying.
         </p>
       </div>
     </>
@@ -178,23 +351,48 @@ function JobsPage() {
 
 function PublicJobCard({ job }: { job: JobListing }) {
   const deadline = job.deadline
-    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${job.deadline}T00:00:00Z`))
+    ? new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(`${job.deadline}T00:00:00Z`))
     : "See official notice";
 
   return (
     <article className="card-surface flex flex-col p-5 md:p-6">
       <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-primary">
+        <span className="rounded-full bg-primary-soft px-3 py-1">
+          {job.sector === "government" ? "Government" : "Private"}
+        </span>
         <span className="rounded-full bg-primary-soft px-3 py-1">{job.recruitment_source}</span>
         <span className="rounded-full bg-primary-soft px-3 py-1">{job.employment_type}</span>
         <span className="text-muted-foreground">{job.location}</span>
       </div>
       <h3 className="mt-4 font-display text-xl font-bold">{job.title}</h3>
       <p className="mt-1 text-sm font-medium text-muted-foreground">{job.organization}</p>
-      {job.qualification && <p className="mt-3 text-sm leading-relaxed"><strong>Eligibility:</strong> {job.qualification}</p>}
-      <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{job.description}</p>
+      {job.qualification && (
+        <p className="mt-3 text-sm leading-relaxed">
+          <strong>Eligibility:</strong> {job.qualification}
+        </p>
+      )}
+      <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+        {job.description}
+      </p>
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-        <p className="flex items-center gap-2 text-sm"><CalendarDays aria-hidden="true" className="h-4 w-4 text-primary" /><span><span className="text-muted-foreground">Last date: </span><strong>{deadline}</strong></span></p>
-        <Button asChild><a href={job.apply_url} target="_blank" rel="noopener noreferrer">View / apply <ArrowUpRight aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a></Button>
+        <p className="flex items-center gap-2 text-sm">
+          <CalendarDays aria-hidden="true" className="h-4 w-4 text-primary" />
+          <span>
+            <span className="text-muted-foreground">Last date: </span>
+            <strong>{deadline}</strong>
+          </span>
+        </p>
+        <Button asChild>
+          <a href={job.apply_url} target="_blank" rel="noopener noreferrer">
+            View / apply <ArrowUpRight aria-hidden="true" />
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        </Button>
       </div>
     </article>
   );
